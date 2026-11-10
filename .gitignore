@@ -1,0 +1,23 @@
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Rahasia
+.env
+
+# Data lokal (SQLite, cache)
+var/
+*.db
+*.db-wal
+*.db-shm
+
+# Alat
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+.ruff_cache/
