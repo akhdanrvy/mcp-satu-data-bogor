@@ -80,3 +80,9 @@ def settings_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setenv("MCP_DB_PATH", str(tmp_path / "var" / "test.db"))
     monkeypatch.setenv("MCP_CACHE_DIR", str(tmp_path / "var" / "cache"))
     return tmp_path
+
+
+@pytest.fixture
+def anyio_backend() -> str:
+    """Tes async (pytest.mark.anyio) hanya memakai asyncio, sama seperti FastMCP."""
+    return "asyncio"

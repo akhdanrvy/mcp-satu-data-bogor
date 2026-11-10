@@ -45,6 +45,17 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [ ] **Langkah 5 (dataset hilang):** portal bisa menghapus dataset (757 pada 5 Nov → 751 pada 10 Nov 2026). Sinkron katalog penuh harus menghapus dari katalog lokal (tabel + indeks FTS5) setiap record yang tidak lagi ada di hasil sinkron; record itu tidak boleh tetap tersaji di `search_datasets`. Penghapusan hanya dilakukan bila sinkron selesai lengkap (semua halaman terbaca, jumlah = `pagination.total_data`); sinkron gagal/terpotong tidak boleh menghapus apa pun. Tes: katalog lama 3 record, sinkron baru 2 record → record ketiga hilang dari tabel dan FTS5; sinkron terpotong → tidak ada yang dihapus.
 - [ ] **Langkah 10:** slug KM-07 = `persentase-kepala-keluarga-miskin-di-kota-bogor`, KM-12 = `persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor`.
 
+## TODO dari Langkah 4 (10 Nov 2026)
+
+- [ ] **Langkah 5:** `sync_worker` memanggil `list_datasets()` lewat `asyncio.run`; hapus record lokal yang tidak ada di snapshot **hanya bila** `snapshot.complete` (KK-K). Uji dengan `FakeSourceAdapter.remove(slug)` dan snapshot tidak lengkap dari adaptor (respx).
+- [ ] **Langkah 5:** peta `opd`/`topik` di katalog memakai `list_organisasi()`/`list_topik()` (KK-H).
+- [ ] **Langkah 5 (KB-26):** `sync_worker` membuat **satu** instans `OpenDataJabarAdapter` untuk seluruh proses, dengan env baru `MCP_SYNC_REQUEST_DELAY_S` (bawaan 0,5, minimal 0,2) sebagai jeda antarpermintaan; tambahkan ke `config.py`, `.env.example`, dan tes config.
+- [ ] **Langkah 5 (KK-K f):** laporan sinkron memuat `pages_read`, `total_data`, jumlah record, `duplicates`, `skipped`, `complete`, `error`, dan jumlah record yang dihapus.
+- [ ] **Langkah 8:** petakan galat adaptor ke `ErrorCode`: `SourceNotFound` → `DATASET_NOT_FOUND`; `SourceUnavailable` → `SOURCE_UNAVAILABLE` (atau `STALE_DATA` bila cache ada); `SourceRateLimited` → `RATE_LIMITED`; `InvalidSourceRequest` → `INVALID_PARAM`; `SourceProtocolError` → `INTERNAL`. Pakai `FakeSourceAdapter.fail_with` untuk UT-14.
+- [ ] **Langkah 9:** konfigurasi handler log JSON (`mcp_bogor.logging`) untuk server; tutup adaptor (`aclose`) saat server berhenti.
+- [ ] **Langkah 9 (KB-26):** server membuat **satu** instans `OpenDataJabarAdapter` saat start (lifespan FastMCP) dan memakainya bersama untuk semua tool call; jangan membuat adaptor per permintaan, karena pembatas laju dan jeda global 429 (KB-25) hanya berlaku per instans.
+- [x] **Akhdan:** putuskan KK-L (kolom `alamat`/`email` di baris data publik): disetujui.
+
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
 
 Bergantung pada jawaban tim lain (buat bisa dikonfigurasi, jangan menunggu): ADR-011, klien MCP di Citya, perubahan `render_chart`, `num_ctx` (→ `MCP_MAX_RESPONSE_TOKENS`, awal 2.000), lokasi server dan jaringan port 8799.

@@ -28,6 +28,19 @@ class ConfigError(RuntimeError):
     """Konfigurasi tidak memenuhi syarat untuk menjalankan suatu komponen."""
 
 
+# AK-05: User-Agent bawaan berisi placeholder ini dan harus diganti kontak tim.
+USER_AGENT_PLACEHOLDER = "<kontak-tim>"
+
+
+def require_user_agent(user_agent: str) -> str:
+    """Satu cek User-Agent untuk adaptor dan skrip perekaman; gagal bila kosong/placeholder."""
+    if not user_agent.strip() or USER_AGENT_PLACEHOLDER in user_agent:
+        raise ConfigError(
+            "MCP_USER_AGENT masih placeholder; isi dengan nama aplikasi dan kontak tim (AK-05)."
+        )
+    return user_agent
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="MCP_",
@@ -41,7 +54,9 @@ class Settings(BaseSettings):
     user_agent: str = "mcp-bogor/0.1 (+<kontak-tim>)"
     request_delay_s: float = Field(default=0.2, ge=0.2)  # AK-03: minimum 0,2 dtk
     http_timeout_s: float = Field(default=20.0, gt=0)
-    max_retries: int = Field(default=5, ge=1, le=5)  # AK-04: maks 5 percobaan
+    max_retries: int = Field(default=5, ge=1, le=5)  # AK-04: maks 5 percobaan (total)
+    # KB-24: tunggu (Retry-After/backoff) lebih lama dari ini → langsung gagal, tanpa tidur.
+    backoff_max_s: float = Field(default=30.0, gt=0)
 
     # --- Penyimpanan ---
     db_path: Path = Path("./var/mcp_bogor.db")

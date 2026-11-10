@@ -35,7 +35,15 @@ from typing import Any
 import httpx
 import yaml
 
-from mcp_bogor.config import WIB, Settings
+from mcp_bogor.adapters.sanitize import (
+    ACCOUNT_KEYS,
+    CONTACT_FIELDS,
+    PiiFinding,
+    SanitizeStats,
+    sanitize,
+    scan_pii,
+)
+from mcp_bogor.config import USER_AGENT_PLACEHOLDER, WIB, ConfigError, Settings, require_user_agent
 from mcp_bogor.services.normalize import parse_id_number
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,7 +55,6 @@ MAX_REQUESTS = 60
 REQUEST_DELAY_S = 0.3
 TIMEOUT_S = 20.0
 RETRY_5XX_DELAY_S = 5.0
-UA_PLACEHOLDER = "<kontak-tim>"
 FORBIDDEN_FRAGMENT = "/view"
 ALLOWED_PATHS = (
     re.compile(r"^/datasets$"),
@@ -57,18 +64,7 @@ ALLOWED_PATHS = (
     re.compile(r"^/topik$"),
 )
 
-DROP_KEYS = frozenset({"username", "user_name", "cuid", "muid"})
-# KK-J: field kontak dan alamat OPD; tidak dibutuhkan MCP. Nilainya diganti REDACTED
-# (kunci dipertahankan agar bentuk respons sama).
-CONTACT_FIELDS = frozenset(
-    {"organisasi_email", "organisasi_notelp", "organisasi_alamat", "email", "notelp", "alamat"}
-)
-CONTACT_LABEL = "kontak produsen"
-VALUE_KEYS = ("value", "nilai", "isi", "content")
-REDACTED = "<redacted>"
 KEPT_HEADERS = ("content-type", "retry-after")
-EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
-PHONE_RE = re.compile(r"(?<!\d)(?:\+62|62|0)[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,5}(?!\d)")
 LAST_PAGE_KEYS = ("total_page", "total_pages", "last_page", "page_count", "totalPage")
 
 
@@ -119,10 +115,11 @@ def check_path(path: str) -> None:
 
 
 def validate_user_agent(user_agent: str) -> None:
-    if not user_agent.strip() or UA_PLACEHOLDER in user_agent:
-        raise ConfigProblem(
-            "MCP_USER_AGENT masih placeholder; isi dengan nama aplikasi dan kontak tim (AK-05)."
-        )
+    """Cek yang sama dengan adaptor (config.require_user_agent)."""
+    try:
+        require_user_agent(user_agent)
+    except ConfigError as exc:
+        raise ConfigProblem(str(exc)) from exc
 
 
 def _now() -> datetime:
@@ -197,84 +194,7 @@ class Recorder:
 
 
 # ---------------------------------------------------------------- sanitasi
-
-
-@dataclass
-class SanitizeStats:
-    removed_keys: int = 0
-    redacted_contacts: int = 0
-
-
-def _is_contact_label(value: Any) -> bool:
-    return isinstance(value, str) and value.strip().casefold() == CONTACT_LABEL
-
-
-def sanitize(obj: Any, stats: SanitizeStats) -> Any:
-    """Salinan bersih: buang DROP_KEYS rekursif; redaksi kontak.
-
-    - Field CONTACT_FIELDS yang tidak null diganti REDACTED (KK-J).
-    - Metadata "Kontak Produsen": kunci bernama "Kontak Produsen", atau objek yang salah
-      satu nilainya "Kontak Produsen" (mis. {key: "Kontak Produsen", value: ...}). Pada bentuk
-      kedua, kunci VALUE_KEYS diredaksi; bila tidak ada, semua nilai lain diredaksi.
-    Idempoten: menyanitasi ulang hasil sanitasi tidak mengubah apa pun.
-    """
-    if isinstance(obj, list):
-        return [sanitize(item, stats) for item in obj]
-    if not isinstance(obj, dict):
-        return obj
-    contact_entry = any(_is_contact_label(v) for v in obj.values())
-    has_value_key = any(k in obj for k in VALUE_KEYS)
-    out: dict[str, Any] = {}
-    for key, value in obj.items():
-        if key in DROP_KEYS:
-            stats.removed_keys += 1
-            continue
-        if key in CONTACT_FIELDS and value is not None and value != REDACTED:
-            out[key] = REDACTED
-            stats.redacted_contacts += 1
-            continue
-        if value == REDACTED:
-            out[key] = value
-            continue
-        if _is_contact_label(key) or (
-            contact_entry
-            and not _is_contact_label(value)
-            and (key in VALUE_KEYS or not has_value_key)
-        ):
-            out[key] = REDACTED
-            stats.redacted_contacts += 1
-            continue
-        out[key] = sanitize(value, stats)
-    return out
-
-
-@dataclass(frozen=True)
-class PiiFinding:
-    file: str
-    json_path: str
-    kind: str
-
-
-def scan_pii(obj: Any, file: str, path: str = "$") -> list[PiiFinding]:
-    """Pola email/telepon di nilai teks. Hanya lokasi yang dilaporkan, bukan nilainya.
-
-    Field gambar (`image`, `*_image`) dilewati: nama berkas hash sering mirip nomor telepon.
-    """
-    found: list[PiiFinding] = []
-    if isinstance(obj, dict):
-        for key, value in obj.items():
-            if key == "image" or str(key).endswith("_image"):
-                continue
-            found.extend(scan_pii(value, file, f"{path}.{key}"))
-    elif isinstance(obj, list):
-        for index, value in enumerate(obj):
-            found.extend(scan_pii(value, file, f"{path}[{index}]"))
-    elif isinstance(obj, str) and obj != REDACTED:
-        if EMAIL_RE.search(obj):
-            found.append(PiiFinding(file, path, "email"))
-        if PHONE_RE.search(obj):
-            found.append(PiiFinding(file, path, "telepon"))
-    return found
+# Logika sanitasi ada di mcp_bogor.adapters.sanitize (satu sumber dengan adaptor).
 
 
 # ---------------------------------------------------------------- target dan rencana
@@ -375,7 +295,9 @@ def format_dry_run(
         f"Base URL   : {base_url}",
         f"User-Agent : {user_agent}"
         + (
-            "   [DITOLAK saat --execute: masih placeholder]" if UA_PLACEHOLDER in user_agent else ""
+            "   [DITOLAK saat --execute: masih placeholder]"
+            if USER_AGENT_PLACEHOLDER in user_agent
+            else ""
         ),
         f"Keluaran   : {out_dir}" + folder_note,
         f"Aturan     : GET saja, jeda {REQUEST_DELAY_S} dtk, anggaran keras {MAX_REQUESTS}, "
@@ -1056,7 +978,7 @@ def build_report(result: RunResult, today: date) -> str:
         f"- Berhenti lebih awal: {result.stop_reason or 'tidak'}",
         f"- Insiden 5xx: {'; '.join(result.incidents) or 'tidak ada'}",
         f"- Sanitasi: {result.stats.removed_keys} kunci akun dibuang "
-        f"({', '.join(sorted(DROP_KEYS))}); {result.stats.redacted_contacts} nilai kontak "
+        f"({', '.join(sorted(ACCOUNT_KEYS))}); {result.stats.redacted_contacts} nilai kontak "
         f"diredaksi (Kontak Produsen, {', '.join(sorted(CONTACT_FIELDS))})",
     ]
     out += [f"- Catatan: {note}" for note in result.notes]
