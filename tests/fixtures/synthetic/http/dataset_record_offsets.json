@@ -1,0 +1,48 @@
+{
+  "_synthetic": true,
+  "_keterangan": "Record dataset dengan cdate ber-offset +07:07 dan mdate tanpa offset (NB-01, KS-01..03), metadata 'None' teks (NB-06), dan username petugas yang harus dibuang (UT-12). Nilai meniru golden set N-01; bentuk metadata[] rekaan (KB-20).",
+  "request": {"method": "GET", "path": "/datasets/tingkat-kemiskinan-di-kota-bogor-2", "params": {}},
+  "response": {
+    "status": 200,
+    "headers": {"content-type": "application/json"},
+    "json": {
+      "code": 200,
+      "message": "OK",
+      "data": {
+        "id": 7001,
+        "slug": "tingkat-kemiskinan-di-kota-bogor-2",
+        "name": "Tingkat Kemiskinan di Kota Bogor",
+        "deskripsi": "<p>Persentase penduduk miskin.</p><p>Penjelasan mengenai variabel:</p><p>- tingkat_kemiskinan: menyatakan Persentase penduduk di bawah garis kemiskinan di Kota Bogor dengan tipe data numerik.</p><p>- tahun: menyatakan Tahun produksi data dengan tipe data numerik.</p>",
+        "organisasi_id": 12,
+        "organisasi_name": "Badan Perencanaan Pembangunan Daerah",
+        "organisasi_slug": "bappeda",
+        "topik_id": 3,
+        "topik_name": "Sosial",
+        "topik_slug": "sosial",
+        "kategori": "indikator",
+        "klasifikasi": "public",
+        "validate": "approve",
+        "kode_wilayah": "32.71",
+        "schema": "bappeda",
+        "table": "tingkat_kemiskinan_di_kota_bogor",
+        "cdate": "2025-07-01T09:12:44+07:07",
+        "mdate": "2026-08-31T16:03:02",
+        "username": "pengunggah.contoh",
+        "metadata": [
+          {"key": "Satuan Dataset", "value": "Persen"},
+          {"key": "Frekuensi Dataset", "value": "Tahunan"},
+          {"key": "Dimensi Dataset Awal", "value": "2019"},
+          {"key": "Dimensi Dataset Akhir", "value": "2025"},
+          {"key": "Tingkat Penyajian", "value": "Kota"},
+          {"key": "Cakupan", "value": "None"},
+          {"key": "Kontak Produsen", "value": "<redacted>"}
+        ],
+        "history_draft": [
+          {"type": "draft", "cdate": "2026-08-30T10:00:00+07:07", "notes": "Generate by AI Agent", "username": "petugas.contoh"},
+          {"type": "approve", "cdate": "2026-08-31T16:03:02+07:07", "notes": "penambahan data tahun 2025", "username": "walidata.contoh"}
+        ]
+      },
+      "error": null
+    }
+  }
+}

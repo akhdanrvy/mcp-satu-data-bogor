@@ -1,0 +1,31 @@
+{
+  "_synthetic": true,
+  "_keterangan": "Isi /bigdata dengan angka teks Indonesia '9.160.885' (NB-07), nilai kosong '', '-', 'None' (NB-02), label segmen beda spasi/tanda hubung (NB-08), kolom id internal (NB-04, KB-17), dan kode BPS teks (NB-05). Bentuk metadata/metadata_filter/pagination rekaan (KB-20).",
+  "request": {
+    "method": "GET",
+    "path": "/bigdata/dishub/kecepatan_lalu_lintas_pajajaran",
+    "params": {"page": 1, "per_page": 500}
+  },
+  "response": {
+    "status": 200,
+    "headers": {"content-type": "application/json"},
+    "json": {
+      "code": 200,
+      "message": "OK",
+      "data": [
+        {"id": 1, "bps_kode_kabupaten_kota": "3271", "segmen": "SIMPANG EKALOKASARI- SIMPANG BARANANGSIANG", "hari_operasional": "HARI KERJA", "kecepatan": "49,23", "jumlah_kendaraan": "9.160.885", "satuan": "km/jam", "tahun": 2025},
+        {"id": 2, "bps_kode_kabupaten_kota": "3271", "segmen": "SIMPANG EKALOKASARI – SIMPANG BARANANGSIANG", "hari_operasional": "HARI LIBUR", "kecepatan": 36.94, "jumlah_kendaraan": "", "satuan": "km/jam", "tahun": 2025},
+        {"id": 3, "bps_kode_kabupaten_kota": "3271", "segmen": "SIMPANG  BARANANGSIANG -\nSIMPANG EKALOKASARI", "hari_operasional": "HARI KERJA", "kecepatan": "-", "jumlah_kendaraan": "None", "satuan": "km/jam", "tahun": "2024"},
+        {"id": 4, "bps_kode_kabupaten_kota": "3271", "segmen": "SIMPANG BARANANGSIANG - SIMPANG EKALOKASARI", "hari_operasional": "HARI LIBUR", "kecepatan": "5.89", "jumlah_kendaraan": "1.234,5", "satuan": "None", "tahun": 2024}
+      ],
+      "metadata": ["id", "bps_kode_kabupaten_kota", "segmen", "hari_operasional", "kecepatan", "jumlah_kendaraan", "satuan", "tahun"],
+      "metadata_filter": {
+        "segmen": ["SIMPANG EKALOKASARI- SIMPANG BARANANGSIANG", "SIMPANG EKALOKASARI – SIMPANG BARANANGSIANG", "SIMPANG  BARANANGSIANG -\nSIMPANG EKALOKASARI", "SIMPANG BARANANGSIANG - SIMPANG EKALOKASARI"],
+        "hari_operasional": ["HARI KERJA", "HARI LIBUR"],
+        "tahun": [2024, "2025"]
+      },
+      "error": null,
+      "pagination": {"page": 1, "per_page": 500, "total": 4, "total_page": 1}
+    }
+  }
+}

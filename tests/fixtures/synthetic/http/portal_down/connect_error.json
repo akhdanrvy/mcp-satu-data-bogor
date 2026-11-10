@@ -1,0 +1,6 @@
+{
+  "_synthetic": true,
+  "_keterangan": "Portal mati: koneksi ditolak sebelum ada respons HTTP (UT-14, SOURCE_UNAVAILABLE). Dipakai respx sebagai side_effect=httpx.ConnectError.",
+  "request": {"method": "GET", "path": "/datasets", "params": {"page": 1, "per_page": 100}},
+  "exception": {"type": "ConnectError", "message": "Connection refused"}
+}

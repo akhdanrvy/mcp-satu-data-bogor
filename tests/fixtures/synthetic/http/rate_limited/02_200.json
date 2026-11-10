@@ -1,0 +1,27 @@
+{
+  "_synthetic": true,
+  "_keterangan": "Urutan 2/2: setelah menunggu Retry-After, permintaan yang sama berhasil.",
+  "request": {"method": "GET", "path": "/datasets/contoh-dataset", "params": {}},
+  "response": {
+    "status": 200,
+    "headers": {"content-type": "application/json"},
+    "json": {
+      "code": 200,
+      "message": "OK",
+      "data": {
+        "id": 101,
+        "slug": "contoh-dataset",
+        "name": "Contoh Dataset",
+        "validate": "approve",
+        "klasifikasi": "public",
+        "schema": "contoh_schema",
+        "table": "contoh_table",
+        "mdate": "2026-01-15T08:00:00",
+        "history_draft": [
+          {"type": "approve", "cdate": "2026-01-15T08:00:00+07:07", "notes": "", "username": "petugas.contoh"}
+        ]
+      },
+      "error": null
+    }
+  }
+}

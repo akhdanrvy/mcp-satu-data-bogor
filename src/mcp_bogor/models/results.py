@@ -140,8 +140,10 @@ class DataResult(ContractModel):
     data_ref: DataRef
     columns: list[ColumnInfo]
     periods_requested: list[int] | None = None
-    periods_found: list[int] = Field(default_factory=list)
-    missing_periods: list[int] = Field(default_factory=list)
+    # KK-F: None/None bila dataset tanpa dimensi waktu (CP-03), ditandai time_dimension=False.
+    periods_found: list[int] | None = Field(default_factory=list)
+    missing_periods: list[int] | None = Field(default_factory=list)
+    time_dimension: bool = True
     preview: list[dict[str, DimensionValue]] = Field(
         default_factory=list, max_length=MAX_PREVIEW_ROWS
     )
@@ -161,6 +163,14 @@ class DataResult(ContractModel):
         if extra:
             raise ValueError(f"filters_applied hanya boleh kolom dimension: {sorted(extra)}")
 
+        if not self.time_dimension:
+            if self.periods_found is not None or self.missing_periods is not None:
+                raise ValueError(
+                    "dataset tanpa dimensi waktu: periods_found dan missing_periods harus null"
+                )
+            return self
+        if self.periods_found is None or self.missing_periods is None:
+            raise ValueError("periods_found/missing_periods null hanya bila time_dimension=false")
         requested = set(self.periods_requested or ())
         missing = set(self.missing_periods)
         if not missing <= requested:

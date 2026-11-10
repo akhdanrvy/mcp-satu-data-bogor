@@ -1,0 +1,6 @@
+{
+  "_synthetic": true,
+  "_keterangan": "Portal tidak menjawab dalam batas waktu (KB-02, 20 detik). Dipakai respx sebagai side_effect=httpx.ReadTimeout.",
+  "request": {"method": "GET", "path": "/datasets/contoh-dataset", "params": {}},
+  "exception": {"type": "ReadTimeout", "message": "timed out"}
+}

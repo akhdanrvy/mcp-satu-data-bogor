@@ -1,0 +1,10 @@
+{
+  "_synthetic": true,
+  "_keterangan": "Urutan 1/2: portal membatasi permintaan dengan Retry-After 2 detik (AK-03). Isi body rekaan, mengikuti bentuk Profil API.",
+  "request": {"method": "GET", "path": "/datasets/contoh-dataset", "params": {}},
+  "response": {
+    "status": 429,
+    "headers": {"content-type": "application/json", "retry-after": "2"},
+    "json": {"code": 429, "message": "Too Many Requests", "data": null, "error": "rate limit"}
+  }
+}

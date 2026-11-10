@@ -1,0 +1,10 @@
+{
+  "_synthetic": true,
+  "_keterangan": "Urutan 1/2: portal sementara tidak tersedia (5xx, AK-03 backoff). Body rekaan.",
+  "request": {"method": "GET", "path": "/datasets", "params": {"page": 1, "per_page": 100}},
+  "response": {
+    "status": 503,
+    "headers": {"content-type": "text/html"},
+    "json": null
+  }
+}

@@ -71,6 +71,9 @@ class Settings(BaseSettings):
     inline_rows_fallback: bool = False
     force_refresh_min_interval_s: int = Field(default=300, ge=0)  # per slug+parameter
 
+    # --- Mutu data (Dok 2 QC-02, KB-18) ---
+    qc_ratio: float = Field(default=50.0, gt=1)
+
     # --- Log ---
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
 

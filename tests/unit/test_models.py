@@ -200,7 +200,8 @@ def test_naive_datetime_rejected() -> None:
 
 
 def test_plus_0707_not_normalized_here() -> None:
-    """+07:07 dari portal belum diurus model (Langkah 2: services/normalize).
+    """Model tidak menormalkan +07:07; itu tugas services/normalize (lihat
+    test_normalize.py::test_plus_0707_through_model_serialization).
 
     Model hanya mengonversi instan waktu, sehingga +07:07 bergeser 7 menit. Tes ini
     mengunci perilaku itu agar normalisasi tidak diam-diam berpindah ke model.
@@ -385,6 +386,7 @@ def test_data_result_has_no_measure_value_fields() -> None:
         "periods_requested",
         "periods_found",
         "missing_periods",
+        "time_dimension",
         "preview",
         "filters_applied",
     }

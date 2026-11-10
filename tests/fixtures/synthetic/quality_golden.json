@@ -1,0 +1,56 @@
+{
+  "_keterangan": "Fixture buatan untuk UT-08/UT-09. Nilai Q-02, Q-03, N-03 disalin dari snapshot golden_set_v0.2 (as_of 2026-11-05). Q-01 buatan: golden set tidak memuat snapshot baris; 2025 dari N-02, tahun lain rekaan, 2024 = 0 di semua segmen sesuai catatan Q-01.",
+  "Q-01": {
+    "measure": "kecepatan",
+    "expected": [{"code": "suspect_zero_period", "rule": "QC-01", "period": 2024}],
+    "rows": [
+      {"tahun": 2023, "segmen": "SIMPANG EKALOKASARI - SIMPANG BARANANGSIANG", "hari_operasional": "HARI KERJA", "kecepatan": 47.1},
+      {"tahun": 2023, "segmen": "SIMPANG BARANANGSIANG - SIMPANG EKALOKASARI", "hari_operasional": "HARI KERJA", "kecepatan": 35.8},
+      {"tahun": 2023, "segmen": "SIMPANG BARANANGSIANG - SIMPANG TUGU KUJANG", "hari_operasional": "HARI KERJA", "kecepatan": 33.0},
+      {"tahun": 2023, "segmen": "SIMPANG TUGU KUJANG - SIMPANG BARANANGSIANG", "hari_operasional": "HARI KERJA", "kecepatan": 34.9},
+      {"tahun": 2024, "segmen": "SIMPANG EKALOKASARI - SIMPANG BARANANGSIANG", "hari_operasional": "HARI KERJA", "kecepatan": 0},
+      {"tahun": 2024, "segmen": "SIMPANG BARANANGSIANG - SIMPANG EKALOKASARI", "hari_operasional": "HARI KERJA", "kecepatan": 0},
+      {"tahun": 2024, "segmen": "SIMPANG BARANANGSIANG - SIMPANG TUGU KUJANG", "hari_operasional": "HARI KERJA", "kecepatan": 0},
+      {"tahun": 2024, "segmen": "SIMPANG TUGU KUJANG - SIMPANG BARANANGSIANG", "hari_operasional": "HARI KERJA", "kecepatan": 0},
+      {"tahun": 2025, "segmen": "SIMPANG EKALOKASARI - SIMPANG BARANANGSIANG", "hari_operasional": "HARI KERJA", "kecepatan": 49.23},
+      {"tahun": 2025, "segmen": "SIMPANG BARANANGSIANG - SIMPANG EKALOKASARI", "hari_operasional": "HARI KERJA", "kecepatan": 36.36},
+      {"tahun": 2025, "segmen": "SIMPANG BARANANGSIANG - SIMPANG TUGU KUJANG", "hari_operasional": "HARI KERJA", "kecepatan": 32.76},
+      {"tahun": 2025, "segmen": "SIMPANG TUGU KUJANG - SIMPANG BARANANGSIANG", "hari_operasional": "HARI KERJA", "kecepatan": 35.27}
+    ]
+  },
+  "Q-02": {
+    "measure": "persentase_pendapatan",
+    "expected": [
+      {"code": "suspect_scale", "rule": "QC-02", "period": 2021},
+      {"code": "suspect_scale", "rule": "QC-02", "period": 2022},
+      {"code": "suspect_scale", "rule": "QC-02", "period": 2023}
+    ],
+    "rows": [
+      {"tahun": 2020, "persentase_pendapatan": 35.91},
+      {"tahun": 2021, "persentase_pendapatan": 0.04},
+      {"tahun": 2022, "persentase_pendapatan": 0.41},
+      {"tahun": 2023, "persentase_pendapatan": 0.45},
+      {"tahun": 2024, "persentase_pendapatan": 46}
+    ]
+  },
+  "Q-03": {
+    "measure": "realisasi_pad",
+    "expected": [{"code": "suspect_outlier", "rule": "QC-02", "period": 2022}],
+    "rows": [
+      {"tahun": 2021, "realisasi_pad": 106539215238},
+      {"tahun": 2022, "realisasi_pad": 55479250},
+      {"tahun": 2023, "realisasi_pad": 375822720275.8}
+    ]
+  },
+  "N-03": {
+    "measure": "total_pendapatan",
+    "expected": [],
+    "rows": [
+      {"tahun": 2020, "total_pendapatan": 872046925527},
+      {"tahun": 2021, "total_pendapatan": 1075240926213},
+      {"tahun": 2022, "total_pendapatan": 1147623045709},
+      {"tahun": 2023, "total_pendapatan": 1338618268169},
+      {"tahun": 2024, "total_pendapatan": 1431967467277.22}
+    ]
+  }
+}

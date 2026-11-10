@@ -95,3 +95,13 @@ def test_dataref_secret_accepted_and_hidden(
     s = _settings()
     assert s.require_dataref_secret() == secret.encode()
     assert secret not in repr(s)
+
+
+def test_qc_ratio(settings_env: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """MCP_QC_RATIO (KB-18): bawaan 50, bisa diubah lewat env, harus > 1."""
+    assert _settings().qc_ratio == 50
+    monkeypatch.setenv("MCP_QC_RATIO", "80")
+    assert _settings().qc_ratio == 80
+    monkeypatch.setenv("MCP_QC_RATIO", "1")
+    with pytest.raises(ValidationError):
+        _settings()

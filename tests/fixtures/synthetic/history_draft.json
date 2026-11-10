@@ -1,0 +1,35 @@
+{
+  "_keterangan": "Fixture buatan untuk UT-04 (KS-01..03) dan UT-12 parsial. Bentuk entri meniru history_draft portal; username sengaja diisi agar tes bisa membuktikan nilainya tidak tersalin. Offset +07:07 meniru portal (NB-01).",
+  "one_approve": {
+    "mdate": "2026-08-31T16:03:02",
+    "history_draft": [
+      {"type": "draft", "cdate": "2026-08-30T09:00:00+07:07", "notes": "Generate by AI Agent", "username": "petugas.rahasia"},
+      {"type": "approve", "cdate": "2026-08-31T16:03:02+07:07", "notes": "penambahan data tahun 2025", "username": "walidata.rahasia"}
+    ],
+    "expected": {"data_updated_at": "2026-08-31T16:03:02+07:00", "freshness_source": "approve", "metadata_changed_after_approve": false, "change_notes": "penambahan data tahun 2025"}
+  },
+  "many_approves": {
+    "mdate": "2025-06-02T10:14:00",
+    "history_draft": [
+      {"type": "approve", "cdate": "2025-06-02T10:14:00+07:07", "notes": "", "username": "walidata.rahasia"},
+      {"type": "approve", "cdate": "2023-03-01T08:00:00+07:07", "notes": "data awal", "username": "walidata.rahasia"},
+      {"type": "approve", "cdate": "2024-05-10T11:30:00+07:07", "notes": "pembaruan tahun 2023", "username": "walidata.rahasia"},
+      {"type": "draft", "cdate": "2025-06-01T15:00:00+07:07", "notes": null, "username": "petugas.rahasia"}
+    ],
+    "expected": {"data_updated_at": "2025-06-02T10:14:00+07:00", "freshness_source": "approve", "metadata_changed_after_approve": false, "change_notes": "pembaruan tahun 2023"}
+  },
+  "no_approve": {
+    "mdate": "2026-11-04T07:45:10",
+    "history_draft": [
+      {"type": "draft", "cdate": "2026-11-04T07:40:00+07:07", "notes": "-", "username": "petugas.rahasia"}
+    ],
+    "expected": {"data_updated_at": "2026-11-04T07:45:10+07:00", "freshness_source": "mdate", "metadata_changed_after_approve": false, "change_notes": null}
+  },
+  "mdate_after_approve": {
+    "mdate": "2026-03-20T09:00:00",
+    "history_draft": [
+      {"type": "approve", "cdate": "2026-03-11T13:20:00+07:07", "notes": "None", "username": "walidata.rahasia"}
+    ],
+    "expected": {"data_updated_at": "2026-03-11T13:20:00+07:00", "freshness_source": "approve", "metadata_changed_after_approve": true, "change_notes": null}
+  }
+}

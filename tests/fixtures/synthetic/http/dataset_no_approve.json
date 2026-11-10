@@ -1,0 +1,33 @@
+{
+  "_synthetic": true,
+  "_keterangan": "Record dataset tanpa entri approve di history_draft (KS-02: data_updated_at = mdate, freshness_source = mdate). validate=draft sehingga status keresmian draf (FR-07).",
+  "request": {"method": "GET", "path": "/datasets/contoh-dataset-draf", "params": {}},
+  "response": {
+    "status": 200,
+    "headers": {"content-type": "application/json"},
+    "json": {
+      "code": 200,
+      "message": "OK",
+      "data": {
+        "id": 7002,
+        "slug": "contoh-dataset-draf",
+        "name": "Contoh Dataset Draf",
+        "klasifikasi": "public",
+        "validate": "draft",
+        "schema": "contoh_schema",
+        "table": "contoh_draf",
+        "cdate": "2026-11-04T07:40:00+07:07",
+        "mdate": "2026-11-04T07:45:10",
+        "metadata": [
+          {"key": "Dimensi Dataset Awal", "value": "2024"},
+          {"key": "Dimensi Dataset Akhir", "value": "None"}
+        ],
+        "history_draft": [
+          {"type": "draft", "cdate": "2026-11-04T07:40:00+07:07", "notes": "-", "username": "petugas.contoh"},
+          {"type": "revisi", "cdate": "2026-11-04T07:44:00+07:07", "notes": "perbaikan deskripsi", "username": "petugas.contoh"}
+        ]
+      },
+      "error": null
+    }
+  }
+}

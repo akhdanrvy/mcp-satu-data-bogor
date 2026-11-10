@@ -1,0 +1,49 @@
+# Target perekaman fixture asli (Langkah 3). Dibaca scripts/record_fixtures.py.
+# Batas akses (AK-01..06) dikunci di skrip, bukan di sini: anggaran 60 permintaan,
+# jeda 0,3 detik, hanya GET, dan "/view" selalu ditolak. Nilai di berkas ini hanya
+# boleh mempersempit, tidak memperluas.
+
+catalog:
+  path: /datasets
+  per_page: 100
+  # Dok 2: 757 dataset / 100 per halaman = 8 halaman. Dipakai untuk perkiraan dry-run;
+  # saat --execute, skrip mengikuti pagination dan berhenti di batas max_pages.
+  expected_pages: 8
+  max_pages: 9  # perkiraan + 1 cadangan; batas atas rencana tetap ≤ 60
+
+# KK-H: endpoint ini tidak tercantum di Dok 2 AK-01 (empat endpoint). Ditambahkan atas
+# instruksi Langkah 3; kosongkan daftar ini bila tidak disetujui.
+extra_endpoints:
+  - /organisasi
+  - /topik
+
+golden_set:
+  path: golden_set/golden_set_v0.2.jsonl
+  # Slug diambil dari expected.dataset, tanpa duplikat, urut kemunculan.
+  expected_count: 10
+
+# Kartu metrik yang slug-nya belum diketahui. Kandidat dicari secara lokal di katalog
+# yang baru direkam (tanpa permintaan tambahan). Detail + /bigdata hanya direkam bila
+# kandidatnya tepat satu; bila lebih, kandidat ditulis ke laporan untuk dipilih manusia.
+# Pencocokan per token kata pada nama dataset (bukan substring: "miskin" tidak cocok
+# dengan "kemiskinan"). Semua all_keywords wajib ada; minimal satu any_keywords ada
+# (any kosong = tidak disyaratkan). opd_hint hanya ditampilkan di laporan.
+metric_cards:
+  - id: KM-07
+    name: Persentase kepala keluarga miskin
+    all_keywords: [miskin]
+    any_keywords: [kk, keluarga]
+    opd_hint: null
+  - id: KM-12
+    name: Persentase penanganan pengaduan
+    all_keywords: [pengaduan]
+    any_keywords: [penanganan, persentase]
+    opd_hint: Inspektorat
+
+bigdata:
+  # Cukup besar agar dataset golden set muat satu halaman.
+  per_page: 1000
+  max_pages_per_dataset: 3
+
+# Slug yang sengaja salah untuk merekam 404 asli.
+invalid_slug: slug-sengaja-salah-untuk-uji-404

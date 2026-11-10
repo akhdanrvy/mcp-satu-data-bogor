@@ -20,9 +20,21 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 
 ## TODO dari review Langkah 1 (10 Nov 2026)
 
-- [ ] **Langkah 2 (UT-01):** offset `+07:07` dari portal dinormalkan dengan `replace(tzinfo=WIB)`, sehingga jam dinding tidak bergeser (bukan `astimezone`). Setelah itu, perbarui tes `test_plus_0707_not_normalized_here` di `tests/unit/test_models.py`, yang saat ini sengaja mengunci pergeseran 7 menit di model.
-- [ ] **Langkah 6:** peran kolom ditentukan setelah urai NB-07. Kolom string yang nilainya hampir semua angka (selain `kode_*` dan `tahun`) diberi peran `measure`. Ini menutup kebocoran KT-03 lewat `preview`/`top_values` (contoh KM-08 "9.160.885"). Pengaman model KB-15 tetap ada sebagai lapis kedua.
+- [x] **Langkah 2 (UT-01):** offset `+07:07` dari portal dinormalkan dengan `replace(tzinfo=WIB)`, sehingga jam dinding tidak bergeser (bukan `astimezone`). Setelah itu, perbarui tes `test_plus_0707_not_normalized_here` di `tests/unit/test_models.py`, yang saat ini sengaja mengunci pergeseran 7 menit di model.
+- [ ] **Langkah 6:** peran kolom ditentukan setelah urai NB-07. Kolom string yang nilainya hampir semua angka (selain `kode_*` dan `tahun`) diberi peran `measure`. Ini menutup kebocoran KT-03 lewat `preview`/`top_values` (contoh KM-08 "9.160.885"). Pengaman model KB-15 tetap ada sebagai lapis kedua. Penentuan peran memakai `ParseIssue` dari `services/normalize.normalize_rows`.
 - [ ] **Langkah 8:** bila `missing_periods` tidak kosong (dan ada periode yang ditemukan), status = `partial`. Dijaga di tool, bukan di amplop.
+
+## TODO dari Langkah 2 (10 Nov 2026)
+
+- [ ] **Langkah 3:** dari fixture asli, verifikasi (a) nama kolom id internal `/bigdata` untuk `INTERNAL_ID_COLUMNS` (KB-17); (b) bentuk `metadata_filter` dan `metadata[]` (KB-20); (c) nilai `type` di `history_draft`; (d) apakah ada angka desimal bertitik bertipe teks (risiko KB-16).
+- [ ] **Langkah 4:** adaptor meratakan `metadata_filter` → `{kolom: nilai_unik}` dan `metadata[]` → `{nama: nilai}` sebelum memanggil `services/periods` (KB-20).
+- [ ] **Langkah 8:** tool membaca `MCP_QC_RATIO` dari settings dan meneruskannya ke `services/quality` (KB-18); `PeriodCoverage.note` disampaikan ke model untuk CP-03 (KK-F).
+- [ ] **Dok 2:** usulkan revisi QC-02 sesuai KB-18 dan AK-01 menjadi enam endpoint sesuai KK-H (di Google Docs, lalu ekspor ulang).
+
+## TODO dari Langkah 3 (10 Nov 2026)
+
+- [ ] **Akhdan, sebelum perekaman:** ~~konfirmasi KK-H~~ (disetujui); isi `MCP_USER_AGENT` di `.env` dengan kontak tim (bukan placeholder); jalankan `uv run python scripts/record_fixtures.py` (dry-run), lalu `--execute`.
+- [ ] **Setelah perekaman:** baca `docs/FIXTURE_REPORT.md`, putuskan KB-17 dan KB-20, pilih slug KM-07/KM-12 bila kandidatnya lebih dari satu, dan tinjau temuan email/telepon sebelum commit `tests/fixtures/recorded/`.
 
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
 
