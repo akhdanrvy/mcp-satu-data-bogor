@@ -1,0 +1,97 @@
+"""Parameter ketiga tool (Dok 4 bagian 3 s.d. 5). Pelanggaran validasi → INVALID_PARAM.
+
+Batas page_size mengikuti MCP_SEARCH_MAX_PAGE_SIZE lewat konteks validasi:
+    SearchParams.model_validate(args, context={SEARCH_MAX_PAGE_SIZE_KEY: n})
+Tanpa konteks dipakai nilai awal Dok 4 bagian 9 (20).
+"""
+
+from __future__ import annotations
+
+from typing import Annotated, Any
+
+from pydantic import (
+    ConfigDict,
+    Field,
+    StringConstraints,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
+
+from mcp_bogor.models.common import ContractModel, RequestId
+
+YEAR_MIN = 2000
+YEAR_MAX = 2100
+QUERY_MIN_CHARS = 2
+QUERY_MAX_CHARS = 100
+DEFAULT_PAGE_SIZE = 10
+DEFAULT_SEARCH_MAX_PAGE_SIZE = 20
+SEARCH_MAX_PAGE_SIZE_KEY = "search_max_page_size"
+MAX_PERIODS = 20
+MAX_FILTER_VALUES = 50
+DEFAULT_SORT = "tahun:asc"
+SORT_PATTERN = r"^[^:\s]+:(asc|desc)$"
+
+Year = Annotated[int, Field(ge=YEAR_MIN, le=YEAR_MAX)]
+NonEmptyStr = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+FilterValues = Annotated[list[NonEmptyStr | int], Field(min_length=1, max_length=MAX_FILTER_VALUES)]
+
+
+class ParamsModel(ContractModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+
+def _blank_to_none(value: Any) -> Any:
+    if isinstance(value, str) and not value.strip():
+        return None
+    return value
+
+
+class SearchParams(ParamsModel):
+    query: str = Field(min_length=QUERY_MIN_CHARS, max_length=QUERY_MAX_CHARS)
+    opd: str | None = None
+    topik: str | None = None
+    tahun: Year | None = None
+    page: int = Field(default=1, ge=1)
+    page_size: int = Field(default=DEFAULT_PAGE_SIZE, ge=1)
+    request_id: RequestId | None = None
+
+    _blank_optional = field_validator("opd", "topik", mode="before")(_blank_to_none)
+
+    @model_validator(mode="after")
+    def _check_page_size(self, info: ValidationInfo) -> SearchParams:
+        limit = (info.context or {}).get(SEARCH_MAX_PAGE_SIZE_KEY, DEFAULT_SEARCH_MAX_PAGE_SIZE)
+        if "page_size" not in self.model_fields_set:
+            # Nilai bawaan diturunkan bila batas yang dikonfigurasi lebih kecil.
+            self.page_size = min(self.page_size, limit)
+        elif self.page_size > limit:
+            raise ValueError(f"page_size maksimal {limit}")
+        return self
+
+
+class InfoParams(ParamsModel):
+    # TODO(Langkah 8): slug harus ada di katalog lokal → DATASET_NOT_FOUND.
+    slug: str = Field(min_length=1)
+    request_id: RequestId | None = None
+
+
+class DataParams(ParamsModel):
+    # TODO(Langkah 8): slug harus ada di katalog lokal → DATASET_NOT_FOUND.
+    slug: str = Field(min_length=1)
+    periods: Annotated[list[Year], Field(min_length=1, max_length=MAX_PERIODS)] | None = None
+    # TODO(Langkah 8): kunci filters harus kolom berperan dimension → INVALID_PARAM.
+    filters: dict[NonEmptyStr, FilterValues] | None = None
+    # TODO(Langkah 8): kolom sort harus ada di dataset → INVALID_PARAM.
+    sort: str = Field(default=DEFAULT_SORT, pattern=SORT_PATTERN)
+    force_refresh: bool = False
+    request_id: RequestId | None = None
+
+    @field_validator("periods")
+    @classmethod
+    def _sorted_unique(cls, value: list[int] | None) -> list[int] | None:
+        return None if value is None else sorted(set(value))
+
+    @field_validator("filters")
+    @classmethod
+    def _empty_filters_to_none(cls, value: dict[str, list[str | int]] | None) -> Any:
+        return value or None

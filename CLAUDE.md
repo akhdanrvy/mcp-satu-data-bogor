@@ -29,7 +29,8 @@ Konflik yang sudah diketahui (ikuti Dok 4):
 6. **Tes unit dan kontrak tidak boleh menyentuh jaringan.** Pakai fixture di `tests/fixtures/`. Hanya `tests/smoke/` yang boleh ke portal asli (maks 60 permintaan per jalan, jeda 0,3 dtk), dan tidak ikut `pytest` bawaan.
 7. **Repo `github.com/sccicitb/satu-data-mcp` (MCP Garut) hanya dibaca** sebagai contoh pola. Jangan push, buka PR, atau mengubah apa pun di sana.
 8. **Rahasia hanya di env.** `.env` di-gitignore; `.env.example` berisi placeholder.
-9. Hal bertanda **[Belum ditentukan]** di dokumen dibuat **bisa dikonfigurasi**, jangan diputuskan diam-diam. Catat di `docs/KEPUTUSAN_BUILD.md` bila terpaksa memilih nilai awal.
+9. **Commit dan push hanya dilakukan Akhdan.** Jangan menjalankan `git commit`, `git push`, `git tag`, `git rebase`, `git reset`, atau perintah lain yang mengubah riwayat atau remote, walaupun langkahnya sudah selesai dan tes hijau. Akhdan yang menentukan kapan commit. `git status`, `git diff`, dan `git log` boleh dipakai untuk membaca. Bila diminta, cukup usulkan pesan commit dan daftar berkas yang sebaiknya masuk.
+10. Hal bertanda **[Belum ditentukan]** di dokumen dibuat **bisa dikonfigurasi**, jangan diputuskan diam-diam. Catat di `docs/KEPUTUSAN_BUILD.md` bila terpaksa memilih nilai awal.
 
 ## Stack (ADR-009)
 - Python **3.11+**, dikelola dengan **uv** (`pyproject.toml` + `uv.lock`, build backend `hatchling`, layout `src/`). `pip install -e .` tetap harus jalan.
@@ -85,9 +86,8 @@ uv run ruff check . ; uv run ruff format .
 ```
 
 ## Cara kerja dengan Akhdan
-- Kerjakan bertahap sesuai urutan di `docs/RENCANA_FASE1.md`; satu langkah = satu commit kecil yang tesnya hijau.
+- Kerjakan bertahap sesuai urutan di `docs/RENCANA_FASE1.md`; satu langkah = satu perubahan kecil yang tesnya hijau, lalu berhenti dan laporkan agar Akhdan bisa me-review dan commit sendiri.
 - Sebelum langkah besar, tulis rencana singkat dan tunggu persetujuan.
 - **Jangan menjalankan smoke test atau perekaman fixture ke portal tanpa izin eksplisit** di percakapan.
 - Bedakan fakta (dari dokumen/respons API), pengetahuan umum, dan dugaan.
-- Jangan push ke remote kecuali diminta.
-- Akhiri tiap sesi dengan ringkasan: yang selesai, tes yang lulus, dan satu langkah berikutnya.
+- Akhiri tiap langkah dan sesi dengan ringkasan: yang selesai, tes yang lulus, usulan pesan commit, dan satu langkah berikutnya.
