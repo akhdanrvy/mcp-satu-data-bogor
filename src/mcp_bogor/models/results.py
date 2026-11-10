@@ -3,6 +3,11 @@
 KT-03 (nol toleransi): DataResult tidak punya field yang bisa menampung nilai kolom
 measure. preview dan filters_applied hanya boleh memakai kolom berperan dimension,
 dan top_values hanya ada untuk kolom dimension.
+
+Pengaman tambahan: nilai preview/top_values berbentuk angka berformat Indonesia
+("9.160.885", "1.234,5") ditolak kecuali kolomnya `tahun` atau `kode_*`. Angka teks
+seperti itu hampir pasti kolom measure yang salah peran (mis. KM-08), sampai
+Langkah 6 menetapkan peran setelah urai NB-07.
 """
 
 from __future__ import annotations
@@ -11,12 +16,28 @@ from typing import Literal
 
 from pydantic import Field, model_validator
 
-from mcp_bogor.models.common import ContractModel, WibDatetime
+from mcp_bogor.models.common import (
+    ContractModel,
+    WibDatetime,
+    is_numeric_label_column,
+    looks_like_formatted_number,
+)
 from mcp_bogor.models.envelope import Officialness
 
 DimensionValue = str | int | None
 ColumnRole = Literal["dimension", "measure", "id"]
 MAX_PREVIEW_ROWS = 5
+
+
+def _reject_formatted_values(column: str, values: list[DimensionValue], where: str) -> None:
+    if is_numeric_label_column(column):
+        return
+    for value in values:
+        if isinstance(value, str) and looks_like_formatted_number(value):
+            raise ValueError(
+                f"{where} kolom {column!r} berisi angka berformat; "
+                "kemungkinan kolom measure (KT-03)"
+            )
 
 
 # --- search_datasets ---
@@ -72,6 +93,8 @@ class ColumnInfo(ContractModel):
             raise ValueError("meaning=null tepat bila meaning_source='none' (KK, tanpa tebakan)")
         if self.top_values is not None and self.role != "dimension":
             raise ValueError("top_values hanya untuk kolom dimension (KT-03)")
+        if self.top_values is not None:
+            _reject_formatted_values(self.name, self.top_values, "top_values")
         return self
 
 
@@ -132,6 +155,8 @@ class DataResult(ContractModel):
             extra = set(row) - dimensions
             if extra:
                 raise ValueError(f"preview hanya boleh kolom dimension; ditolak: {sorted(extra)}")
+            for column, value in row.items():
+                _reject_formatted_values(column, [value], "preview")
         extra = set(self.filters_applied) - dimensions
         if extra:
             raise ValueError(f"filters_applied hanya boleh kolom dimension: {sorted(extra)}")

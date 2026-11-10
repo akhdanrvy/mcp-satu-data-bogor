@@ -18,6 +18,12 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 | 11 | Smoke test | `tests/smoke/` ST-01..05, maks 60 permintaan, jeda 0,3 dtk | **Dijalankan Akhdan di laptop, atas izin** |
 | 12 | Dokumentasi | `README.md` (instal, jalan, konfigurasi), `docs/RUNBOOK.md` (sinkron, rotasi secret, portal mati, rekam ulang fixture) | — |
 
+## TODO dari review Langkah 1 (10 Nov 2026)
+
+- [ ] **Langkah 2 (UT-01):** offset `+07:07` dari portal dinormalkan dengan `replace(tzinfo=WIB)`, sehingga jam dinding tidak bergeser (bukan `astimezone`). Setelah itu, perbarui tes `test_plus_0707_not_normalized_here` di `tests/unit/test_models.py`, yang saat ini sengaja mengunci pergeseran 7 menit di model.
+- [ ] **Langkah 6:** peran kolom ditentukan setelah urai NB-07. Kolom string yang nilainya hampir semua angka (selain `kode_*` dan `tahun`) diberi peran `measure`. Ini menutup kebocoran KT-03 lewat `preview`/`top_values` (contoh KM-08 "9.160.885"). Pengaman model KB-15 tetap ada sebagai lapis kedua.
+- [ ] **Langkah 8:** bila `missing_periods` tidak kosong (dan ada periode yang ditemukan), status = `partial`. Dijaga di tool, bukan di amplop.
+
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
 
 Bergantung pada jawaban tim lain (buat bisa dikonfigurasi, jangan menunggu): ADR-011, klien MCP di Citya, perubahan `render_chart`, `num_ctx` (→ `MCP_MAX_RESPONSE_TOKENS`, awal 2.000), lokasi server dan jaringan port 8799.

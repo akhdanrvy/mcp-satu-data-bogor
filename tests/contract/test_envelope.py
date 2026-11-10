@@ -1,4 +1,4 @@
-"""Tes kontrak amplop (Dok 4 bagian 2 dan 7).
+"""Tes kontrak amplop (Dok 4 bagian 2 dan 7) dan templat pesan galat (KB-10 revisi).
 
 - Invarian amplop, termasuk STALE_DATA dengan status=partial.
 - KT-04 (bagian tabel): 10 kode galat = 9 kode Dok 4 bagian 7 + LEVEL_NOT_AVAILABLE (KK-A1).
@@ -16,17 +16,19 @@ from mcp_bogor.config import CONTRACT_VERSION
 from mcp_bogor.models import (
     ALL_TOOLS,
     ERROR_SPECS,
+    MESSAGE_TEMPLATES,
     DataResult,
     ErrorCode,
     InfoResult,
     SearchResult,
     ToolEnvelope,
+    contains_formatted_number,
     contains_number,
     error,
     ok,
     partial,
 )
-from mcp_bogor.models.errors import is_code_allowed
+from mcp_bogor.models.errors import OPTIONAL_CLAUSES, ErrorArgs, ToolError, is_code_allowed
 from tests import model_samples as s
 
 SEARCH, INFO, DATA = "search_datasets", "get_dataset_info", "get_dataset_data"
@@ -44,6 +46,20 @@ EXPECTED_ERROR_TABLE: dict[str, tuple[bool, set[str]]] = {
     "RESPONSE_TOO_LARGE": (False, {SEARCH, INFO, DATA}),
     "INTERNAL": (True, {SEARCH, INFO, DATA}),
     "LEVEL_NOT_AVAILABLE": (False, {DATA}),  # KK-A1
+}
+
+# Argumen templat yang sah untuk tiap kode (STALE_DATA lewat partial(stale=True)).
+SLUG = "contoh-kemiskinan"
+SAMPLE_ARGS: dict[ErrorCode, dict[str, Any]] = {
+    ErrorCode.INVALID_PARAM: {"param": "page_size", "limit": 20},
+    ErrorCode.DATASET_NOT_FOUND: {"slug": SLUG},
+    ErrorCode.NO_MATCH: {},
+    ErrorCode.PERIOD_NOT_AVAILABLE: {"slug": SLUG, "periods": [2026, 2027]},
+    ErrorCode.SOURCE_UNAVAILABLE: {"slug": SLUG},
+    ErrorCode.RATE_LIMITED: {},
+    ErrorCode.RESPONSE_TOO_LARGE: {"limit": 2000},
+    ErrorCode.INTERNAL: {},
+    ErrorCode.LEVEL_NOT_AVAILABLE: {"slug": SLUG, "column": "kecamatan"},
 }
 
 
@@ -87,13 +103,13 @@ def test_error_codes_are_uppercase_strings() -> None:
 @pytest.mark.parametrize("code", [c for c in ErrorCode if c is not ErrorCode.STALE_DATA])
 def test_error_constructor_uses_table(code: ErrorCode) -> None:
     for tool in ERROR_SPECS[code].tools:
-        env = error(code, "Pesan galat", tool=tool)
+        env = error(code, **SAMPLE_ARGS[code], tool=tool)
         assert env.error is not None
         assert env.error.retryable is ERROR_SPECS[code].retryable
     for tool in ALL_TOOLS - ERROR_SPECS[code].tools:
         assert not is_code_allowed(code, tool)
         with pytest.raises(ValueError, match="tidak dipakai"):
-            error(code, "Pesan galat", tool=tool)
+            error(code, **SAMPLE_ARGS[code], tool=tool)
 
 
 # ---------------------------------------------------------------- invarian amplop
@@ -142,7 +158,7 @@ def test_stale_data_never_with_status_error() -> None:
     with pytest.raises(ValidationError, match="status=partial"):
         ToolEnvelope(status="error", error=_stale_error(), provenance=s.provenance("stale_cache"))
     with pytest.raises(ValueError, match="partial"):
-        error(ErrorCode.STALE_DATA, "Data lama")
+        error(ErrorCode.STALE_DATA)
 
 
 def test_stale_data_pairs_with_stale_cache() -> None:
@@ -207,22 +223,75 @@ def test_partial_constructor_variants() -> None:
     stale = partial(
         s.info_result(),
         provenance=s.provenance("stale_cache"),
-        stale_message="Portal tidak bisa dihubungi sejak 2026-11-06",
+        stale=True,
     )
     assert stale.error is not None and stale.error.code is ErrorCode.STALE_DATA
-    assert not contains_number(stale.error.message)
+    assert stale.error.message == MESSAGE_TEMPLATES[ErrorCode.STALE_DATA].text
 
 
-def test_error_constructor_masks_numbers() -> None:
-    env = error(ErrorCode.INTERNAL, "Gagal membaca 9.160.885 baris, nilai 1.234,5", request_id="rq")
-    assert env.status == "error" and env.result is None
-    assert env.error is not None and not contains_number(env.error.message)
-    # Selain contract_version ("0.1"), respons galat tidak memuat digit apa pun.
-    assert not contains_number(env.model_dump_json(exclude={"request_id", "contract_version"}))
+def test_every_code_has_template() -> None:
+    assert set(MESSAGE_TEMPLATES) == set(ErrorCode)
+    fields = set(ErrorArgs.model_fields)
+    for code, template in MESSAGE_TEMPLATES.items():
+        assert template.required <= fields, code
+        assert template.optional <= set(OPTIONAL_CLAUSES), code
+        assert not template.required & template.optional, code
+        assert not contains_number(template.text), code
+
+
+def test_messages_carry_years_limits_and_slug() -> None:
+    env = error(ErrorCode.PERIOD_NOT_AVAILABLE, slug=SLUG, periods=[2026, 2027])
+    assert env.error is not None
+    assert env.error.message == f"Periode 2026, 2027 tidak tersedia di dataset '{SLUG}'."
+
+    env = error(ErrorCode.INVALID_PARAM, param="page_size", limit=20)
+    assert env.error is not None
+    assert env.error.message == "Parameter 'page_size' tidak valid. Batas: 20."
+
+    env = error(ErrorCode.INVALID_PARAM, param="filters", column="kecamatan")
+    assert env.error is not None
+    assert env.error.message == "Parameter 'filters' tidak valid. Kolom: 'kecamatan'."
+
+    env = error(ErrorCode.LEVEL_NOT_AVAILABLE, slug=SLUG, column="kelurahan")
+    assert env.error is not None and "'kelurahan'" in env.error.message
+
+
+def test_error_rejects_free_text() -> None:
+    with pytest.raises(TypeError):
+        error(ErrorCode.INTERNAL, "Gagal membaca 9.160.885 baris")  # type: ignore[misc]
+
+
+@pytest.mark.parametrize(
+    ("code", "kwargs", "match"),
+    [
+        (ErrorCode.DATASET_NOT_FOUND, {}, "butuh argumen"),
+        (ErrorCode.PERIOD_NOT_AVAILABLE, {"slug": SLUG}, "butuh argumen"),
+        (ErrorCode.NO_MATCH, {"slug": SLUG}, "tidak memakai"),
+        (ErrorCode.INTERNAL, {"limit": 5}, "tidak memakai"),
+        (ErrorCode.DATASET_NOT_FOUND, {"slug": "9.160.885"}, "angka berformat"),
+        (ErrorCode.DATASET_NOT_FOUND, {"slug": "dua kata"}, "pattern"),
+        (ErrorCode.DATASET_NOT_FOUND, {"slug": "x" * 201}, "at most"),
+        (ErrorCode.LEVEL_NOT_AVAILABLE, {"slug": SLUG, "column": "1.234,5"}, "angka berformat"),
+        (ErrorCode.INVALID_PARAM, {"param": "where"}, "parameter tool"),
+        (ErrorCode.INVALID_PARAM, {"param": "page", "limit": -1}, "greater than"),
+        (ErrorCode.PERIOD_NOT_AVAILABLE, {"slug": SLUG, "periods": [1999]}, "greater than"),
+        (ErrorCode.PERIOD_NOT_AVAILABLE, {"slug": SLUG, "periods": []}, "at least"),
+    ],
+)
+def test_error_rejects_bad_template_args(code: ErrorCode, kwargs: dict, match: str) -> None:
+    with pytest.raises(ValueError, match=match):
+        error(code, **kwargs)
+
+
+def test_tool_error_direct_rejects_formatted_number() -> None:
+    with pytest.raises(ValidationError, match="angka berformat"):
+        ToolError(code="INTERNAL", message="Total 9.160.885 orang", retryable=True)
+    # Tahun dan batas polos boleh.
+    assert ToolError(code="INTERNAL", message="Periode 2026; batas 20", retryable=True)
 
 
 def test_error_constructor_with_result_type_round_trips() -> None:
-    env = error(ErrorCode.DATASET_NOT_FOUND, "Slug tidak ada", result_type=InfoResult)
+    env = error(ErrorCode.DATASET_NOT_FOUND, slug=SLUG, result_type=InfoResult)
     assert type(env) is ToolEnvelope[InfoResult]
     assert ToolEnvelope[InfoResult].model_validate_json(env.model_dump_json()) == env
 
@@ -255,10 +324,10 @@ def _all_paths() -> list[tuple[str, ToolEnvelope[Any], type]]:
             SearchResult,
         ),
         ("info-ok", ok(s.info_result(), **one), InfoResult),
-        ("info-stale", partial(s.info_result(), stale_message="cache lama", **stale), InfoResult),
+        ("info-stale", partial(s.info_result(), stale=True, **stale), InfoResult),
         ("data-ok", ok(s.data_result(), quality_flags=[s.quality_flag()], **one), DataResult),
         ("data-missing-period", partial(s.data_result(), **one), DataResult),
-        ("data-stale", partial(s.data_result(), stale_message="cache lama", **stale), DataResult),
+        ("data-stale", partial(s.data_result(), stale=True, **stale), DataResult),
     ]
     for code in ErrorCode:
         if code is ErrorCode.STALE_DATA:
@@ -266,7 +335,11 @@ def _all_paths() -> list[tuple[str, ToolEnvelope[Any], type]]:
         for tool, rtype in ((SEARCH, SearchResult), (INFO, InfoResult), (DATA, DataResult)):
             if is_code_allowed(code, tool):
                 paths.append(
-                    (f"{tool}-{code}", error(code, "Pesan", tool=tool, result_type=rtype), rtype)
+                    (
+                        f"{tool}-{code}",
+                        error(code, **SAMPLE_ARGS[code], tool=tool, result_type=rtype),
+                        rtype,
+                    )
                 )
     return paths
 
@@ -294,7 +367,7 @@ def test_kt02_envelope_fields(name: str, env: ToolEnvelope[Any], rtype: type) ->
 
     if payload["status"] == "error":
         assert payload["result"] is None and payload["error"] is not None
-        assert not contains_number(payload["error"]["message"])
+        assert not contains_formatted_number(payload["error"]["message"])
     else:
         assert isinstance(payload["result"], dict)
 

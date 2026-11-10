@@ -21,9 +21,10 @@ from mcp_bogor.models import (
     SearchParams,
     SearchResult,
     ToolError,
-    contains_number,
+    contains_formatted_number,
     format_wib,
-    mask_numbers,
+    is_numeric_label_column,
+    looks_like_formatted_number,
 )
 from mcp_bogor.models.params import DEFAULT_SEARCH_MAX_PAGE_SIZE, SEARCH_MAX_PAGE_SIZE_KEY
 from tests import model_samples as s
@@ -220,12 +221,26 @@ def test_empty_values_serialize_as_null() -> None:
 # ---------------------------------------------------------------- penjaga angka
 
 
-def test_mask_numbers() -> None:
-    assert mask_numbers("baris 9.160.885 dan 1.234,5 tahun 2024") == (
-        "baris [angka] dan [angka] tahun [angka]"
-    )
-    assert not contains_number(mask_numbers("x 12 y 3"))
-    assert mask_numbers("tanpa angka") == "tanpa angka"
+@pytest.mark.parametrize(
+    "value", ["9.160.885", "1.234,5", "12,5", "1.234", "-1.000", " 9.160.885 "]
+)
+def test_looks_like_formatted_number(value: str) -> None:
+    assert looks_like_formatted_number(value)
+    assert contains_formatted_number(f"total {value.strip()} orang")
+
+
+@pytest.mark.parametrize(
+    "value", ["2024", "3271", "Bogor Barat", "Jl. Pajajaran", "Segmen 1", "1.2.3", "12.34", ""]
+)
+def test_not_formatted_number(value: str) -> None:
+    assert not looks_like_formatted_number(value)
+
+
+def test_numeric_label_columns() -> None:
+    assert is_numeric_label_column("tahun")
+    assert is_numeric_label_column("kode_kecamatan")
+    assert not is_numeric_label_column("jumlah_kunjungan")
+    assert not is_numeric_label_column("tahun_anggaran")
 
 
 # ---------------------------------------------------------------- bagian amplop
@@ -280,9 +295,13 @@ def test_quality_flag_invalid(kwargs: dict) -> None:
         QualityFlag(**kwargs)
 
 
-def test_tool_error_rejects_numbers_and_wrong_retryable() -> None:
+def test_quality_flag_detail_rejects_any_digit() -> None:
     with pytest.raises(ValidationError, match="angka"):
-        ToolError(code="INTERNAL", message="gagal 42", retryable=True)
+        QualityFlag(code="suspect_scale", rule="QC-02", detail="Lima puluh kali median 40")
+    assert QualityFlag(code="suspect_scale", rule="QC-02", detail="Jauh di bawah median")
+
+
+def test_tool_error_rejects_wrong_retryable_and_unknown_code() -> None:
     with pytest.raises(ValidationError, match="retryable"):
         ToolError(code="INTERNAL", message="gagal", retryable=False)
     with pytest.raises(ValidationError):
@@ -300,6 +319,48 @@ def test_column_info_rules() -> None:
     with pytest.raises(ValidationError, match="meaning"):
         ColumnInfo(name="x", role="id", meaning_source="template")
     assert ColumnInfo(name="x", role="dimension").meaning_source == "none"
+
+
+# Pengaman KT-03: angka berformat Indonesia di dimensi = measure salah peran (KM-08).
+
+
+@pytest.mark.parametrize("value", ["9.160.885", "1.234,5", "12,5"])
+def test_column_info_rejects_formatted_top_values(value: str) -> None:
+    with pytest.raises(ValidationError, match="angka berformat"):
+        ColumnInfo(name="jumlah_kunjungan", role="dimension", top_values=["Januari", value])
+
+
+@pytest.mark.parametrize("name", ["tahun", "kode_wilayah"])
+def test_column_info_allows_formatted_in_label_columns(name: str) -> None:
+    col = ColumnInfo(name=name, role="dimension", top_values=["32.71", "1.234", 2024])
+    assert col.top_values == ["32.71", "1.234", 2024]
+
+
+def test_column_info_allows_plain_labels() -> None:
+    values = ["Bogor Barat", "Jl. Pajajaran", "2024", 3271, None]
+    assert ColumnInfo(name="segmen", role="dimension", top_values=values).top_values == values
+
+
+def _guard_columns() -> list[ColumnInfo]:
+    return [
+        ColumnInfo(name="tahun", role="dimension"),
+        ColumnInfo(name="kode_kecamatan", role="dimension"),
+        ColumnInfo(name="bulan", role="dimension"),
+        ColumnInfo(name="jumlah_kunjungan", role="measure"),
+    ]
+
+
+@pytest.mark.parametrize("value", ["9.160.885", "1.234,5", " 12,5 "])
+def test_data_result_preview_rejects_formatted_number(value: str) -> None:
+    data = {**s.data_result().model_dump(), "columns": _guard_columns(), "filters_applied": {}}
+    with pytest.raises(ValidationError, match="angka berformat"):
+        DataResult(**{**data, "preview": [{"tahun": 2024, "bulan": value}]})
+
+
+def test_data_result_preview_allows_label_columns() -> None:
+    data = {**s.data_result().model_dump(), "columns": _guard_columns(), "filters_applied": {}}
+    preview = [{"tahun": "2.024", "kode_kecamatan": "32.71.010", "bulan": "Januari"}]
+    assert DataResult(**{**data, "preview": preview}).preview == preview
 
 
 def test_search_result_rules() -> None:
@@ -367,7 +428,8 @@ ROUND_TRIP_SAMPLES = [
     s.provenance("stale_cache"),
     s.officialness(),
     s.quality_flag(),
-    ToolError.from_code("RATE_LIMITED", "Portal membatasi permintaan"),
+    ToolError.from_template("RATE_LIMITED"),
+    ToolError.from_template("PERIOD_NOT_AVAILABLE", slug="contoh", periods=[2026]),
     *s.columns(),
     s.search_result().items[0],
     s.search_result(),

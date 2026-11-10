@@ -158,19 +158,15 @@ def partial(
     officialness: Officialness | None = None,
     quality_flags: Iterable[QualityFlag] = (),
     truncated_reason: str | None = None,
-    stale_message: str | None = None,
+    stale: bool = False,
 ) -> ToolEnvelope[ResultT]:
-    """Hasil sebagian: terpotong (truncated_reason), dari cache usang (stale_message
+    """Hasil sebagian: terpotong (truncated_reason), dari cache usang (stale=True
     → error STALE_DATA, provenance.served_from wajib stale_cache), atau sebagian periode
     kosong (cukup result.missing_periods)."""
     return _envelope_cls(result)(
         status="partial",
         result=result,
-        error=(
-            ToolError.from_code(ErrorCode.STALE_DATA, stale_message)
-            if stale_message is not None
-            else None
-        ),
+        error=ToolError.from_template(ErrorCode.STALE_DATA) if stale else None,
         request_id=request_id,
         provenance=provenance,
         officialness=officialness,
@@ -182,21 +178,30 @@ def partial(
 
 def error(
     code: ErrorCode,
-    message: str,
     *,
+    slug: str | None = None,
+    param: str | None = None,
+    limit: int | None = None,
+    periods: list[int] | None = None,
+    column: str | None = None,
     request_id: str | None = None,
     tool: str | None = None,
     result_type: type[ResultT] | None = None,
 ) -> ToolEnvelope[ResultT]:
-    """Respons galat: result=null dan angka di pesan disamarkan (FR-10).
+    """Respons galat: result=null, pesan dari templat kode (KB-10 revisi, FR-10).
 
-    Bila `tool` diberikan, kode diperiksa terhadap ERROR_SPECS.
+    Argumen slug/param/limit/periods/column mengisi placeholder templat; argumen yang
+    tidak dipakai templat kode itu ditolak. Bila `tool` diberikan, kode diperiksa
+    terhadap ERROR_SPECS.
     """
     if code is ErrorCode.STALE_DATA:
-        raise ValueError("STALE_DATA bukan galat penuh; pakai partial(stale_message=...)")
+        raise ValueError("STALE_DATA bukan galat penuh; pakai partial(stale=True)")
     if tool is not None and not is_code_allowed(code, tool):
         raise ValueError(f"kode {code} tidak dipakai oleh tool {tool}")
+    tool_error = ToolError.from_template(
+        code, slug=slug, param=param, limit=limit, periods=periods, column=column
+    )
     cls: type[ToolEnvelope[Any]] = (
         ToolEnvelope if result_type is None else ToolEnvelope[result_type]
     )
-    return cls(status="error", error=ToolError.from_code(code, message), request_id=request_id)
+    return cls(status="error", error=tool_error, request_id=request_id)

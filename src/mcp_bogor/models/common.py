@@ -16,10 +16,12 @@ from pydantic import AfterValidator, BaseModel, ConfigDict, PlainSerializer, Str
 
 from mcp_bogor.config import WIB
 
-# Deret digit, termasuk pemisah ribuan/desimal: "9.160.885", "1.234,5", "2024".
-_NUMBER_RE = re.compile(r"\d+(?:[.,]\d+)*")
 _DIGIT_RE = re.compile(r"\d")
-NUMBER_MASK = "[angka]"
+# Angka berformat Indonesia: pemisah ribuan titik dan/atau desimal koma.
+# Contoh: "9.160.885", "1.234,5", "12,5". Angka polos ("2024", "3271") tidak termasuk.
+_ID_NUMBER = r"-?(?:\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+,\d+)"
+_ID_NUMBER_FULL = re.compile(rf"^{_ID_NUMBER}$")
+_ID_NUMBER_ANYWHERE = re.compile(_ID_NUMBER)
 
 
 class ContractModel(BaseModel):
@@ -32,15 +34,30 @@ def contains_number(text: str) -> bool:
     return _DIGIT_RE.search(text) is not None
 
 
-def mask_numbers(text: str) -> str:
-    """Ganti setiap deret angka dengan NUMBER_MASK (aturan 2 CLAUDE.md, FR-10)."""
-    return _NUMBER_RE.sub(NUMBER_MASK, text)
-
-
 def reject_numbers(text: str) -> str:
     if contains_number(text):
         raise ValueError("teks ini tidak boleh memuat angka (FR-10)")
     return text
+
+
+def looks_like_formatted_number(value: str) -> bool:
+    """True bila seluruh nilai berupa angka berformat Indonesia (mis. "9.160.885")."""
+    return _ID_NUMBER_FULL.match(value.strip()) is not None
+
+
+def contains_formatted_number(text: str) -> bool:
+    return _ID_NUMBER_ANYWHERE.search(text) is not None
+
+
+def is_numeric_label_column(name: str) -> bool:
+    """Kolom yang sah berisi label berbentuk angka: `tahun` dan `kode_*`."""
+    return name == "tahun" or name.startswith("kode_")
+
+
+def reject_formatted_number(value: str) -> str:
+    if looks_like_formatted_number(value):
+        raise ValueError(f"nilai {value!r} berbentuk angka berformat Indonesia (KT-03)")
+    return value
 
 
 def to_wib(value: datetime) -> datetime:
@@ -63,3 +80,9 @@ WibDatetime = Annotated[
 
 RequestId = Annotated[str, StringConstraints(min_length=1, max_length=64)]
 NoNumberText = Annotated[str, StringConstraints(min_length=1), AfterValidator(reject_numbers)]
+PlaceholderStr = Annotated[
+    str,
+    StringConstraints(pattern=r"^\S+$", max_length=200),
+    AfterValidator(reject_formatted_number),
+]
+"""Nilai placeholder pesan galat (slug, column): satu token, bukan angka berformat."""
