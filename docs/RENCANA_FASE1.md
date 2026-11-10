@@ -1,0 +1,23 @@
+# Rencana Fase 1 — Build MCP Kota Bogor
+
+Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap langkah selesai bila tesnya hijau dan sudah di-commit. Centang di sini saat selesai.
+
+| # | Langkah | Isi | Tes / bukti selesai |
+|---|---|---|---|
+| 0 | Kerangka repo | `pyproject.toml` (hatchling, src layout, Python ≥3.11), `uv.lock`, `.gitignore`, `.env.example`, `config.py` (semua env var Dok 3 bagian 6 + Dok 4 bagian 9, ditambah `MCP_TRANSPORT`, `MCP_HTTP_PORT`=8800, `MCP_FILESERVER_PORT`=8799, `MCP_DB_PATH`, `MCP_CACHE_DIR`), modul kosong sesuai struktur, konfigurasi pytest (marker `smoke` tidak ikut bawaan), ruff | `uv run pytest` jalan; tes kecil memastikan `sqlite3` punya FTS5 |
+| 1 | Model dan amplop | `models.py`: `ToolEnvelope`, `Provenance`, `Officialness`, `QualityFlag`, `DataRef`, `ColumnInfo`, enum 9 kode galat + `retryable` | KT-02 (sebagian), KT-04 (tabel kode) |
+| 2 | Service murni | `normalize` (NB-01..08), `freshness` (KS-01..05), `officialness`, `periods` (CP-01..04), `quality` (QC-01..03; QC-04 log terpisah) | UT-01, 02, 03, 04, 05, 07, 08, 09 |
+| 3 | Fixture | Fixture buatan (portal mati, 429, 404, `+07:07`, "9.160.885", nilai kosong). Skrip `scripts/record_fixtures.py` untuk merekam respons asli (halaman 1 & terakhir katalog, detail + `/bigdata` 12 kartu metrik + 3 dataset bermasalah), dengan jeda 0,3 dtk dan username dibuang | **Perekaman dijalankan Akhdan, atas izin** |
+| 4 | Adaptor | `adapters/base.py` (`SourceAdapter` Protocol, 5 metode), `adapters/opendata_jabar.py` (httpx, jeda, backoff, paginasi, 404 → NotFound, `health()`) | Tes kontrak adaptor dengan `respx`; tidak ada panggilan ke `/view` |
+| 5 | Katalog | `storage/db.py` (SQLite WAL, FTS5), `services/catalog.py` (sanitasi kueri, filter opd/topik/tahun), `sync_worker.py --once` | UT-10, UT-12 |
+| 6 | Kamus kolom | `services/dictionary.py` (urai template, validasi ke kolom asli, peran dimension/measure/id, status documented/undocumented/orphan), `overrides/` | UT-06 |
+| 7 | Cache dan file server | `storage/cache.py` (berkas per kueri + meta, TTL 24 jam, stale), `fileserver/app.py` (HMAC, 200/403/410/404/503) | UT-11, KT-06 |
+| 8 | Tiga tool | `tools/search.py`, `tools/info.py`, `tools/data.py`; awalan `MCP_TOOL_PREFIX`; batas token dan `truncated`; galat portal mati / stale | KT-01 (snapshot JSON Schema), KT-03, KT-05, UT-13, UT-14 |
+| 9 | Server | `server.py` + `__main__.py`: stdio dan streamable-http :8800, file server :8799 | Uji manual dengan MCP Inspector (dicatat di README) |
+| 10 | Kartu metrik | 12 berkas YAML di `metric_cards/` (field Dok 4 bagian 8); slug dan kolom diisi dari katalog asli, lalu **diperiksa Akhdan** | Validasi skema kartu |
+| 11 | Smoke test | `tests/smoke/` ST-01..05, maks 60 permintaan, jeda 0,3 dtk | **Dijalankan Akhdan di laptop, atas izin** |
+| 12 | Dokumentasi | `README.md` (instal, jalan, konfigurasi), `docs/RUNBOOK.md` (sinkron, rotasi secret, portal mati, rekam ulang fixture) | — |
+
+Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
+
+Bergantung pada jawaban tim lain (buat bisa dikonfigurasi, jangan menunggu): ADR-011, klien MCP di Citya, perubahan `render_chart`, `num_ctx` (→ `MCP_MAX_RESPONSE_TOKENS`, awal 2.000), lokasi server dan jaringan port 8799.
