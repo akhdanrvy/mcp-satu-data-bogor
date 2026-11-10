@@ -1,0 +1,171 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/bigdata/inspektorat/persentase_penanganan_pengaduan_masyarakat_ke_inspekt",
+    "params": {
+      "page": 1,
+      "per_page": 1000
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success",
+      "data": [
+        {
+          "id": 1,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_penanganan": 100,
+          "satuan": "PERSEN",
+          "tahun": 2019
+        },
+        {
+          "id": 2,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_penanganan": 100,
+          "satuan": "PERSEN",
+          "tahun": 2020
+        },
+        {
+          "id": 3,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_penanganan": 100,
+          "satuan": "PERSEN",
+          "tahun": 2021
+        },
+        {
+          "id": 4,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_penanganan": 100,
+          "satuan": "PERSEN",
+          "tahun": 2022
+        },
+        {
+          "id": 5,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_penanganan": 100,
+          "satuan": "PERSEN",
+          "tahun": 2023
+        },
+        {
+          "id": 6,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_penanganan": 100,
+          "satuan": "PERSEN",
+          "tahun": 2024
+        },
+        {
+          "id": 7,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_penanganan": 100,
+          "satuan": "PERSEN",
+          "tahun": 2025
+        }
+      ],
+      "error": {},
+      "pagination": {
+        "page": 1,
+        "per_page": 1000,
+        "total_page": 1,
+        "total_data": 7,
+        "has_next": false,
+        "has_previous": false
+      },
+      "source": {
+        "rows": 7,
+        "cols": 8
+      },
+      "metadata": [
+        "id",
+        "kode_provinsi",
+        "nama_provinsi",
+        "bps_kode_kabupaten_kota",
+        "bps_nama_kabupaten_kota",
+        "persentase_penanganan",
+        "satuan",
+        "tahun"
+      ],
+      "metadata_filter": [
+        {
+          "key": "kode_provinsi",
+          "type": "select",
+          "value": [
+            "32"
+          ]
+        },
+        {
+          "key": "nama_provinsi",
+          "type": "select",
+          "value": [
+            "JAWA BARAT"
+          ]
+        },
+        {
+          "key": "bps_kode_kabupaten_kota",
+          "type": "select",
+          "value": [
+            "3271"
+          ]
+        },
+        {
+          "key": "bps_nama_kabupaten_kota",
+          "type": "select",
+          "value": [
+            "KOTA BOGOR"
+          ]
+        },
+        {
+          "key": "persentase_penanganan",
+          "type": "free text",
+          "value": []
+        },
+        {
+          "key": "satuan",
+          "type": "select",
+          "value": [
+            "PERSEN"
+          ]
+        },
+        {
+          "key": "tahun",
+          "type": "select",
+          "value": [
+            "2019",
+            "2020",
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ]
+        }
+      ]
+    }
+  },
+  "recorded_at": "2026-11-10T16:19:14+07:00"
+}

@@ -1,0 +1,296 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/datasets/tren-kunjungan-pasien-puskesmas-di-kota-bogor",
+    "params": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success to get a dataset",
+      "data": {
+        "id": 19088,
+        "name": "Tren Kunjungan Pasien Puskesmas di Kota Bogor",
+        "slug": "tren-kunjungan-pasien-puskesmas-di-kota-bogor",
+        "deskripsi": "<p>Dataset ini berisi data <span id=\"editor-name\">tren kunjungan pasien puskesmas di kota bogor</span> dari tahun <span id=\"editor-yearStart\">2019 </span>s.d. <span id=\"editor-yearEnd\">2025</span>.</p><p>Dataset terkait topik Kesehatan ini dihasilkan oleh <span id=\"editor-organization\">Dinas Kesehatan </span>yang dikeluarkan dalam periode <span id=\"editor-periode\">1 tahun sekali</span>.</p><p>Penjelasan mengenai variabel di dalam dataset ini:</p><ul><li>kode_provinsi: menyatakan kode Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik</li><li>nama_provinsi: menyatakan lingkup data berasal dari wilayah Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>bps_kode_kabupaten_kota: menyatakan kode dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>bps_nama_kabupaten_kota: menyatakan lingkup data berasal dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai penamaan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>jumlah_pasien: menyatakan tren kunjungan pasien puskesmas dengan tipe data teks.</li><li>satuan: menyatakan satuan dari tren kunjungan pasien puskesmas<span id=\"editor-name\"> </span>dalam orang dengan tipe data teks.</li><li>tahun: menyatakan tahun produksi data dengan tipe data numerik</li></ul>",
+        "periode": null,
+        "satuan": null,
+        "image": null,
+        "topik_name": "Kesehatan",
+        "topik_image": "static/upload/20260424210402_health-check.png",
+        "topik_slug": "kesehatan",
+        "topik_id": 94,
+        "organisasi_name": "Dinas Kesehatan",
+        "organisasi_slug": "dinas_kesehatan",
+        "organisasi_image": "static/upload/09194921a4fd3aeaa9bfef394c30a1a157bd3d938f7aa4311de5ab68516978df.png",
+        "organisasi_notelp": "<redacted>",
+        "organisasi_alamat": "<redacted>",
+        "organisasi_website": "https://dinkes.kotabogor.go.id",
+        "organisasi_email": "<redacted>",
+        "organisasi_id": 167,
+        "kode_wilayah": "32.71",
+        "nama_wilayah": "KOTA BOGOR",
+        "wilayah_image": "static/upload/16_kotabogor.png",
+        "wilayah_id": 20,
+        "klasifikasi": "public",
+        "kategori": "agregat",
+        "data_tetap": "tetap",
+        "tags": "data agregat,tresn kunjungan pasien puskesmas,dinas kesehatan",
+        "priority_level": "priority",
+        "data_score_status": "sangat_baik",
+        "count_view_opendata": 25,
+        "count_download_opendata": 7,
+        "count_share_opendata": 0,
+        "count_view_satudata": 20,
+        "count_download_satudata": 0,
+        "count_share_satudata": 0,
+        "schema": "dinas_kesehatan",
+        "table": "tren_kunjungan_pasien_puskesmas_di_kota_bogor_1",
+        "validate": "approve",
+        "validate_discontinue": null,
+        "timestamp_discontinue_submit": null,
+        "timestamp_discontinue_approved": null,
+        "cdate": "2024-11-30T23:00:55.479387+07:07",
+        "mdate": "2026-05-05T08:26:36.516582+07:07",
+        "is_highlight": false,
+        "is_realtime": false,
+        "is_active": true,
+        "is_deleted": false,
+        "history_draft": [
+          {
+            "id": 31996,
+            "dataset_id": 19088,
+            "type": "preview",
+            "notes": null,
+            "cdate": "2024-11-30T23:00:55.700864+07:07"
+          },
+          {
+            "id": 31997,
+            "dataset_id": 19088,
+            "type": "verification-new",
+            "notes": null,
+            "cdate": "2024-11-30T23:00:58.077500+07:07"
+          },
+          {
+            "id": 31998,
+            "dataset_id": 19088,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2024-11-30T23:01:52.231200+07:07"
+          },
+          {
+            "id": 34291,
+            "dataset_id": 19088,
+            "type": "preview",
+            "notes": "Menambahkan data tahun 2024",
+            "cdate": "2025-05-14T09:54:26.309793+07:07"
+          },
+          {
+            "id": 34292,
+            "dataset_id": 19088,
+            "type": "verification-edit",
+            "notes": "Menambahkan data tahun 2024",
+            "cdate": "2025-05-14T09:54:28.670403+07:07"
+          },
+          {
+            "id": 35125,
+            "dataset_id": 19088,
+            "type": "preview",
+            "notes": "Melakukan Perubahan pada Deskripsi, dimensi akhir tahun serta Penambahan Jenis dan judul Data Prioritas",
+            "cdate": "2025-05-20T09:18:10.702769+07:07"
+          },
+          {
+            "id": 35127,
+            "dataset_id": 19088,
+            "type": "verification-edit",
+            "notes": "Melakukan Perubahan pada Deskripsi, dimensi akhir tahun serta Penambahan Jenis dan judul Data Prioritas",
+            "cdate": "2025-05-20T09:18:14.343361+07:07"
+          },
+          {
+            "id": 35130,
+            "dataset_id": 19088,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-05-20T09:18:24.215251+07:07"
+          },
+          {
+            "id": 35462,
+            "dataset_id": 19088,
+            "type": "preview",
+            "notes": "Menambahkan data tahun 2024",
+            "cdate": "2025-05-21T08:46:55.231962+07:07"
+          },
+          {
+            "id": 35463,
+            "dataset_id": 19088,
+            "type": "verification-edit",
+            "notes": "Menambahkan data tahun 2024",
+            "cdate": "2025-05-21T08:46:57.547683+07:07"
+          },
+          {
+            "id": 35773,
+            "dataset_id": 19088,
+            "type": "preview",
+            "notes": "Menambahkan pada data prioritas",
+            "cdate": "2025-05-23T11:04:48.974990+07:07"
+          },
+          {
+            "id": 35774,
+            "dataset_id": 19088,
+            "type": "verification-edit",
+            "notes": "Menambahkan pada data prioritas",
+            "cdate": "2025-05-23T11:04:51.005887+07:07"
+          },
+          {
+            "id": 35775,
+            "dataset_id": 19088,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-05-23T11:04:56.450449+07:07"
+          },
+          {
+            "id": 38287,
+            "dataset_id": 19088,
+            "type": "verification-edit",
+            "notes": "Menambahkan data tahun 2025",
+            "cdate": "2026-04-27T15:08:57.325643+07:07"
+          },
+          {
+            "id": 38336,
+            "dataset_id": 19088,
+            "type": "verification-edit",
+            "notes": "Deskripsi: perbaikan deskripsi terkait dimensi tahun data",
+            "cdate": "2026-05-05T08:26:32.136647+07:07"
+          },
+          {
+            "id": 38337,
+            "dataset_id": 19088,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2026-05-05T08:26:36.649568+07:07"
+          }
+        ],
+        "history_dataset_discontinue": [],
+        "metadata": [
+          {
+            "id": 194329,
+            "dataset_id": 19088,
+            "type": "bisnis",
+            "key": "Pengukuran Dataset",
+            "value": "Tren Kunjungan Pasien Puskesmas",
+            "cdate": "2026-05-05T08:26:31.979778+07:07",
+            "mdate": null
+          },
+          {
+            "id": 194330,
+            "dataset_id": 19088,
+            "type": "bisnis",
+            "key": "Tingkat Penyajian Dataset",
+            "value": "Kota Bogor",
+            "cdate": "2026-05-05T08:26:31.979797+07:07",
+            "mdate": null
+          },
+          {
+            "id": 194331,
+            "dataset_id": 19088,
+            "type": "bisnis",
+            "key": "Cakupan Dataset",
+            "value": "Seluruh Kunjungan Pasien Puskesmas di Kota Bogor",
+            "cdate": "2026-05-05T08:26:31.979804+07:07",
+            "mdate": null
+          },
+          {
+            "id": 194332,
+            "dataset_id": 19088,
+            "type": "bisnis",
+            "key": "Produsen",
+            "value": "Dinas Kesehatan",
+            "cdate": "2026-05-05T08:26:31.979809+07:07",
+            "mdate": null
+          },
+          {
+            "id": 194333,
+            "dataset_id": 19088,
+            "type": "bisnis",
+            "key": "Kontak Produsen",
+            "value": "<redacted>",
+            "cdate": "2026-05-05T08:26:31.979815+07:07",
+            "mdate": null
+          },
+          {
+            "id": 194334,
+            "dataset_id": 19088,
+            "type": "bisnis",
+            "key": "Kode Indikator",
+            "value": "None",
+            "cdate": "2026-05-05T08:26:31.979821+07:07",
+            "mdate": null
+          },
+          {
+            "id": 194335,
+            "dataset_id": 19088,
+            "type": "bisnis",
+            "key": "Satuan Dataset",
+            "value": "ORANG",
+            "cdate": "2026-05-05T08:26:31.979826+07:07",
+            "mdate": null
+          },
+          {
+            "id": 194336,
+            "dataset_id": 19088,
+            "type": "bisnis",
+            "key": "Frekuensi Dataset",
+            "value": "Tahunan",
+            "cdate": "2026-05-05T08:26:31.979833+07:07",
+            "mdate": null
+          },
+          {
+            "id": 194337,
+            "dataset_id": 19088,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Awal",
+            "value": "2019",
+            "cdate": "2026-05-05T08:26:31.979838+07:07",
+            "mdate": null
+          },
+          {
+            "id": 194338,
+            "dataset_id": 19088,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Akhir",
+            "value": "2025",
+            "cdate": "2026-05-05T08:26:31.979843+07:07",
+            "mdate": null
+          },
+          {
+            "id": 194339,
+            "dataset_id": 19088,
+            "type": "bisnis",
+            "key": "Sumber External",
+            "value": "None",
+            "cdate": "2026-05-05T08:26:31.979848+07:07",
+            "mdate": null
+          }
+        ],
+        "permission": [],
+        "data_priority": {
+          "name": "Tren Kunjungan Pasien Puskesmas di Kota Bogor",
+          "ids": [
+            "0196da07-a470-7e35-a575-25faeed8de92",
+            "019cb6de-0e57-7eff-9b1b-c4dc54027520"
+          ],
+          "years": [
+            2024,
+            2025
+          ]
+        }
+      },
+      "error": {}
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:15+07:00"
+}

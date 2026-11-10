@@ -1,0 +1,160 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/bigdata/badan_pendapatan_daerah/realisasi_pendapatan_asli_daerah_pad_kota_bogor",
+    "params": {
+      "page": 1,
+      "per_page": 1000
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success",
+      "data": [
+        {
+          "id": 1,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "total_pendapatan": 1015884216919.0,
+          "satuan": "RUPIAH",
+          "tahun": 2019
+        },
+        {
+          "id": 2,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "total_pendapatan": 872046925527.0,
+          "satuan": "RUPIAH",
+          "tahun": 2020
+        },
+        {
+          "id": 3,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "total_pendapatan": 1075240926213.0,
+          "satuan": "RUPIAH",
+          "tahun": 2021
+        },
+        {
+          "id": 4,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "total_pendapatan": 1147623045709.0,
+          "satuan": "RUPIAH",
+          "tahun": 2022
+        },
+        {
+          "id": 5,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "total_pendapatan": 1338618268169.0,
+          "satuan": "RUPIAH",
+          "tahun": 2023
+        },
+        {
+          "id": 6,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "total_pendapatan": 1431967467277.22,
+          "satuan": "RUPIAH",
+          "tahun": 2024
+        }
+      ],
+      "error": {},
+      "pagination": {
+        "page": 1,
+        "per_page": 1000,
+        "total_page": 1,
+        "total_data": 6,
+        "has_next": false,
+        "has_previous": false
+      },
+      "source": {
+        "rows": 6,
+        "cols": 8
+      },
+      "metadata": [
+        "id",
+        "kode_provinsi",
+        "nama_provinsi",
+        "bps_kode_kabupaten_kota",
+        "bps_nama_kabupaten_kota",
+        "total_pendapatan",
+        "satuan",
+        "tahun"
+      ],
+      "metadata_filter": [
+        {
+          "key": "kode_provinsi",
+          "type": "select",
+          "value": [
+            "32"
+          ]
+        },
+        {
+          "key": "nama_provinsi",
+          "type": "select",
+          "value": [
+            "JAWA BARAT"
+          ]
+        },
+        {
+          "key": "bps_kode_kabupaten_kota",
+          "type": "select",
+          "value": [
+            "3271"
+          ]
+        },
+        {
+          "key": "bps_nama_kabupaten_kota",
+          "type": "select",
+          "value": [
+            "KOTA BOGOR"
+          ]
+        },
+        {
+          "key": "total_pendapatan",
+          "type": "free text",
+          "value": []
+        },
+        {
+          "key": "satuan",
+          "type": "select",
+          "value": [
+            "RUPIAH"
+          ]
+        },
+        {
+          "key": "tahun",
+          "type": "select",
+          "value": [
+            "2019",
+            "2020",
+            "2021",
+            "2022",
+            "2023",
+            "2024"
+          ]
+        }
+      ]
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:11+07:00"
+}

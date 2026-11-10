@@ -523,3 +523,367 @@ def test_describe_shapes() -> None:
     assert rf.describe([]) == "list[?] (n=0)"
     assert rf.describe({str(i): i for i in range(13)}).endswith(", ...}")
     assert rf.describe("x") == "str"
+
+
+# ---------------------------------------------------------------- sanitasi kontak (KK-J)
+
+
+def test_sanitize_redacts_contact_fields_and_muid() -> None:
+    stats = rf.SanitizeStats()
+    clean = rf.sanitize(
+        {
+            "data": [
+                {
+                    "organisasi_email": "dinas@kotabogor.go.id",
+                    "organisasi_notelp": "(0251) 83820xx",
+                    "organisasi_alamat": "Jl. Contoh",
+                    "organisasi_image": "static/upload/0251838201234.png",
+                },
+                {
+                    "email": "opd@kotabogor.go.id",
+                    "notelp": None,
+                    "alamat": "Jl. Pajajaran No. 10",
+                    "muid": 7,
+                    "cuid": None,
+                },
+            ]
+        },
+        stats,
+    )
+    assert clean["data"][0] == {
+        "organisasi_email": "<redacted>",
+        "organisasi_notelp": "<redacted>",
+        "organisasi_alamat": "<redacted>",
+        "organisasi_image": "static/upload/0251838201234.png",
+    }
+    assert clean["data"][1] == {"email": "<redacted>", "notelp": None, "alamat": "<redacted>"}
+    assert stats.redacted_contacts == 5 and stats.removed_keys == 2
+
+
+def test_sanitize_is_idempotent() -> None:
+    raw = {
+        "username": "a",
+        "organisasi_email": "x@contoh.test",
+        "metadata": [{"key": "Kontak Produsen", "value": "0812-3456-7890"}],
+    }
+    once = rf.sanitize(raw, rf.SanitizeStats())
+    stats = rf.SanitizeStats()
+    assert rf.sanitize(once, stats) == once
+    assert stats.removed_keys == 0 and stats.redacted_contacts == 0
+
+
+def test_scan_pii_skips_image_fields() -> None:
+    obj = {
+        "image": "static/upload/08123456789.png",
+        "topik_image": "static/upload/e23d3308123456789.png",
+        "organisasi_image": "0251 8382 0123",
+        "alamat": "telp 0812-3456-7890",
+    }
+    assert [(p.json_path, p.kind) for p in rf.scan_pii(obj, "f")] == [("$.alamat", "telepon")]
+
+
+def test_group_pii() -> None:
+    findings = [
+        rf.PiiFinding("a.json", "$.data[0].email", "email"),
+        rf.PiiFinding("a.json", "$.data[12].email", "email"),
+        rf.PiiFinding("b.json", "$.data[0].email", "email"),
+    ]
+    assert rf.group_pii(findings) == {
+        ("email", "a.json", "$.data[].email"): 2,
+        ("email", "b.json", "$.data[].email"): 1,
+    }
+
+
+# ---------------------------------------------------------------- mode --only
+
+
+ONLY_SLUG = "persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor"
+
+
+def _existing_folder(root: Path) -> Path:
+    folder = root / "2026-11-10"
+    folder.mkdir(parents=True)
+    (folder / "001_katalog-hal-1.json").write_text('{"lama": 1}', encoding="utf-8")
+    (folder / "033_uji-404.json").write_text('{"lama": 33}', encoding="utf-8")
+    (folder / "manifest.json").write_text('{"files": []}', encoding="utf-8")
+    (folder / "catalog_slim.json").write_text("{}", encoding="utf-8")
+    return folder
+
+
+def _mock_only(router: respx.MockRouter) -> None:
+    router.get(f"{BASE}/datasets/{ONLY_SLUG}").mock(
+        return_value=_ok(
+            {
+                "slug": ONLY_SLUG,
+                "schema": "inspektorat",
+                "table": "pengaduan",
+                "organisasi_email": "inspektorat@contoh.test",
+                "username": "rahasia",
+            }
+        )
+    )
+    router.get(f"{BASE}/bigdata/inspektorat/pengaduan").mock(
+        return_value=_ok([{"id": 1, "tahun": 2024, "persentase": 100}])
+    )
+
+
+def test_execute_only_appends_without_overwriting(tmp_path: Path) -> None:
+    folder = _existing_folder(tmp_path)
+    sleep = FakeSleep()
+    with respx.mock(assert_all_mocked=True) as router, httpx.Client(base_url=BASE) as client:
+        _mock_only(router)
+        result = rf.execute_only(
+            rf.load_targets(),
+            ONLY_SLUG,
+            base_url=BASE,
+            user_agent=UA,
+            out_dir=folder,
+            client=client,
+            sleep=sleep,
+            clock=_clock,
+        )
+        assert len(router.calls) == 2
+    assert result.stop_reason is None and result.sent == 2 and sleep.calls == [0.3]
+    names = [name for name, _ in result.files]
+    assert names[0].startswith("034_detail-") and names[1].startswith("035_bigdata-")
+    assert (folder / "001_katalog-hal-1.json").read_text(encoding="utf-8") == '{"lama": 1}'
+    assert (folder / "manifest.json").read_text(encoding="utf-8") == '{"files": []}'
+    manifest_path = rf.only_manifest_path(folder, ONLY_SLUG)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["mode"] == "only" and manifest["request_count"] == 2
+    assert [f["file"] for f in manifest["files"]] == names
+    detail = (folder / names[0]).read_text(encoding="utf-8")
+    assert "rahasia" not in detail and "inspektorat@contoh.test" not in detail
+    assert validate_exchange(json.loads(detail)) == []
+
+    with pytest.raises(rf.ConfigProblem, match="sudah ada"):
+        rf.execute_only(rf.load_targets(), ONLY_SLUG, base_url=BASE, user_agent=UA, out_dir=folder)
+
+
+def test_execute_only_refusals(tmp_path: Path) -> None:
+    targets = rf.load_targets()
+    with pytest.raises(rf.ConfigProblem, match="belum ada"):
+        rf.execute_only(targets, ONLY_SLUG, base_url=BASE, user_agent=UA, out_dir=tmp_path / "x")
+    with pytest.raises(rf.ConfigProblem, match="MCP_USER_AGENT"):
+        rf.execute_only(
+            targets, ONLY_SLUG, base_url=BASE, user_agent="a (+<kontak-tim>)", out_dir=tmp_path
+        )
+    with pytest.raises(rf.AccessRuleViolation):
+        rf.execute_only(targets, "x/view", base_url=BASE, user_agent=UA, out_dir=tmp_path)
+
+
+def test_session_never_overwrites(tmp_path: Path) -> None:
+    (tmp_path / "001_a.json").write_text("{}", encoding="utf-8")
+    recorder, _, client = _recorder()
+    session = rf.Session(recorder, tmp_path, BASE, start_index=0)
+    with respx.mock as router, client:
+        router.get(f"{BASE}/topik").mock(return_value=_ok([]))
+        with pytest.raises(rf.ConfigProblem, match="tidak ditimpa"):
+            session.record("a", "/topik")
+    assert (tmp_path / "001_a.json").read_text(encoding="utf-8") == "{}"
+
+
+def test_only_dry_run_cli(
+    settings_env: Path, capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
+    root = tmp_path / "rec"
+    _existing_folder(root)
+    with respx.mock(assert_all_mocked=True) as router:
+        code = rf.main(["--only", ONLY_SLUG, "--out-root", str(root)])
+        assert router.calls.call_count == 0
+    out = capsys.readouterr().out
+    assert code == 0 and out.startswith("DRY-RUN")
+    assert "[ada; berkas lama tidak ditimpa]" in out
+    assert "Jumlah terencana: 2 permintaan (2 pasti + 0 bersyarat)" in out
+    assert "Batas atas bila pagination lebih panjang: 4" in out
+    assert "Berkas baru mulai dari nomor 034" in out
+
+
+def test_local_modes_without_folder(
+    settings_env: Path, capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
+    assert rf.main(["--only", ONLY_SLUG, "--out-root", str(tmp_path)]) == 2
+    assert rf.main(["--resanitize", "--out-root", str(tmp_path), "--date", "2026-01-01"]) == 2
+    assert "DITOLAK" in capsys.readouterr().out
+
+
+def test_only_execute_cli_refused_with_placeholder_ua(
+    settings_env: Path, capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
+    _existing_folder(tmp_path)
+    assert rf.main(["--only", ONLY_SLUG, "--execute", "--out-root", str(tmp_path)]) == 2
+    assert "MCP_USER_AGENT" in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------- sanitasi ulang (lokal)
+
+
+def _write_exchange(folder: Path, name: str, path: str, data: Any, **params: Any) -> None:
+    exchange = {
+        "request": {"method": "GET", "path": path, "params": params},
+        "response": {"status": 200, "headers": {}, "json": {"code": 200, "data": data}},
+        "recorded_at": "2026-11-10T15:56:00+07:00",
+    }
+    (folder / name).write_text(json.dumps(exchange), encoding="utf-8")
+
+
+def test_resanitize_rewrites_and_updates_manifests(
+    settings_env: Path, capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
+    folder = tmp_path / "2026-11-10"
+    folder.mkdir()
+    _write_exchange(
+        folder,
+        "001_katalog-hal-1.json",
+        "/datasets",
+        [
+            {
+                "slug": "kk",
+                "name": "Persentase KK Miskin",
+                "organisasi_email": "a@b.test",
+                "organisasi_notelp": "0251-8321075",
+                "topik_image": "static/0812345678901.png",
+            }
+        ],
+        page=1,
+    )
+    _write_exchange(
+        folder,
+        "002_referensi-organisasi.json",
+        "/organisasi",
+        [{"email": "c@d.test", "notelp": "0251-1234567", "muid": 3}],
+    )
+    (folder / "manifest.json").write_text(
+        json.dumps(
+            {
+                "request_count": 2,
+                "stop_reason": None,
+                "incidents": [],
+                "files": [
+                    {"file": "001_katalog-hal-1.json", "sha256": "lama"},
+                    {"file": "002_referensi-organisasi.json", "sha256": "lama"},
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (folder / "manifest_only_x.json").write_text(
+        json.dumps({"files": [{"file": "002_referensi-organisasi.json", "sha256": "lama"}]}),
+        encoding="utf-8",
+    )
+    report = tmp_path / "REPORT.md"
+    code = rf.main(["--resanitize", "--out-root", str(tmp_path), "--report", str(report)])
+    assert code == 0 and "0 temuan email/telepon tersisa" in capsys.readouterr().out
+    for name in ("001_katalog-hal-1.json", "002_referensi-organisasi.json"):
+        text = (folder / name).read_text(encoding="utf-8")
+        assert "@" not in text and "0251" not in text and "muid" not in text
+    manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
+    only = json.loads((folder / "manifest_only_x.json").read_text(encoding="utf-8"))
+    assert all(len(f["sha256"]) == 64 for f in manifest["files"] + only["files"])
+    assert only["files"][0]["sha256"] == manifest["files"][1]["sha256"]
+    body = report.read_text(encoding="utf-8")
+    assert "### KM-07 (1 kandidat" in body and "- tidak ada" in body
+
+    before = {p.name: p.read_bytes() for p in folder.glob("0*.json")}
+    rf.resanitize(folder, report, rf.load_targets())
+    assert before == {p.name: p.read_bytes() for p in folder.glob("0*.json")}  # idempoten
+
+
+# ---------------------------------------------------------------- katalog ramping
+
+
+def _catalog_page(
+    folder: Path, page: int, items: list[dict[str, Any]], total_page: int, total_data: int
+) -> None:
+    exchange = {
+        "request": {"method": "GET", "path": "/datasets", "params": {"page": page}},
+        "response": {
+            "status": 200,
+            "headers": {},
+            "json": {
+                "data": items,
+                "pagination": {"page": page, "total_page": total_page, "total_data": total_data},
+            },
+        },
+        "recorded_at": "2026-11-10T15:56:00+07:00",
+    }
+    (folder / f"00{page}_katalog-hal-{page}.json").write_text(json.dumps(exchange), "utf-8")
+
+
+def _raw_record(slug: str) -> dict[str, Any]:
+    return {
+        "id": 1,
+        "slug": slug,
+        "name": slug.upper(),
+        "deskripsi": "<p>d</p>",
+        "organisasi_email": "x@y.test",
+        "organisasi_alamat": "Jl.",
+        "count_view_opendata": 9,
+        "validate": "approve",
+        "klasifikasi": "public",
+        "mdate": "2026-01-01T00:00:00+07:07",
+        "metadata": [
+            {"id": 1, "type": "bisnis", "key": "Satuan Dataset", "value": "Persen", "muid": None},
+            {"id": 2, "type": "bisnis", "key": "Kontak Produsen", "value": "<redacted>"},
+            {"id": 3, "type": "bisnis", "key": "Dimensi Dataset Akhir", "value": "2025"},
+        ],
+        "history_draft": [
+            {
+                "id": 5,
+                "dataset_id": 1,
+                "type": "approve",
+                "cdate": "2026-01-01T00:00:00+07:07",
+                "notes": None,
+            }
+        ],
+    }
+
+
+def test_catalog_slim_build(settings_env: Path, tmp_path: Path) -> None:
+    folder = tmp_path / "2026-11-10"
+    folder.mkdir()
+    _catalog_page(folder, 1, [_raw_record("a"), _raw_record("b")], 2, 3)
+    _catalog_page(folder, 2, [_raw_record("c")], 2, 3)
+    _write_exchange(folder, "003_detail-a.json", "/datasets/a", {"slug": "a"})
+    assert rf.main(["--slim-catalog", "--out-root", str(tmp_path)]) == 0
+    slim = json.loads((folder / "catalog_slim.json").read_text(encoding="utf-8"))
+    assert slim["record_count"] == 3 == slim["pagination_total_data"]
+    assert slim["source_files"] == ["001_katalog-hal-1.json", "002_katalog-hal-2.json"]
+    record = slim["records"][0]
+    assert set(record) == set(rf.CATALOG_SLIM_FIELDS) | {"metadata", "history_draft"}
+    assert record["metadata"] == [
+        {"key": "Satuan Dataset", "value": "Persen"},
+        {"key": "Dimensi Dataset Akhir", "value": "2025"},
+    ]
+    assert record["history_draft"] == [
+        {"type": "approve", "cdate": "2026-01-01T00:00:00+07:07", "notes": None}
+    ]
+    text = (folder / "catalog_slim.json").read_text(encoding="utf-8")
+    assert "organisasi_email" not in text and "Kontak Produsen" not in text
+    record_lines = [line for line in text.splitlines() if line.startswith('    {"id"')]
+    assert len(record_lines) == 3  # satu record per baris
+
+
+@pytest.mark.parametrize(
+    ("pages", "match"),
+    [
+        ([], "tidak ada halaman"),
+        ([(1, ["a", "b"], 3, 5), (2, ["c"], 3, 5)], "tidak lengkap"),
+        ([(1, ["a", "b"], 1, 5)], "total_data"),
+        ([(1, ["a", "a"], 1, 2)], "slug ganda"),
+    ],
+)
+def test_catalog_slim_refuses_inconsistent_pages(
+    tmp_path: Path, pages: list[tuple[int, list[str], int, int]], match: str
+) -> None:
+    for page, slugs, total_page, total_data in pages:
+        _catalog_page(tmp_path, page, [_raw_record(s) for s in slugs], total_page, total_data)
+    with pytest.raises(rf.ConfigProblem, match=match):
+        rf.build_catalog_slim(tmp_path)
+
+
+def test_latest_date_folder(tmp_path: Path) -> None:
+    assert rf.latest_date_folder(tmp_path) is None
+    for name in ("2026-11-10", "2026-11-12", "catatan", "2026-11-11"):
+        (tmp_path / name).mkdir()
+    assert rf.latest_date_folder(tmp_path).name == "2026-11-12"

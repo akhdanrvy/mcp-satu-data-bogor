@@ -1,0 +1,198 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/datasets/perkembangan-jumlah-kunjungan-wisatawan-di-kota-bogor",
+    "params": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success to get a dataset",
+      "data": {
+        "id": 19217,
+        "name": "Perkembangan Jumlah Kunjungan Wisatawan di Kota Bogor",
+        "slug": "perkembangan-jumlah-kunjungan-wisatawan-di-kota-bogor",
+        "deskripsi": "<p>Dataset ini berisi data <span id=\"editor-name\">perkembangan jumlah kunjungan wisatawan di kota bogor</span> dari tahun <span id=\"editor-yearStart\">2019 </span>s.d. <span id=\"editor-yearEnd\">2024</span>.</p><p>Dataset terkait topik Pariwisata ini dihasilkan oleh <span id=\"editor-organization\">Dinas Pariwisata dan Kebudayaan </span>yang dikeluarkan dalam periode <span id=\"editor-periode\">1 tahun sekali</span>.</p><p>Penjelasan mengenai variabel di dalam dataset ini:</p><ul><li>kode_provinsi: menyatakan kode Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik</li><li>nama_provinsi: menyatakan lingkup data berasal dari wilayah Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>bps_kode_kabupaten_kota: menyatakan kode dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>bps_nama_kabupaten_kota: menyatakan lingkup data berasal dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai penamaan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>perkembangan_kunjungan: menyatakan <span id=\"editor-name\">perkembangan jumlah kunjungan wisatawan </span>dengan tipe data numerik.</li><li>satuan: menyatakan satuan &nbsp;dari <span id=\"editor-name\">perkembangan jumlah kunjungan wisatawan </span>dalam kunjungan dengan tipe data teks.</li><li>tahun: menyatakan tahun produksi data dengan tipe data numerik</li></ul>",
+        "periode": null,
+        "satuan": null,
+        "image": null,
+        "topik_name": "Pariwisata",
+        "topik_image": "static/upload/44cc53b34b136bfad51f164ce544fba1ff856b8d64359af39b74471b075220ff.png",
+        "topik_slug": "pariwisata",
+        "topik_id": 72,
+        "organisasi_name": "Dinas Pariwisata dan Kebudayaan",
+        "organisasi_slug": "dinas_pariwisata_dan_kebudayaan",
+        "organisasi_image": "static/upload/5b71d2d48b2e0e800b74d8625237e8fb45592714d8f4436a86bba2a65d3e4685.jpg",
+        "organisasi_notelp": "<redacted>",
+        "organisasi_alamat": "<redacted>",
+        "organisasi_website": "https://disparbud.kotabogor.go.id",
+        "organisasi_email": "<redacted>",
+        "organisasi_id": 177,
+        "kode_wilayah": "32.71",
+        "nama_wilayah": "KOTA BOGOR",
+        "wilayah_image": "static/upload/16_kotabogor.png",
+        "wilayah_id": 20,
+        "klasifikasi": "public",
+        "kategori": "agregat",
+        "data_tetap": "tetap",
+        "tags": "data agregat,jumlah kunjungan wisatawan,disparbud",
+        "priority_level": "non-priority",
+        "data_score_status": "sangat_baik",
+        "count_view_opendata": 1596,
+        "count_download_opendata": 106,
+        "count_share_opendata": 7,
+        "count_view_satudata": 21,
+        "count_download_satudata": 3,
+        "count_share_satudata": 0,
+        "schema": "dinas_pariwisata_dan_kebudayaan",
+        "table": "perkembangan_jumlah_kunjungan_wisatawan_di_kota_bogor",
+        "validate": "approve",
+        "validate_discontinue": null,
+        "timestamp_discontinue_submit": null,
+        "timestamp_discontinue_approved": null,
+        "cdate": "2025-01-21T13:29:19.735390+07:07",
+        "mdate": "2025-04-09T08:50:41.968506+07:07",
+        "is_highlight": false,
+        "is_realtime": false,
+        "is_active": true,
+        "is_deleted": false,
+        "history_draft": [
+          {
+            "id": 32479,
+            "dataset_id": 19217,
+            "type": "preview",
+            "notes": null,
+            "cdate": "2025-01-21T13:29:19.880222+07:07"
+          },
+          {
+            "id": 32480,
+            "dataset_id": 19217,
+            "type": "verification-new",
+            "notes": null,
+            "cdate": "2025-01-21T13:29:22.824159+07:07"
+          },
+          {
+            "id": 32484,
+            "dataset_id": 19217,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-01-21T13:37:25.255033+07:07"
+          },
+          {
+            "id": 33566,
+            "dataset_id": 19217,
+            "type": "preview",
+            "notes": "data update tahun 2024",
+            "cdate": "2025-03-26T09:00:15.250076+07:07"
+          },
+          {
+            "id": 33567,
+            "dataset_id": 19217,
+            "type": "verification-edit",
+            "notes": "data update tahun 2024",
+            "cdate": "2025-03-26T09:00:55.558917+07:07"
+          },
+          {
+            "id": 33583,
+            "dataset_id": 19217,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-04-09T08:50:42.060045+07:07"
+          }
+        ],
+        "history_dataset_discontinue": [],
+        "metadata": [
+          {
+            "id": 172660,
+            "dataset_id": 19217,
+            "type": "bisnis",
+            "key": "Pengukuran Dataset",
+            "value": "Perkembangan Jumlah Kunjungan Wisatawan",
+            "cdate": "2025-03-26T09:00:13.128762+07:07",
+            "mdate": null
+          },
+          {
+            "id": 172661,
+            "dataset_id": 19217,
+            "type": "bisnis",
+            "key": "Tingkat Penyajian Dataset",
+            "value": "Kota Bogor",
+            "cdate": "2025-03-26T09:00:13.128774+07:07",
+            "mdate": null
+          },
+          {
+            "id": 172662,
+            "dataset_id": 19217,
+            "type": "bisnis",
+            "key": "Cakupan Dataset",
+            "value": "Seluruh Kunjungan Wisatawan di Kota Bogor",
+            "cdate": "2025-03-26T09:00:13.128778+07:07",
+            "mdate": null
+          },
+          {
+            "id": 172663,
+            "dataset_id": 19217,
+            "type": "bisnis",
+            "key": "Produsen",
+            "value": "Dinas Kebudayaan dan Pariwisata",
+            "cdate": "2025-03-26T09:00:13.128781+07:07",
+            "mdate": null
+          },
+          {
+            "id": 172664,
+            "dataset_id": 19217,
+            "type": "bisnis",
+            "key": "Kontak Produsen",
+            "value": "<redacted>",
+            "cdate": "2025-03-26T09:00:13.128784+07:07",
+            "mdate": null
+          },
+          {
+            "id": 172665,
+            "dataset_id": 19217,
+            "type": "bisnis",
+            "key": "Satuan Dataset",
+            "value": "KUNJUNGAN",
+            "cdate": "2025-03-26T09:00:13.128787+07:07",
+            "mdate": null
+          },
+          {
+            "id": 172666,
+            "dataset_id": 19217,
+            "type": "bisnis",
+            "key": "Frekuensi Dataset",
+            "value": "Tahunan",
+            "cdate": "2025-03-26T09:00:13.128789+07:07",
+            "mdate": null
+          },
+          {
+            "id": 172667,
+            "dataset_id": 19217,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Awal",
+            "value": "2019",
+            "cdate": "2025-03-26T09:00:13.128792+07:07",
+            "mdate": null
+          },
+          {
+            "id": 172668,
+            "dataset_id": 19217,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Akhir",
+            "value": "2024",
+            "cdate": "2025-03-26T09:00:13.128795+07:07",
+            "mdate": null
+          }
+        ],
+        "permission": [],
+        "data_priority": {}
+      },
+      "error": {}
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:13+07:00"
+}

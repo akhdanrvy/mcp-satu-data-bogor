@@ -66,12 +66,17 @@ def _block_network(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPat
 
 @pytest.fixture
 def settings_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """Arahkan path penyimpanan ke tmp_path dan kosongkan env MCP_ dari luar."""
+    """Arahkan path penyimpanan ke tmp_path dan kosongkan env MCP_ dari luar.
+
+    Juga pindah ke tmp_path agar berkas `.env` lokal pengembang (mis. MCP_USER_AGENT asli)
+    tidak terbaca oleh Settings() dan tes tetap deterministik.
+    """
     import os
 
     for key in list(os.environ):
         if key.startswith("MCP_"):
             monkeypatch.delenv(key)
+    monkeypatch.chdir(tmp_path)
     monkeypatch.setenv("MCP_DB_PATH", str(tmp_path / "var" / "test.db"))
     monkeypatch.setenv("MCP_CACHE_DIR", str(tmp_path / "var" / "cache"))
     return tmp_path

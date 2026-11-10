@@ -1,0 +1,171 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/bigdata/dinas_kesehatan/tren_kunjungan_pasien_puskesmas_di_kota_bogor_1",
+    "params": {
+      "page": 1,
+      "per_page": 1000
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success",
+      "data": [
+        {
+          "id": 1,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "jumlah_pasien": 1419789,
+          "satuan": "ORANG",
+          "tahun": 2019
+        },
+        {
+          "id": 2,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "jumlah_pasien": 851645,
+          "satuan": "ORANG",
+          "tahun": 2020
+        },
+        {
+          "id": 3,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "jumlah_pasien": 792366,
+          "satuan": "ORANG",
+          "tahun": 2021
+        },
+        {
+          "id": 4,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "jumlah_pasien": 1111365,
+          "satuan": "ORANG",
+          "tahun": 2022
+        },
+        {
+          "id": 5,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "jumlah_pasien": 1310191,
+          "satuan": "ORANG",
+          "tahun": 2023
+        },
+        {
+          "id": 6,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "jumlah_pasien": 2092637,
+          "satuan": "ORANG",
+          "tahun": 2024
+        },
+        {
+          "id": 7,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "jumlah_pasien": 2505887,
+          "satuan": "ORANG",
+          "tahun": 2025
+        }
+      ],
+      "error": {},
+      "pagination": {
+        "page": 1,
+        "per_page": 1000,
+        "total_page": 1,
+        "total_data": 7,
+        "has_next": false,
+        "has_previous": false
+      },
+      "source": {
+        "rows": 7,
+        "cols": 8
+      },
+      "metadata": [
+        "id",
+        "kode_provinsi",
+        "nama_provinsi",
+        "bps_kode_kabupaten_kota",
+        "bps_nama_kabupaten_kota",
+        "jumlah_pasien",
+        "satuan",
+        "tahun"
+      ],
+      "metadata_filter": [
+        {
+          "key": "kode_provinsi",
+          "type": "select",
+          "value": [
+            "32"
+          ]
+        },
+        {
+          "key": "nama_provinsi",
+          "type": "select",
+          "value": [
+            "JAWA BARAT"
+          ]
+        },
+        {
+          "key": "bps_kode_kabupaten_kota",
+          "type": "select",
+          "value": [
+            "3271"
+          ]
+        },
+        {
+          "key": "bps_nama_kabupaten_kota",
+          "type": "select",
+          "value": [
+            "KOTA BOGOR"
+          ]
+        },
+        {
+          "key": "jumlah_pasien",
+          "type": "free text",
+          "value": []
+        },
+        {
+          "key": "satuan",
+          "type": "select",
+          "value": [
+            "ORANG"
+          ]
+        },
+        {
+          "key": "tahun",
+          "type": "select",
+          "value": [
+            "2019",
+            "2020",
+            "2021",
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ]
+        }
+      ]
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:15+07:00"
+}

@@ -1,0 +1,160 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/bigdata/badan_keuangan_dan_aset_daerah/persentase_sisa_lebih_perhitungan_anggaran_silpa_terhadap_angga",
+    "params": {
+      "page": 1,
+      "per_page": 1000
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success",
+      "data": [
+        {
+          "id": 1,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_silpa": 8.84,
+          "satuan": "PERSEN",
+          "tahun": 2019
+        },
+        {
+          "id": 2,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_silpa": 11.9,
+          "satuan": "PERSEN",
+          "tahun": 2020
+        },
+        {
+          "id": 3,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_silpa": 14.0,
+          "satuan": "PERSEN",
+          "tahun": 2021
+        },
+        {
+          "id": 4,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_silpa": 8.0,
+          "satuan": "PERSEN",
+          "tahun": 2022
+        },
+        {
+          "id": 5,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_silpa": 1.79,
+          "satuan": "PERSEN",
+          "tahun": 2023
+        },
+        {
+          "id": 6,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "persentase_silpa": 2.67,
+          "satuan": "PERSEN",
+          "tahun": 2024
+        }
+      ],
+      "error": {},
+      "pagination": {
+        "page": 1,
+        "per_page": 1000,
+        "total_page": 1,
+        "total_data": 6,
+        "has_next": false,
+        "has_previous": false
+      },
+      "source": {
+        "rows": 6,
+        "cols": 8
+      },
+      "metadata": [
+        "id",
+        "kode_provinsi",
+        "nama_provinsi",
+        "bps_kode_kabupaten_kota",
+        "bps_nama_kabupaten_kota",
+        "persentase_silpa",
+        "satuan",
+        "tahun"
+      ],
+      "metadata_filter": [
+        {
+          "key": "kode_provinsi",
+          "type": "select",
+          "value": [
+            "32"
+          ]
+        },
+        {
+          "key": "nama_provinsi",
+          "type": "select",
+          "value": [
+            "JAWA BARAT"
+          ]
+        },
+        {
+          "key": "bps_kode_kabupaten_kota",
+          "type": "select",
+          "value": [
+            "3271"
+          ]
+        },
+        {
+          "key": "bps_nama_kabupaten_kota",
+          "type": "select",
+          "value": [
+            "KOTA BOGOR"
+          ]
+        },
+        {
+          "key": "persentase_silpa",
+          "type": "free text",
+          "value": []
+        },
+        {
+          "key": "satuan",
+          "type": "select",
+          "value": [
+            "PERSEN"
+          ]
+        },
+        {
+          "key": "tahun",
+          "type": "select",
+          "value": [
+            "2019",
+            "2020",
+            "2021",
+            "2022",
+            "2023",
+            "2024"
+          ]
+        }
+      ]
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:13+07:00"
+}

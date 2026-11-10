@@ -2,9 +2,11 @@
 
 v0.1 hanya mengenal periode tahunan (kolom `tahun`); kolom bulan di luar cakupan (KB-19).
 
-Bentuk masukan: adaptor (Langkah 4) meratakan respons portal lebih dulu, yaitu
-`metadata_filter` menjadi {nama_kolom: nilai_unik} dan `metadata[]` dataset menjadi
-{nama_metadata: nilai}. Modul ini tidak bergantung pada bentuk JSON portal.
+Bentuk masukan: adaptor meratakan respons portal lebih dulu, yaitu `metadata_filter`
+(asli: list {key, type, value}, tahun bertipe teks) menjadi {nama_kolom: nilai_unik} lewat
+adapters.opendata_jabar.flatten_metadata_filter, dan `metadata[]` dataset menjadi
+{nama_metadata: nilai} lewat flatten_metadata. Modul ini tidak bergantung pada bentuk JSON
+portal; kecocokannya dengan rekaman asli diuji di tests/unit/test_services_recorded.py.
 """
 
 from __future__ import annotations

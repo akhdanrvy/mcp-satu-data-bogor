@@ -1,0 +1,212 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/datasets/persentase-kepala-keluarga-miskin-di-kota-bogor",
+    "params": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success to get a dataset",
+      "data": {
+        "id": 18779,
+        "name": "Persentase Kepala Keluarga Miskin di Kota Bogor",
+        "slug": "persentase-kepala-keluarga-miskin-di-kota-bogor",
+        "deskripsi": "<p>Dataset ini berisi data <span id=\"editor-name\">persentase kepala keluarga miskin di kota bogor</span> dari tahun <span id=\"editor-yearStart\">2019 </span>s.d. <span id=\"editor-yearEnd\">2024</span>.</p><p>Dataset terkait topik <span id=\"editor-topic\">Sosial </span>ini dihasilkan oleh <span id=\"editor-organization\">Dinas Sosial Kota Bogor </span>yang dikeluarkan dalam periode <span id=\"editor-periode\">1 tahun sekalu</span>.</p><p>Penjelasan mengenai variabel di dalam dataset ini:</p><ul><li>kode_provinsi: menyatakan kode Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>nama_provinsi: menyatakan lingkup data berasal dari wilayah Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>bps_kode_kabupaten_kota: menyatakan kode dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>bps_nama_kabupaten_kota: menyatakan lingkup data berasal dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai penamaan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>persentase: menyatakan persentase kepala keluarga miskin dengan tipe data numerik.</li><li>satuan: menyatakan satuan dari pengukuran persentase &nbsp;kepala keluarga miskin dalam persen dengan tipe data teks.</li><li>tahun: menyatakan tahun produksi data dengan tipe data numerik.</li></ul>",
+        "periode": null,
+        "satuan": null,
+        "image": null,
+        "topik_name": "Sosial",
+        "topik_image": "static/upload/904f0a99b1d6ee36e1c93a6a42341baa3a3ea8a6e40a412ffc270ff36862f0f4.png",
+        "topik_slug": "sosial",
+        "topik_id": 90,
+        "organisasi_name": "Dinas Sosial",
+        "organisasi_slug": "dinas_sosial",
+        "organisasi_image": "static/upload/f5cc758f1f502f69f30a5b7e1a4ced1ba69813a472d630ee6472458157c3038a.png",
+        "organisasi_notelp": "<redacted>",
+        "organisasi_alamat": "<redacted>",
+        "organisasi_website": "https://dinsos.kotabogor.go.id",
+        "organisasi_email": "<redacted>",
+        "organisasi_id": 173,
+        "kode_wilayah": "32.71",
+        "nama_wilayah": "KOTA BOGOR",
+        "wilayah_image": "static/upload/16_kotabogor.png",
+        "wilayah_id": 20,
+        "klasifikasi": "public",
+        "kategori": "indikator",
+        "data_tetap": "tetap",
+        "tags": "data indikator,dinas sosial,kepala keluarga miskin",
+        "priority_level": "non-priority",
+        "data_score_status": "sangat_baik",
+        "count_view_opendata": 115,
+        "count_download_opendata": 9,
+        "count_share_opendata": 0,
+        "count_view_satudata": 15,
+        "count_download_satudata": 2,
+        "count_share_satudata": 0,
+        "schema": "dinas_sosial",
+        "table": "persentase_kepala_keluarga_miskin_di_kota_bogor",
+        "validate": "approve",
+        "validate_discontinue": null,
+        "timestamp_discontinue_submit": null,
+        "timestamp_discontinue_approved": null,
+        "cdate": "2024-07-01T14:42:18.682838+07:07",
+        "mdate": "2025-05-14T10:23:19.357189+07:07",
+        "is_highlight": false,
+        "is_realtime": false,
+        "is_active": true,
+        "is_deleted": false,
+        "history_draft": [
+          {
+            "id": 30871,
+            "dataset_id": 18779,
+            "type": "preview",
+            "notes": null,
+            "cdate": "2024-07-01T14:42:18.901462+07:07"
+          },
+          {
+            "id": 30872,
+            "dataset_id": 18779,
+            "type": "verification-new",
+            "notes": null,
+            "cdate": "2024-07-01T14:42:21.497393+07:07"
+          },
+          {
+            "id": 30873,
+            "dataset_id": 18779,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2024-07-01T14:48:30.271833+07:07"
+          },
+          {
+            "id": 33853,
+            "dataset_id": 18779,
+            "type": "preview",
+            "notes": "Tambahan data 2023-2024",
+            "cdate": "2025-05-07T15:58:54.316102+07:07"
+          },
+          {
+            "id": 33854,
+            "dataset_id": 18779,
+            "type": "verification-edit",
+            "notes": "Tambahan data 2023-2024",
+            "cdate": "2025-05-07T15:58:56.749217+07:07"
+          },
+          {
+            "id": 34304,
+            "dataset_id": 18779,
+            "type": "preview",
+            "notes": "Revisi tahun pada metadata dan deskripsi data",
+            "cdate": "2025-05-14T10:23:10.869388+07:07"
+          },
+          {
+            "id": 34305,
+            "dataset_id": 18779,
+            "type": "verification-edit",
+            "notes": "Revisi tahun pada metadata dan deskripsi data",
+            "cdate": "2025-05-14T10:23:13.403084+07:07"
+          },
+          {
+            "id": 34306,
+            "dataset_id": 18779,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-05-14T10:23:19.445639+07:07"
+          }
+        ],
+        "history_dataset_discontinue": [],
+        "metadata": [
+          {
+            "id": 175731,
+            "dataset_id": 18779,
+            "type": "bisnis",
+            "key": "Pengukuran Dataset",
+            "value": "Persentase Kepala Keluarga Miskin",
+            "cdate": "2025-05-14T10:23:10.558274+07:07",
+            "mdate": null
+          },
+          {
+            "id": 175732,
+            "dataset_id": 18779,
+            "type": "bisnis",
+            "key": "Tingkat Penyajian Dataset",
+            "value": "Kota",
+            "cdate": "2025-05-14T10:23:10.558287+07:07",
+            "mdate": null
+          },
+          {
+            "id": 175733,
+            "dataset_id": 18779,
+            "type": "bisnis",
+            "key": "Cakupan Dataset",
+            "value": "Seluruh Kepala Keluarga Miskin di Kota Bogor",
+            "cdate": "2025-05-14T10:23:10.558291+07:07",
+            "mdate": null
+          },
+          {
+            "id": 175734,
+            "dataset_id": 18779,
+            "type": "bisnis",
+            "key": "Produsen",
+            "value": "Dinas Sosial",
+            "cdate": "2025-05-14T10:23:10.558294+07:07",
+            "mdate": null
+          },
+          {
+            "id": 175735,
+            "dataset_id": 18779,
+            "type": "bisnis",
+            "key": "Kontak Produsen",
+            "value": "<redacted>",
+            "cdate": "2025-05-14T10:23:10.558297+07:07",
+            "mdate": null
+          },
+          {
+            "id": 175736,
+            "dataset_id": 18779,
+            "type": "bisnis",
+            "key": "Satuan Dataset",
+            "value": "PERSEN",
+            "cdate": "2025-05-14T10:23:10.558301+07:07",
+            "mdate": null
+          },
+          {
+            "id": 175737,
+            "dataset_id": 18779,
+            "type": "bisnis",
+            "key": "Frekuensi Dataset",
+            "value": "Tahunan",
+            "cdate": "2025-05-14T10:23:10.558304+07:07",
+            "mdate": null
+          },
+          {
+            "id": 175738,
+            "dataset_id": 18779,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Awal",
+            "value": "2019",
+            "cdate": "2025-05-14T10:23:10.558307+07:07",
+            "mdate": null
+          },
+          {
+            "id": 175739,
+            "dataset_id": 18779,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Akhir",
+            "value": "2024",
+            "cdate": "2025-05-14T10:23:10.558310+07:07",
+            "mdate": null
+          }
+        ],
+        "permission": [],
+        "data_priority": {}
+      },
+      "error": {}
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:19+07:00"
+}

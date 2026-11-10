@@ -1,0 +1,234 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/datasets/persentase-realisasi-pendapatan-asli-daerah-pad-kota-bogor",
+    "params": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success to get a dataset",
+      "data": {
+        "id": 19242,
+        "name": "Persentase Realisasi Pendapatan Asli Daerah (PAD) Kota Bogor",
+        "slug": "persentase-realisasi-pendapatan-asli-daerah-pad-kota-bogor",
+        "deskripsi": "<p>Dataset ini berisi data <span id=\"editor-name\">persentase realisasi pendapatan asli daerah (pad) kota bogor</span> dari tahun <span id=\"editor-yearStart\">2015 </span>s.d. <span id=\"editor-yearEnd\">2024</span>.</p><p>Dataset terkait topik <span id=\"editor-topic\">Keuangan </span>ini dihasilkan oleh <span id=\"editor-organization\">Badan Pendapatan Daerah </span>yang dikeluarkan dalam periode <span id=\"editor-periode\">1 tahun sekali</span>.</p><p>Penjelasan mengenai variabel di dalam dataset ini:</p><ul><li>kode_provinsi: menyatakan kode Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>nama_provinsi: menyatakan lingkup data berasal dari wilayah Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>bps_kode_kabupaten_kota: menyatakan kode dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>bps_nama_kabupaten_kota: menyatakan lingkup data berasal dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai penamaan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.&nbsp;</li><li>persentase_pendapatan: menyatakan <span id=\"editor-name\">persentase realisasi pendapatan daerah (pad) kota bogor</span> dengan tipe data numerik</li><li>satuan: menyatakan satuan dari &nbsp;<span id=\"editor-name\">realisasi pendapatan asli daerah (pad) kota bogor</span> dalam persen dengan tipe data teks.</li><li>tahun: menyatakan tahun produksi data dengan tipe data numerik.</li></ul>",
+        "periode": null,
+        "satuan": null,
+        "image": null,
+        "topik_name": "Keuangan",
+        "topik_image": "static/upload/20260424210644_wallet.png",
+        "topik_slug": "keuangan",
+        "topik_id": 62,
+        "organisasi_name": "Badan Pendapatan Daerah",
+        "organisasi_slug": "badan_pendapatan_daerah",
+        "organisasi_image": "static/upload/9772540ce5939a67d79b5884b8a7762303b853ba317fa5c775e35ff4c0c4d9e0.png",
+        "organisasi_notelp": "<redacted>",
+        "organisasi_alamat": "<redacted>",
+        "organisasi_website": "https://layanan-bapenda.kotabogor.go.id/web/",
+        "organisasi_email": "<redacted>",
+        "organisasi_id": 201,
+        "kode_wilayah": "32.71",
+        "nama_wilayah": "KOTA BOGOR",
+        "wilayah_image": "static/upload/16_kotabogor.png",
+        "wilayah_id": 20,
+        "klasifikasi": "public",
+        "kategori": "indikator",
+        "data_tetap": "tetap",
+        "tags": "data indikator,pendapatan asli daerah,badan pendapatan daerah",
+        "priority_level": "priority",
+        "data_score_status": "sangat_baik",
+        "count_view_opendata": 567,
+        "count_download_opendata": 48,
+        "count_share_opendata": 1,
+        "count_view_satudata": 10,
+        "count_download_satudata": 0,
+        "count_share_satudata": 0,
+        "schema": "badan_pendapatan_daerah",
+        "table": "persentase_realisasi_pendapatan_asli_daerah_pad_kota_bogor",
+        "validate": "approve",
+        "validate_discontinue": null,
+        "timestamp_discontinue_submit": null,
+        "timestamp_discontinue_approved": null,
+        "cdate": "2025-01-31T11:41:04.223150+07:07",
+        "mdate": "2025-05-20T10:29:51.471390+07:07",
+        "is_highlight": false,
+        "is_realtime": false,
+        "is_active": true,
+        "is_deleted": false,
+        "history_draft": [
+          {
+            "id": 32578,
+            "dataset_id": 19242,
+            "type": "preview",
+            "notes": null,
+            "cdate": "2025-01-31T11:41:04.748866+07:07"
+          },
+          {
+            "id": 32579,
+            "dataset_id": 19242,
+            "type": "verification-new",
+            "notes": null,
+            "cdate": "2025-01-31T11:41:07.671859+07:07"
+          },
+          {
+            "id": 32583,
+            "dataset_id": 19242,
+            "type": "preview",
+            "notes": "perbaikan judul",
+            "cdate": "2025-01-31T14:23:28.083563+07:07"
+          },
+          {
+            "id": 32584,
+            "dataset_id": 19242,
+            "type": "verification-new",
+            "notes": "perbaikan judul",
+            "cdate": "2025-01-31T14:23:31.010318+07:07"
+          },
+          {
+            "id": 32585,
+            "dataset_id": 19242,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-01-31T14:23:38.131432+07:07"
+          },
+          {
+            "id": 34099,
+            "dataset_id": 19242,
+            "type": "preview",
+            "notes": "Updating data tahun 2024",
+            "cdate": "2025-05-09T14:01:43.681737+07:07"
+          },
+          {
+            "id": 34100,
+            "dataset_id": 19242,
+            "type": "verification-edit",
+            "notes": "Updating data tahun 2024",
+            "cdate": "2025-05-09T14:01:49.993358+07:07"
+          },
+          {
+            "id": 35312,
+            "dataset_id": 19242,
+            "type": "preview",
+            "notes": "Penambahan data prioritas dan perubahan dimensi data",
+            "cdate": "2025-05-20T10:29:44.520607+07:07"
+          },
+          {
+            "id": 35313,
+            "dataset_id": 19242,
+            "type": "verification-edit",
+            "notes": "Penambahan data prioritas dan perubahan dimensi data",
+            "cdate": "2025-05-20T10:29:47.004713+07:07"
+          },
+          {
+            "id": 35314,
+            "dataset_id": 19242,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-05-20T10:29:51.547625+07:07"
+          }
+        ],
+        "history_dataset_discontinue": [],
+        "metadata": [
+          {
+            "id": 179350,
+            "dataset_id": 19242,
+            "type": "bisnis",
+            "key": "Pengukuran Dataset",
+            "value": "Persentase Realisasi Asli Pendapatan Daerah (PAD)",
+            "cdate": "2025-05-20T10:29:43.668651+07:07",
+            "mdate": null
+          },
+          {
+            "id": 179351,
+            "dataset_id": 19242,
+            "type": "bisnis",
+            "key": "Tingkat Penyajian Dataset",
+            "value": "Kota Bogor",
+            "cdate": "2025-05-20T10:29:43.668665+07:07",
+            "mdate": null
+          },
+          {
+            "id": 179352,
+            "dataset_id": 19242,
+            "type": "bisnis",
+            "key": "Cakupan Dataset",
+            "value": "Seluruh  Pendapatan Asli Daerah (PAD) Kota Bogor",
+            "cdate": "2025-05-20T10:29:43.668670+07:07",
+            "mdate": null
+          },
+          {
+            "id": 179353,
+            "dataset_id": 19242,
+            "type": "bisnis",
+            "key": "Produsen",
+            "value": "Badan Pendapatan Daerah",
+            "cdate": "2025-05-20T10:29:43.668675+07:07",
+            "mdate": null
+          },
+          {
+            "id": 179354,
+            "dataset_id": 19242,
+            "type": "bisnis",
+            "key": "Kontak Produsen",
+            "value": "<redacted>",
+            "cdate": "2025-05-20T10:29:43.668679+07:07",
+            "mdate": null
+          },
+          {
+            "id": 179355,
+            "dataset_id": 19242,
+            "type": "bisnis",
+            "key": "Satuan Dataset",
+            "value": "PERSEN",
+            "cdate": "2025-05-20T10:29:43.668682+07:07",
+            "mdate": null
+          },
+          {
+            "id": 179356,
+            "dataset_id": 19242,
+            "type": "bisnis",
+            "key": "Frekuensi Dataset",
+            "value": "Tahunan",
+            "cdate": "2025-05-20T10:29:43.668686+07:07",
+            "mdate": null
+          },
+          {
+            "id": 179357,
+            "dataset_id": 19242,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Awal",
+            "value": "2015",
+            "cdate": "2025-05-20T10:29:43.668690+07:07",
+            "mdate": null
+          },
+          {
+            "id": 179358,
+            "dataset_id": 19242,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Akhir",
+            "value": "2024",
+            "cdate": "2025-05-20T10:29:43.668693+07:07",
+            "mdate": null
+          }
+        ],
+        "permission": [],
+        "data_priority": {
+          "name": "Persentase Realisasi Pendapatan Asli Daerah (PAD) Kota Bogor",
+          "ids": [
+            "0196dd8f-d496-72de-85df-0cc207d69896"
+          ],
+          "years": [
+            2024
+          ]
+        }
+      },
+      "error": {}
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:17+07:00"
+}

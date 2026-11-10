@@ -1,0 +1,306 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/datasets/persentase-sisa-lebih-perhitungan-anggaran-silpa-terhadap-anggaran-pendapatan-dan-belanja-daerah-apbd-di-kota-bogor",
+    "params": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success to get a dataset",
+      "data": {
+        "id": 19293,
+        "name": "Persentase Sisa Lebih Perhitungan Anggaran (SILPA) Terhadap Anggaran Pendapatan dan Belanja Daerah (APBD) di Kota Bogor",
+        "slug": "persentase-sisa-lebih-perhitungan-anggaran-silpa-terhadap-anggaran-pendapatan-dan-belanja-daerah-apbd-di-kota-bogor",
+        "deskripsi": "<p>Dataset ini berisi data <span id=\"editor-name\">persentase sisa lebih perhitungan anggaran (silpa) terhadap anggaran pendapatan dan belanja daerah (apbd) di kota bogor</span> dari tahun <span id=\"editor-yearStart\">2019 </span>s.d. <span id=\"editor-yearEnd\">2024</span>.</p><p>Dataset terkait topik <span id=\"editor-topic\">Keuangan </span>ini dihasilkan oleh <span id=\"editor-organization\">Badan Keuangan dan Aset Daerah </span>yang dikeluarkan dalam periode <span id=\"editor-periode\">1 tahun sekali</span>.</p><p>Penjelasan mengenai variabel di dalam dataset ini:</p><ul><li>kode_provinsi: menyatakan kode Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>nama_provinsi: menyatakan lingkup data berasal dari wilayah Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>bps_kode_kabupaten_kota: menyatakan kode dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>bps_nama_kabupaten_kota: menyatakan lingkup data berasal dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai penamaan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.&nbsp;</li><li>persentase_silpa: menyatakan <span id=\"editor-name\">persentase sisa lebih perhitungan anggaran (silpa) terhadap anggaran pendapatan dan belanja daerah (apbd) </span>dengan tipe data numerik</li><li>satuan: menyatakan satuan dari <span id=\"editor-name\">persentase sisa lebih perhitungan anggaran (silpa) terhadap anggaran pendapatan dan belanja daerah (apbd) </span>dalam persen dengan tipe data teks.</li><li>tahun: menyatakan tahun produksi data dengan tipe data numerik.</li></ul>",
+        "periode": null,
+        "satuan": null,
+        "image": null,
+        "topik_name": "Keuangan",
+        "topik_image": "static/upload/20260424210644_wallet.png",
+        "topik_slug": "keuangan",
+        "topik_id": 62,
+        "organisasi_name": "Badan Keuangan dan Aset Daerah",
+        "organisasi_slug": "badan_keuangan_dan_aset_daerah",
+        "organisasi_image": "static/upload/d11363150b0f28024873b1507afe09af3a18a1fcf1949ca533c3e291bff3df06.png",
+        "organisasi_notelp": "<redacted>",
+        "organisasi_alamat": "<redacted>",
+        "organisasi_website": "https://bkad.kotabogor.go.id",
+        "organisasi_email": "<redacted>",
+        "organisasi_id": 166,
+        "kode_wilayah": "32.71",
+        "nama_wilayah": "KOTA BOGOR",
+        "wilayah_image": "static/upload/16_kotabogor.png",
+        "wilayah_id": 20,
+        "klasifikasi": "public",
+        "kategori": "indikator",
+        "data_tetap": "tetap",
+        "tags": "data indikator,persentase silpa,bkad",
+        "priority_level": "priority",
+        "data_score_status": "sangat_baik",
+        "count_view_opendata": 53,
+        "count_download_opendata": 4,
+        "count_share_opendata": 0,
+        "count_view_satudata": 11,
+        "count_download_satudata": 1,
+        "count_share_satudata": 0,
+        "schema": "badan_keuangan_dan_aset_daerah",
+        "table": "persentase_sisa_lebih_perhitungan_anggaran_silpa_terhadap_angga",
+        "validate": "approve",
+        "validate_discontinue": null,
+        "timestamp_discontinue_submit": null,
+        "timestamp_discontinue_approved": null,
+        "cdate": "2025-02-06T22:06:42.371677+07:07",
+        "mdate": "2025-05-26T09:36:52.333927+07:07",
+        "is_highlight": false,
+        "is_realtime": false,
+        "is_active": true,
+        "is_deleted": false,
+        "history_draft": [
+          {
+            "id": 32749,
+            "dataset_id": 19293,
+            "type": "preview",
+            "notes": null,
+            "cdate": "2025-02-06T22:06:44.759717+07:07"
+          },
+          {
+            "id": 32750,
+            "dataset_id": 19293,
+            "type": "verification-new",
+            "notes": null,
+            "cdate": "2025-02-06T22:06:49.163940+07:07"
+          },
+          {
+            "id": 32757,
+            "dataset_id": 19293,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-02-07T08:19:28.678573+07:07"
+          },
+          {
+            "id": 33073,
+            "dataset_id": 19293,
+            "type": "preview",
+            "notes": "Menambahkan nilai persen tahun 2023 s.d 2024",
+            "cdate": "2025-02-17T10:15:40.432152+07:07"
+          },
+          {
+            "id": 33074,
+            "dataset_id": 19293,
+            "type": "preview",
+            "notes": "Menambahkan nilai persen tahun 2023-2024",
+            "cdate": "2025-02-17T10:19:40.764378+07:07"
+          },
+          {
+            "id": 33075,
+            "dataset_id": 19293,
+            "type": "verification-edit",
+            "notes": "Menambahkan nilai persen tahun 2023-2024",
+            "cdate": "2025-02-17T10:19:57.997592+07:07"
+          },
+          {
+            "id": 33080,
+            "dataset_id": 19293,
+            "type": "preview",
+            "notes": "Menambahkan persen SILPA tahun 2023-2024",
+            "cdate": "2025-02-17T10:33:15.767073+07:07"
+          },
+          {
+            "id": 33081,
+            "dataset_id": 19293,
+            "type": "verification-edit",
+            "notes": "Menambahkan persen SILPA tahun 2023-2024",
+            "cdate": "2025-02-17T10:33:22.247720+07:07"
+          },
+          {
+            "id": 33088,
+            "dataset_id": 19293,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-02-17T11:24:15.981537+07:07"
+          },
+          {
+            "id": 34369,
+            "dataset_id": 19293,
+            "type": "preview",
+            "notes": "Menambahkan persen dan nilai yang terletak di row nomor 7",
+            "cdate": "2025-05-15T09:29:22.467792+07:07"
+          },
+          {
+            "id": 34370,
+            "dataset_id": 19293,
+            "type": "verification-edit",
+            "notes": "Menambahkan persen dan nilai yang terletak di row nomor 7",
+            "cdate": "2025-05-15T09:29:25.484793+07:07"
+          },
+          {
+            "id": 35032,
+            "dataset_id": 19293,
+            "type": "preview",
+            "notes": "perubahan tahun pada keterangan dan penambahan data prioritas",
+            "cdate": "2025-05-20T08:31:45.064399+07:07"
+          },
+          {
+            "id": 35033,
+            "dataset_id": 19293,
+            "type": "verification-edit",
+            "notes": "perubahan tahun pada keterangan dan penambahan data prioritas",
+            "cdate": "2025-05-20T08:31:47.793152+07:07"
+          },
+          {
+            "id": 35034,
+            "dataset_id": 19293,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-05-20T08:31:52.672073+07:07"
+          },
+          {
+            "id": 35682,
+            "dataset_id": 19293,
+            "type": "preview",
+            "notes": "Melakukanpenambahan pada persen dataset yang terletak di row nomor 6 dan 7",
+            "cdate": "2025-05-22T15:22:03.539049+07:07"
+          },
+          {
+            "id": 35683,
+            "dataset_id": 19293,
+            "type": "verification-edit",
+            "notes": "Melakukanpenambahan pada persen dataset yang terletak di row nomor 6 dan 7",
+            "cdate": "2025-05-22T15:22:06.330582+07:07"
+          },
+          {
+            "id": 35878,
+            "dataset_id": 19293,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-05-26T09:36:52.451009+07:07"
+          },
+          {
+            "id": 35876,
+            "dataset_id": 19293,
+            "type": "preview",
+            "notes": "Melakukan perubahan pada dimensi awal tahun serta penambahan jenis dan judu data prioritas",
+            "cdate": "2025-05-26T09:36:38.630672+07:07"
+          },
+          {
+            "id": 35877,
+            "dataset_id": 19293,
+            "type": "verification-edit",
+            "notes": "Melakukan perubahan pada dimensi awal tahun serta penambahan jenis dan judu data prioritas",
+            "cdate": "2025-05-26T09:36:42.382744+07:07"
+          }
+        ],
+        "history_dataset_discontinue": [],
+        "metadata": [
+          {
+            "id": 181557,
+            "dataset_id": 19293,
+            "type": "bisnis",
+            "key": "Pengukuran Dataset",
+            "value": "Persentase Sisa Lebih Perhitungan Anggaran (SILPA) Terhadap Anggaran Pendapatan dan Belanja Daerah (APBD)",
+            "cdate": "2025-05-26T09:36:38.386173+07:07",
+            "mdate": null
+          },
+          {
+            "id": 181558,
+            "dataset_id": 19293,
+            "type": "bisnis",
+            "key": "Tingkat Penyajian Dataset",
+            "value": "Kota Bogor",
+            "cdate": "2025-05-26T09:36:38.386183+07:07",
+            "mdate": null
+          },
+          {
+            "id": 181559,
+            "dataset_id": 19293,
+            "type": "bisnis",
+            "key": "Cakupan Dataset",
+            "value": "Seluruh Sisa Lebih Perhitungan Anggaran (SILPA) Terhadap Anggaran Pendapatan dan Belanja Daerah (APBD) di Kota Bogor",
+            "cdate": "2025-05-26T09:36:38.386186+07:07",
+            "mdate": null
+          },
+          {
+            "id": 181560,
+            "dataset_id": 19293,
+            "type": "bisnis",
+            "key": "Produsen",
+            "value": "Badan Keuangan dan Aset Daerah",
+            "cdate": "2025-05-26T09:36:38.386189+07:07",
+            "mdate": null
+          },
+          {
+            "id": 181561,
+            "dataset_id": 19293,
+            "type": "bisnis",
+            "key": "Kontak Produsen",
+            "value": "<redacted>",
+            "cdate": "2025-05-26T09:36:38.386192+07:07",
+            "mdate": null
+          },
+          {
+            "id": 181562,
+            "dataset_id": 19293,
+            "type": "bisnis",
+            "key": "Satuan Dataset",
+            "value": "PERSEN",
+            "cdate": "2025-05-26T09:36:38.386194+07:07",
+            "mdate": null
+          },
+          {
+            "id": 181563,
+            "dataset_id": 19293,
+            "type": "bisnis",
+            "key": "Frekuensi Dataset",
+            "value": "Tahunan",
+            "cdate": "2025-05-26T09:36:38.386197+07:07",
+            "mdate": null
+          },
+          {
+            "id": 181564,
+            "dataset_id": 19293,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Awal",
+            "value": "2019",
+            "cdate": "2025-05-26T09:36:38.386199+07:07",
+            "mdate": null
+          },
+          {
+            "id": 181565,
+            "dataset_id": 19293,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Akhir",
+            "value": "2024",
+            "cdate": "2025-05-26T09:36:38.386202+07:07",
+            "mdate": null
+          },
+          {
+            "id": 181566,
+            "dataset_id": 19293,
+            "type": "bisnis",
+            "key": "Sumber External",
+            "value": "Badan Keuangan dan Aset Daerah",
+            "cdate": "2025-05-26T09:36:38.386204+07:07",
+            "mdate": null
+          }
+        ],
+        "permission": [],
+        "data_priority": {
+          "name": "Persentase Sisa Lebih Perhitungan Anggaran (SILPA) Terhadap Anggaran Pendapatan dan Belanja Daerah (APBD) di Kota Bogor",
+          "ids": [
+            "0196dd89-a968-7ec8-b9ad-436af137a7ab"
+          ],
+          "years": [
+            2024
+          ]
+        }
+      },
+      "error": {}
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:12+07:00"
+}

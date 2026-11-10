@@ -57,7 +57,12 @@ ALLOWED_PATHS = (
     re.compile(r"^/topik$"),
 )
 
-DROP_KEYS = frozenset({"username", "user_name", "cuid"})
+DROP_KEYS = frozenset({"username", "user_name", "cuid", "muid"})
+# KK-J: field kontak dan alamat OPD; tidak dibutuhkan MCP. Nilainya diganti REDACTED
+# (kunci dipertahankan agar bentuk respons sama).
+CONTACT_FIELDS = frozenset(
+    {"organisasi_email", "organisasi_notelp", "organisasi_alamat", "email", "notelp", "alamat"}
+)
 CONTACT_LABEL = "kontak produsen"
 VALUE_KEYS = ("value", "nilai", "isi", "content")
 REDACTED = "<redacted>"
@@ -205,11 +210,13 @@ def _is_contact_label(value: Any) -> bool:
 
 
 def sanitize(obj: Any, stats: SanitizeStats) -> Any:
-    """Salinan bersih: buang DROP_KEYS rekursif; redaksi nilai "Kontak Produsen".
+    """Salinan bersih: buang DROP_KEYS rekursif; redaksi kontak.
 
-    Bentuk metadata yang dikenali: kunci bernama "Kontak Produsen", atau objek yang salah
-    satu nilainya "Kontak Produsen" (mis. {key: "Kontak Produsen", value: ...}). Pada bentuk
-    kedua, kunci VALUE_KEYS diredaksi; bila tidak ada, semua nilai lain diredaksi.
+    - Field CONTACT_FIELDS yang tidak null diganti REDACTED (KK-J).
+    - Metadata "Kontak Produsen": kunci bernama "Kontak Produsen", atau objek yang salah
+      satu nilainya "Kontak Produsen" (mis. {key: "Kontak Produsen", value: ...}). Pada bentuk
+      kedua, kunci VALUE_KEYS diredaksi; bila tidak ada, semua nilai lain diredaksi.
+    Idempoten: menyanitasi ulang hasil sanitasi tidak mengubah apa pun.
     """
     if isinstance(obj, list):
         return [sanitize(item, stats) for item in obj]
@@ -221,6 +228,13 @@ def sanitize(obj: Any, stats: SanitizeStats) -> Any:
     for key, value in obj.items():
         if key in DROP_KEYS:
             stats.removed_keys += 1
+            continue
+        if key in CONTACT_FIELDS and value is not None and value != REDACTED:
+            out[key] = REDACTED
+            stats.redacted_contacts += 1
+            continue
+        if value == REDACTED:
+            out[key] = value
             continue
         if _is_contact_label(key) or (
             contact_entry
@@ -242,10 +256,15 @@ class PiiFinding:
 
 
 def scan_pii(obj: Any, file: str, path: str = "$") -> list[PiiFinding]:
-    """Pola email/telepon di nilai teks. Hanya lokasi yang dilaporkan, bukan nilainya."""
+    """Pola email/telepon di nilai teks. Hanya lokasi yang dilaporkan, bukan nilainya.
+
+    Field gambar (`image`, `*_image`) dilewati: nama berkas hash sering mirip nomor telepon.
+    """
     found: list[PiiFinding] = []
     if isinstance(obj, dict):
         for key, value in obj.items():
+            if key == "image" or str(key).endswith("_image"):
+                continue
             found.extend(scan_pii(value, file, f"{path}.{key}"))
     elif isinstance(obj, list):
         for index, value in enumerate(obj):
@@ -327,7 +346,8 @@ def build_plan(targets: dict[str, Any], slugs: list[str]) -> list[PlannedRequest
 def upper_bound(targets: dict[str, Any], plan: list[PlannedRequest]) -> int:
     """Batas atas bila katalog/bigdata lebih panjang dari perkiraan (tetap dipotong di 60)."""
     catalog = targets["catalog"]
-    extra_catalog = catalog["max_pages"] - catalog["expected_pages"]
+    has_catalog = any(p.group == "katalog" for p in plan)
+    extra_catalog = catalog["max_pages"] - catalog["expected_pages"] if has_catalog else 0
     bigdata_calls = sum(1 for p in plan if p.path.startswith("/bigdata"))
     extra_bigdata = bigdata_calls * (targets["bigdata"]["max_pages_per_dataset"] - 1)
     return len(plan) + extra_catalog + extra_bigdata
@@ -340,7 +360,16 @@ def format_dry_run(
     base_url: str,
     user_agent: str,
     out_dir: Path,
+    existing_required: bool = False,
 ) -> str:
+    if existing_required:
+        folder_note = (
+            "   [ada; berkas lama tidak ditimpa]"
+            if out_dir.is_dir()
+            else "   [BELUM ADA: --execute akan menolak]"
+        )
+    else:
+        folder_note = "   [SUDAH ADA: --execute akan menolak]" if out_dir.exists() else ""
     lines = [
         "DRY-RUN: tidak ada permintaan yang dikirim. Tambahkan --execute untuk merekam.",
         f"Base URL   : {base_url}",
@@ -348,8 +377,7 @@ def format_dry_run(
         + (
             "   [DITOLAK saat --execute: masih placeholder]" if UA_PLACEHOLDER in user_agent else ""
         ),
-        f"Keluaran   : {out_dir}"
-        + ("   [SUDAH ADA: --execute akan menolak]" if out_dir.exists() else ""),
+        f"Keluaran   : {out_dir}" + folder_note,
         f"Aturan     : GET saja, jeda {REQUEST_DELAY_S} dtk, anggaran keras {MAX_REQUESTS}, "
         "429 berhenti, 5xx retry sekali (5 dtk), timeout 20 dtk, '/view' ditolak",
         "",
@@ -378,13 +406,33 @@ def _safe_name(label: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", label.lower()).strip("-")[:80] or "respons"
 
 
+def _dump(obj: Any) -> bytes:
+    return (json.dumps(obj, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+
+
+_NUMBERED = re.compile(r"^(\d{3})_.+\.json$")
+
+
+def numbered_files(folder: Path) -> list[Path]:
+    """Berkas rekaman bernomor (NNN_*.json) terurut; manifest dan turunan tidak termasuk."""
+    return sorted(p for p in folder.glob("*.json") if _NUMBERED.match(p.name))
+
+
+def last_index(folder: Path) -> int:
+    files = numbered_files(folder)
+    return int(_NUMBERED.match(files[-1].name).group(1)) if files else 0
+
+
 class Session:
     """Merekam lewat Recorder, menyanitasi, lalu menulis satu JSON per permintaan."""
 
-    def __init__(self, recorder: Recorder, out_dir: Path, base_url: str) -> None:
+    def __init__(
+        self, recorder: Recorder, out_dir: Path, base_url: str, start_index: int = 0
+    ) -> None:
         self.recorder = recorder
         self.out_dir = out_dir
         self.base_url = base_url
+        self.start_index = start_index
         self.files: list[tuple[str, dict[str, Any]]] = []
         self.manifest: list[dict[str, Any]] = []
         self.stats = SanitizeStats()
@@ -401,9 +449,12 @@ class Session:
 
     def _write(self, label: str, exchange: dict[str, Any]) -> dict[str, Any]:
         clean = sanitize(exchange, self.stats)
-        name = f"{len(self.files) + 1:03d}_{_safe_name(label)}.json"
-        data = (json.dumps(clean, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
-        (self.out_dir / name).write_bytes(data)
+        name = f"{self.start_index + len(self.files) + 1:03d}_{_safe_name(label)}.json"
+        target = self.out_dir / name
+        if target.exists():
+            raise ConfigProblem(f"berkas {name} sudah ada; tidak ditimpa")
+        data = _dump(clean)
+        target.write_bytes(data)
         self.files.append((name, clean))
         self.pii.extend(scan_pii(clean, name))
         self.manifest.append(
@@ -607,6 +658,276 @@ def execute(
     return result
 
 
+# ---------------------------------------------------------------- mode --only
+
+
+def latest_date_folder(out_root: Path) -> Path | None:
+    folders = sorted(
+        p for p in out_root.glob("*") if p.is_dir() and re.fullmatch(r"\d{4}-\d{2}-\d{2}", p.name)
+    )
+    return folders[-1] if folders else None
+
+
+def plan_only(targets: dict[str, Any], slug: str) -> list[PlannedRequest]:
+    bigdata = targets["bigdata"]
+    plan = [
+        PlannedRequest("only", f"/datasets/{slug}", {}),
+        PlannedRequest(
+            "only",
+            "/bigdata/{schema}/{table}",
+            {"page": 1, "per_page": bigdata["per_page"]},
+            f"schema/table dari detail; maks {bigdata['max_pages_per_dataset']} halaman",
+        ),
+    ]
+    check_path(plan[0].path)
+    return plan
+
+
+def only_manifest_path(out_dir: Path, slug: str) -> Path:
+    return out_dir / f"manifest_only_{_safe_name(slug)}.json"
+
+
+def execute_only(
+    targets: dict[str, Any],
+    slug: str,
+    *,
+    base_url: str,
+    user_agent: str,
+    out_dir: Path,
+    client: httpx.Client | None = None,
+    sleep: Callable[[float], None] = time.sleep,
+    clock: Callable[[], datetime] = _now,
+) -> RunResult:
+    """Rekam detail + /bigdata satu slug ke folder tanggal yang sudah ada.
+
+    Semua aturan akses tetap berlaku. Berkas baru dinomori setelah berkas terakhir;
+    tidak ada berkas yang ditimpa, termasuk manifest.json (manifest terpisah per slug).
+    """
+    validate_user_agent(user_agent)
+    check_path(f"/datasets/{slug}")
+    if not out_dir.is_dir():
+        raise ConfigProblem(f"folder {out_dir} belum ada; --only menulis ke folder rekaman lama")
+    manifest_path = only_manifest_path(out_dir, slug)
+    if manifest_path.exists():
+        raise ConfigProblem(f"{manifest_path.name} sudah ada; tidak ditimpa")
+    own_client = client is None
+    if client is None:
+        client = httpx.Client(
+            base_url=base_url,
+            headers={"User-Agent": user_agent},
+            timeout=TIMEOUT_S,
+            follow_redirects=False,
+        )
+    recorder = Recorder(client, sleep=sleep, clock=clock)
+    session = Session(recorder, out_dir, base_url, start_index=last_index(out_dir))
+    started = clock()
+    stop_reason: str | None = None
+    notes: list[str] = []
+    try:
+        record_dataset(session, slug, targets["bigdata"], notes)
+    except RecorderStop as stop:
+        stop_reason = f"{type(stop).__name__}: {stop}"
+    finally:
+        if own_client:
+            client.close()
+    manifest = {
+        "started_at": started.isoformat(timespec="seconds"),
+        "mode": "only",
+        "slug": slug,
+        "base_url": base_url,
+        "budget": MAX_REQUESTS,
+        "request_count": recorder.sent,
+        "file_count": len(session.files),
+        "stop_reason": stop_reason,
+        "incidents": recorder.incidents,
+        "notes": notes,
+        "files": session.manifest,
+    }
+    manifest_path.write_bytes(_dump(manifest))
+    return RunResult(
+        out_dir=out_dir,
+        files=session.files,
+        sent=recorder.sent,
+        stop_reason=stop_reason,
+        candidates={},
+        pii=session.pii,
+        stats=session.stats,
+        incidents=recorder.incidents,
+        notes=notes,
+    )
+
+
+# ---------------------------------------------------------------- sanitasi ulang (lokal)
+
+
+def resanitize(folder: Path, report_path: Path, targets: dict[str, Any]) -> RunResult:
+    """Terapkan sanitasi terbaru ke rekaman yang sudah ada, tanpa permintaan jaringan.
+
+    Berkas bernomor yang berubah ditulis ulang; sha256 di semua manifest*.json
+    diperbarui; laporan dibuat ulang dari berkas yang ada di disk.
+    """
+    if not folder.is_dir():
+        raise ConfigProblem(f"folder {folder} tidak ada")
+    stats = SanitizeStats()
+    files: list[tuple[str, dict[str, Any]]] = []
+    pii: list[PiiFinding] = []
+    new_hashes: dict[str, str] = {}
+    for path in numbered_files(folder):
+        original = path.read_bytes()
+        clean = sanitize(json.loads(original), stats)
+        data = _dump(clean)
+        if data != original:
+            path.write_bytes(data)
+        new_hashes[path.name] = hashlib.sha256(data).hexdigest()
+        files.append((path.name, clean))
+        pii.extend(scan_pii(clean, path.name))
+
+    main_manifest: dict[str, Any] = {}
+    for manifest_path in sorted(folder.glob("manifest*.json")):
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        for entry in manifest.get("files", []):
+            if entry["file"] in new_hashes:
+                entry["sha256"] = new_hashes[entry["file"]]
+        manifest_path.write_bytes(_dump(manifest))
+        if manifest_path.name == "manifest.json":
+            main_manifest = manifest
+
+    catalog_items = [
+        item
+        for _, exchange in files
+        if exchange["request"]["path"] == "/datasets"
+        for item in (_json_body(exchange).get("data") or [])
+        if isinstance(item, dict)
+    ]
+    result = RunResult(
+        out_dir=folder,
+        files=files,
+        sent=int(main_manifest.get("request_count", len(files))),
+        stop_reason=main_manifest.get("stop_reason"),
+        candidates=find_candidates(catalog_items, targets.get("metric_cards") or []),
+        pii=pii,
+        stats=stats,
+        incidents=list(main_manifest.get("incidents", [])),
+        notes=[],
+    )
+    report_path.write_text(
+        build_report(result, date.fromisoformat(folder.name)), encoding="utf-8", newline="\n"
+    )
+    return result
+
+
+# ---------------------------------------------------------------- katalog ramping (lokal)
+
+CATALOG_SLIM_NAME = "catalog_slim.json"
+# Dok 2 bagian 2: field katalog yang dipakai MCP. Kontak OPD, hitungan view/download/share,
+# path gambar, tags, dan field akun tidak ikut (KK-J).
+CATALOG_SLIM_FIELDS = (
+    "id",
+    "slug",
+    "name",
+    "deskripsi",
+    "organisasi_id",
+    "organisasi_name",
+    "organisasi_slug",
+    "topik_id",
+    "topik_name",
+    "topik_slug",
+    "kategori",
+    "klasifikasi",
+    "validate",
+    "priority_level",
+    "data_score_status",
+    "kode_wilayah",
+    "schema",
+    "table",
+    "mdate",
+)
+CATALOG_SLIM_METADATA_KEYS = (
+    "Satuan Dataset",
+    "Frekuensi Dataset",
+    "Dimensi Dataset Awal",
+    "Dimensi Dataset Akhir",
+    "Tingkat Penyajian Dataset",
+    "Cakupan Dataset",
+)
+CATALOG_SLIM_HISTORY_KEYS = ("type", "cdate", "notes")
+
+
+def slim_record(record: dict[str, Any]) -> dict[str, Any]:
+    out = {key: record.get(key) for key in CATALOG_SLIM_FIELDS}
+    out["metadata"] = [
+        {"key": m.get("key"), "value": m.get("value")}
+        for m in record.get("metadata") or []
+        if isinstance(m, dict) and m.get("key") in CATALOG_SLIM_METADATA_KEYS
+    ]
+    out["history_draft"] = [
+        {key: entry.get(key) for key in CATALOG_SLIM_HISTORY_KEYS}
+        for entry in record.get("history_draft") or []
+        if isinstance(entry, dict)
+    ]
+    return out
+
+
+def build_catalog_slim(folder: Path) -> dict[str, Any]:
+    """Gabungkan semua halaman katalog di folder menjadi satu berkas ramping (lokal)."""
+    pages: list[tuple[int, str, dict[str, Any]]] = []
+    for path in numbered_files(folder):
+        exchange = json.loads(path.read_text(encoding="utf-8"))
+        if exchange["request"]["path"] == "/datasets":
+            pages.append((int(exchange["request"]["params"]["page"]), path.name, exchange))
+    if not pages:
+        raise ConfigProblem(f"tidak ada halaman katalog di {folder}")
+    pages.sort()
+    numbers = [page for page, _, _ in pages]
+    total_page = _json_body(pages[0][2]).get("pagination", {}).get("total_page")
+    total_data = _json_body(pages[0][2]).get("pagination", {}).get("total_data")
+    if numbers != list(range(1, len(numbers) + 1)) or (total_page and len(numbers) != total_page):
+        raise ConfigProblem(f"halaman katalog tidak lengkap: {numbers}, total_page={total_page}")
+    records = [
+        slim_record(item)
+        for _, _, exchange in pages
+        for item in _json_body(exchange).get("data") or []
+        if isinstance(item, dict)
+    ]
+    slugs = [r["slug"] for r in records]
+    if len(set(slugs)) != len(slugs):
+        raise ConfigProblem("slug ganda di katalog")
+    if total_data is not None and len(records) != total_data:
+        raise ConfigProblem(f"jumlah record {len(records)} ≠ pagination.total_data {total_data}")
+    return {
+        "_keterangan": (
+            "Katalog ramping turunan halaman /datasets (Dok 5: halaman 1 dan terakhir di-commit "
+            "mentah). Hanya field yang dipakai MCP (Dok 2 bagian 2); metadata hanya key/value "
+            "yang dipakai; history_draft hanya type/cdate/notes. Dibuat oleh "
+            "scripts/record_fixtures.py --slim-catalog tanpa permintaan jaringan."
+        ),
+        "source_folder": _display_path(folder),
+        "source_files": [name for _, name, _ in pages],
+        "recorded_at": pages[0][2].get("recorded_at"),
+        "pagination_total_data": total_data,
+        "record_count": len(records),
+        "fields": [*CATALOG_SLIM_FIELDS, "metadata", "history_draft"],
+        "metadata_keys": list(CATALOG_SLIM_METADATA_KEYS),
+        "records": records,
+    }
+
+
+def dump_catalog_slim(slim: dict[str, Any]) -> bytes:
+    """JSON sah dengan header berindentasi dan satu record per baris (ringkas, enak di-diff)."""
+    header = {k: v for k, v in slim.items() if k != "records"}
+    head = json.dumps(header, ensure_ascii=False, indent=2)[:-2]  # buang "\n}" penutup
+    records = ",\n".join(
+        "    " + json.dumps(r, ensure_ascii=False, separators=(",", ":")) for r in slim["records"]
+    )
+    return f'{head},\n  "records": [\n{records}\n  ]\n}}\n'.encode()
+
+
+def write_catalog_slim(folder: Path) -> Path:
+    target = folder / CATALOG_SLIM_NAME
+    target.write_bytes(dump_catalog_slim(build_catalog_slim(folder)))
+    return target
+
+
 # ---------------------------------------------------------------- laporan
 
 
@@ -735,8 +1056,8 @@ def build_report(result: RunResult, today: date) -> str:
         f"- Berhenti lebih awal: {result.stop_reason or 'tidak'}",
         f"- Insiden 5xx: {'; '.join(result.incidents) or 'tidak ada'}",
         f"- Sanitasi: {result.stats.removed_keys} kunci akun dibuang "
-        f"({', '.join(sorted(DROP_KEYS))}); {result.stats.redacted_contacts} nilai "
-        "Kontak Produsen diredaksi",
+        f"({', '.join(sorted(DROP_KEYS))}); {result.stats.redacted_contacts} nilai kontak "
+        f"diredaksi (Kontak Produsen, {', '.join(sorted(CONTACT_FIELDS))})",
     ]
     out += [f"- Catatan: {note}" for note in result.notes]
 
@@ -785,8 +1106,17 @@ def build_report(result: RunResult, today: date) -> str:
         out.append("")
 
     out += ["## Temuan email/telepon setelah sanitasi", ""]
-    out += [f"- {p.kind}: `{p.file}` di `{p.json_path}`" for p in result.pii] or ["- tidak ada"]
+    out.append("Dikelompokkan per berkas dan pola path (indeks list diringkas menjadi `[]`).")
+    out.append("")
+    out += [
+        f"- {kind}: `{file}` di `{path}` ({count} kali)"
+        for (kind, file, path), count in sorted(group_pii(result.pii).items())
+    ] or ["- tidak ada"]
     return "\n".join(out) + "\n"
+
+
+def group_pii(findings: Iterable[PiiFinding]) -> Counter[tuple[str, str, str]]:
+    return Counter((p.kind, p.file, re.sub(r"\[\d+\]", "[]", p.json_path)) for p in findings)
 
 
 # ---------------------------------------------------------------- CLI
@@ -798,10 +1128,44 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--targets", type=Path, default=DEFAULT_TARGETS)
     parser.add_argument("--out-root", type=Path, default=DEFAULT_OUT_ROOT)
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
+    parser.add_argument(
+        "--date", help="folder tanggal (YYYY-MM-DD); bawaan: --only/lokal = folder terbaru"
+    )
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--only", metavar="SLUG", help="rekam detail + /bigdata satu slug saja")
+    mode.add_argument(
+        "--resanitize", action="store_true", help="sanitasi ulang rekaman (lokal, tanpa jaringan)"
+    )
+    mode.add_argument("--slim-catalog", action="store_true", help="buat catalog_slim.json (lokal)")
     args = parser.parse_args(argv)
 
     settings = Settings()
     targets = load_targets(args.targets)
+
+    if args.only or args.resanitize or args.slim_catalog:
+        folder = args.out_root / args.date if args.date else latest_date_folder(args.out_root)
+        if folder is None:
+            print(f"DITOLAK: belum ada folder rekaman di {args.out_root}")
+            return 2
+        try:
+            if args.resanitize:
+                result = resanitize(folder, args.report, targets)
+                print(
+                    f"Sanitasi ulang {len(result.files)} berkas di {folder}: "
+                    f"{result.stats.removed_keys} kunci akun dibuang, "
+                    f"{result.stats.redacted_contacts} nilai kontak diredaksi, "
+                    f"{len(result.pii)} temuan email/telepon tersisa. Laporan: {args.report}"
+                )
+                return 0
+            if args.slim_catalog:
+                target = write_catalog_slim(folder)
+                count = json.loads(target.read_text(encoding="utf-8"))["record_count"]
+                print(f"{target} ditulis: {count} record, {target.stat().st_size:,} byte")
+                return 0
+            return _run_only(args, targets, settings, folder)
+        except ConfigProblem as exc:
+            print(f"DITOLAK: {exc}")
+            return 2
     slugs = golden_slugs(ROOT / targets["golden_set"]["path"])
     expected = targets["golden_set"]["expected_count"]
     if len(slugs) != expected:
@@ -836,6 +1200,47 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     print(f"Selesai: {result.sent} permintaan, {len(result.files)} berkas di {result.out_dir}")
     print(f"Laporan: {args.report}")
+    if result.stop_reason:
+        print(f"BERHENTI LEBIH AWAL: {result.stop_reason}")
+        return 1
+    return 0
+
+
+def _run_only(
+    args: argparse.Namespace, targets: dict[str, Any], settings: Settings, folder: Path
+) -> int:
+    plan = plan_only(targets, args.only)
+    if not args.execute:
+        next_index = last_index(folder) + 1 if folder.is_dir() else 1
+        manifest = only_manifest_path(folder, args.only)
+        print(
+            format_dry_run(
+                plan,
+                targets,
+                base_url=settings.source_base_url,
+                user_agent=settings.user_agent,
+                out_dir=folder,
+                existing_required=True,
+            )
+        )
+        print(
+            f"Berkas baru mulai dari nomor {next_index:03d}; manifest terpisah: {manifest.name}"
+            + ("   [SUDAH ADA: --execute akan menolak]" if manifest.exists() else "")
+        )
+        return 0
+    result = execute_only(
+        targets,
+        args.only,
+        base_url=settings.source_base_url,
+        user_agent=settings.user_agent,
+        out_dir=folder,
+    )
+    print(f"Selesai: {result.sent} permintaan, {len(result.files)} berkas baru di {folder}")
+    for name, _ in result.files:
+        print(f"  {name}")
+    print(f"Temuan email/telepon: {len(result.pii)}")
+    for note in result.notes:
+        print(f"Catatan: {note}")
     if result.stop_reason:
         print(f"BERHENTI LEBIH AWAL: {result.stop_reason}")
         return 1

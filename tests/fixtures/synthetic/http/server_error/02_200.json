@@ -1,6 +1,6 @@
 {
   "_synthetic": true,
-  "_keterangan": "Urutan 2/2: setelah backoff, halaman katalog berhasil. Bentuk pagination rekaan; bentuk aslinya dicatat di FIXTURE_REPORT setelah perekaman.",
+  "_keterangan": "Urutan 2/2: setelah backoff, halaman katalog berhasil. Bentuk pagination disamakan dengan rekaman asli 2026-11-10; isi record rekaan.",
   "request": {"method": "GET", "path": "/datasets", "params": {"page": 1, "per_page": 100}},
   "response": {
     "status": 200,
@@ -12,7 +12,7 @@
         {"id": 101, "slug": "contoh-dataset", "name": "Contoh Dataset", "validate": "approve", "klasifikasi": "public"}
       ],
       "error": null,
-      "pagination": {"page": 1, "per_page": 100, "total": 1, "total_page": 1}
+      "pagination": {"page": 1, "per_page": 100, "total_page": 1, "total_data": 1, "has_next": false, "has_previous": false}
     }
   }
 }

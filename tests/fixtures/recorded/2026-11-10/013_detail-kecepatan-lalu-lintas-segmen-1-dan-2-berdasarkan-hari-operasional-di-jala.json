@@ -1,0 +1,275 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/datasets/kecepatan-lalu-lintas-segmen-1-dan-2-berdasarkan-hari-operasional-di-jalan-raya-pajajaran-kota-bogor",
+    "params": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success to get a dataset",
+      "data": {
+        "id": 18750,
+        "name": "Kecepatan Lalu Lintas Segmen 1 dan 2 Berdasarkan Hari Operasional di Jalan Raya Pajajaran Kota Bogor",
+        "slug": "kecepatan-lalu-lintas-segmen-1-dan-2-berdasarkan-hari-operasional-di-jalan-raya-pajajaran-kota-bogor",
+        "deskripsi": "<p>Dataset ini berisi data <span id=\"editor-name\">kecepatan lalu lintas segmen 1 dan 2 berdasarkan hari operasional di Jalan Raya Pajajaran Kota Bogor </span>dari tahun <span id=\"editor-yearStart\">2015 </span>s.d. <span id=\"editor-yearEnd\">2025</span>.</p><p>Dataset terkait topik <span id=\"editor-topic\">Perhubungan </span>ini dihasilkan oleh <span id=\"editor-organization\">Dinas Perhubungan Kota Bogor </span>yang dikeluarkan dalam periode <span id=\"editor-periode\">1 tahun sekali</span>.</p><p>Penjelasan mengenai variabel di dalam dataset ini:</p><ul><li>kode_provinsi: menyatakan kode Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>nama_provinsi: menyatakan lingkup data berasal dari wilayah Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>bps_kode_kabupaten_kota: menyatakan kode dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>bps_nama_kabupaten_kota: menyatakan lingkup data berasal dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai penamaan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>no_segmen: nomor segmen jalan dengan tipe data numerik.</li><li>segmen: nama segmen jalan dengan tipe data teks.</li><li>hari_operasional: menyatakan hari operasional dengan tipe data teks.<ul><li>HARI KERJA: menyatakan hari operasional yaitu hari kerja.</li><li>HARI LIBUR: menyatakan hari operasional yaitu hari libur.</li></ul></li><li>kecepatan: nilai kecepatan rata-rata kendaraan yang melintasi suatu segmen jalan dengan tipe data numerik.</li><li>satuan: satuan data dalam bentuk km/jam dengan tipe data teks.</li><li>tahun: menyatakan tahun produksi data dengan tipe data numerik.</li></ul>",
+        "periode": null,
+        "satuan": null,
+        "image": null,
+        "topik_name": "Perhubungan",
+        "topik_image": "static/upload/e23d33d62ffdb33eeba1b758bff6b3ed84d800fab601549e1164c9da7d8f24e2.png",
+        "topik_slug": "perhubungan",
+        "topik_id": 81,
+        "organisasi_name": "Dinas Perhubungan",
+        "organisasi_slug": "dinas_perhubungan",
+        "organisasi_image": "static/upload/4bd8c39f8bd9f37a9d289feda9f18e49cb35177ec93105636ee22652bef0ffc7.png",
+        "organisasi_notelp": "<redacted>",
+        "organisasi_alamat": "<redacted>",
+        "organisasi_website": "https://dishub.kotabogor.go.id",
+        "organisasi_email": "<redacted>",
+        "organisasi_id": 175,
+        "kode_wilayah": "32.71",
+        "nama_wilayah": "KOTA BOGOR",
+        "wilayah_image": "static/upload/16_kotabogor.png",
+        "wilayah_id": 20,
+        "klasifikasi": "public",
+        "kategori": "agregat",
+        "data_tetap": "tetap",
+        "tags": "dinas perhubungan kota bogor,data agregat,lalu lintas kota bogor,jalan pajajaran",
+        "priority_level": "priority",
+        "data_score_status": "sangat_baik",
+        "count_view_opendata": 211,
+        "count_download_opendata": 17,
+        "count_share_opendata": 0,
+        "count_view_satudata": 12,
+        "count_download_satudata": 2,
+        "count_share_satudata": 0,
+        "schema": "dinas_perhubungan",
+        "table": "kecepatan_lalu_lintas_segmen_1_dan_2_berdasarkan_hari",
+        "validate": "approve",
+        "validate_discontinue": null,
+        "timestamp_discontinue_submit": null,
+        "timestamp_discontinue_approved": null,
+        "cdate": "2024-06-01T14:41:35.585344+07:07",
+        "mdate": "2026-03-11T12:01:45.060992+07:07",
+        "is_highlight": false,
+        "is_realtime": false,
+        "is_active": true,
+        "is_deleted": false,
+        "history_draft": [
+          {
+            "id": 30715,
+            "dataset_id": 18750,
+            "type": "preview",
+            "notes": null,
+            "cdate": "2024-06-01T14:41:35.824242+07:07"
+          },
+          {
+            "id": 30716,
+            "dataset_id": 18750,
+            "type": "verification-new",
+            "notes": null,
+            "cdate": "2024-06-01T14:41:39.004827+07:07"
+          },
+          {
+            "id": 30718,
+            "dataset_id": 18750,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2024-06-01T14:43:05.144698+07:07"
+          },
+          {
+            "id": 30801,
+            "dataset_id": 18750,
+            "type": "preview",
+            "notes": "perbaikan standarisasi data",
+            "cdate": "2024-06-24T09:00:51.340045+07:07"
+          },
+          {
+            "id": 30802,
+            "dataset_id": 18750,
+            "type": "verification-edit",
+            "notes": "perbaikan standarisasi data",
+            "cdate": "2024-06-24T09:00:54.490003+07:07"
+          },
+          {
+            "id": 30803,
+            "dataset_id": 18750,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2024-06-24T09:03:14.658928+07:07"
+          },
+          {
+            "id": 34311,
+            "dataset_id": 18750,
+            "type": "preview",
+            "notes": "melakukan perubahan data pada row 74 sampai dengan Row 81",
+            "cdate": "2025-05-14T10:34:22.957255+07:07"
+          },
+          {
+            "id": 34312,
+            "dataset_id": 18750,
+            "type": "verification-edit",
+            "notes": "melakukan perubahan data pada row 74 sampai dengan Row 81",
+            "cdate": "2025-05-14T10:34:25.836149+07:07"
+          },
+          {
+            "id": 35109,
+            "dataset_id": 18750,
+            "type": "preview",
+            "notes": "Tahun 2024 tidak dilakukan pengukuran",
+            "cdate": "2025-05-20T09:11:41.482278+07:07"
+          },
+          {
+            "id": 35110,
+            "dataset_id": 18750,
+            "type": "verification-edit",
+            "notes": "Tahun 2024 tidak dilakukan pengukuran",
+            "cdate": "2025-05-20T09:11:46.243719+07:07"
+          },
+          {
+            "id": 35112,
+            "dataset_id": 18750,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-05-20T09:11:51.507547+07:07"
+          },
+          {
+            "id": 37672,
+            "dataset_id": 18750,
+            "type": "verification-edit",
+            "notes": "penambahan data tahun 2025",
+            "cdate": "2026-03-10T11:43:13.370810+07:07"
+          },
+          {
+            "id": 37697,
+            "dataset_id": 18750,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2026-03-11T12:01:45.214520+07:07"
+          }
+        ],
+        "history_dataset_discontinue": [],
+        "metadata": [
+          {
+            "id": 190177,
+            "dataset_id": 18750,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Akhir",
+            "value": "2025",
+            "cdate": "2026-03-10T11:43:12.904832+07:07",
+            "mdate": null
+          },
+          {
+            "id": 190178,
+            "dataset_id": 18750,
+            "type": "bisnis",
+            "key": "Sumber External",
+            "value": "None",
+            "cdate": "2026-03-10T11:43:12.904835+07:07",
+            "mdate": null
+          },
+          {
+            "id": 190168,
+            "dataset_id": 18750,
+            "type": "bisnis",
+            "key": "Pengukuran Dataset",
+            "value": "Kecepatan Lalu Lintas Segmen 1 dan 2",
+            "cdate": "2026-03-10T11:43:12.904793+07:07",
+            "mdate": null
+          },
+          {
+            "id": 190169,
+            "dataset_id": 18750,
+            "type": "bisnis",
+            "key": "Tingkat Penyajian Dataset",
+            "value": "Hari Operasional",
+            "cdate": "2026-03-10T11:43:12.904806+07:07",
+            "mdate": null
+          },
+          {
+            "id": 190170,
+            "dataset_id": 18750,
+            "type": "bisnis",
+            "key": "Cakupan Dataset",
+            "value": "Semua Kecepatan Lalu Lintas di Jalan Raya Pajajaran Kota Bogor",
+            "cdate": "2026-03-10T11:43:12.904810+07:07",
+            "mdate": null
+          },
+          {
+            "id": 190171,
+            "dataset_id": 18750,
+            "type": "bisnis",
+            "key": "Produsen",
+            "value": "Dinas Perhubungan",
+            "cdate": "2026-03-10T11:43:12.904814+07:07",
+            "mdate": null
+          },
+          {
+            "id": 190172,
+            "dataset_id": 18750,
+            "type": "bisnis",
+            "key": "Kontak Produsen",
+            "value": "<redacted>",
+            "cdate": "2026-03-10T11:43:12.904817+07:07",
+            "mdate": null
+          },
+          {
+            "id": 190173,
+            "dataset_id": 18750,
+            "type": "bisnis",
+            "key": "Kode Indikator",
+            "value": "None",
+            "cdate": "2026-03-10T11:43:12.904820+07:07",
+            "mdate": null
+          },
+          {
+            "id": 190174,
+            "dataset_id": 18750,
+            "type": "bisnis",
+            "key": "Satuan Dataset",
+            "value": "KM/JAM",
+            "cdate": "2026-03-10T11:43:12.904823+07:07",
+            "mdate": null
+          },
+          {
+            "id": 190175,
+            "dataset_id": 18750,
+            "type": "bisnis",
+            "key": "Frekuensi Dataset",
+            "value": "Tahunan",
+            "cdate": "2026-03-10T11:43:12.904826+07:07",
+            "mdate": null
+          },
+          {
+            "id": 190176,
+            "dataset_id": 18750,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Awal",
+            "value": "2015",
+            "cdate": "2026-03-10T11:43:12.904829+07:07",
+            "mdate": null
+          }
+        ],
+        "permission": [],
+        "data_priority": {
+          "name": "Kecepatan Lalu Lintas Segmen 1 dan 2 Berdasarkan Hari Operasional di Jalan Raya Pajajaran Kota Bogor",
+          "ids": [
+            "0196dd2c-7bbe-7d8c-8e01-cdbc6535cd95",
+            "019cb6de-0fc8-79a6-9630-7c11d4295a0e"
+          ],
+          "years": [
+            2024,
+            2025
+          ]
+        }
+      },
+      "error": {}
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:09+07:00"
+}

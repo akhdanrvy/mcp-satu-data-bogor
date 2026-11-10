@@ -26,15 +26,24 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 
 ## TODO dari Langkah 2 (10 Nov 2026)
 
-- [ ] **Langkah 3:** dari fixture asli, verifikasi (a) nama kolom id internal `/bigdata` untuk `INTERNAL_ID_COLUMNS` (KB-17); (b) bentuk `metadata_filter` dan `metadata[]` (KB-20); (c) nilai `type` di `history_draft`; (d) apakah ada angka desimal bertitik bertipe teks (risiko KB-16).
-- [ ] **Langkah 4:** adaptor meratakan `metadata_filter` → `{kolom: nilai_unik}` dan `metadata[]` → `{nama: nilai}` sebelum memanggil `services/periods` (KB-20).
+- [x] **Langkah 3:** dari fixture asli, verifikasi (a) nama kolom id internal `/bigdata` untuk `INTERNAL_ID_COLUMNS` (KB-17); (b) bentuk `metadata_filter` dan `metadata[]` (KB-20); (c) nilai `type` di `history_draft`; (d) apakah ada angka desimal bertitik bertipe teks (risiko KB-16).
+- [x] **Langkah 4:** adaptor meratakan `metadata_filter` → `{kolom: nilai_unik}` dan `metadata[]` → `{nama: nilai}` sebelum memanggil `services/periods` (KB-20).
 - [ ] **Langkah 8:** tool membaca `MCP_QC_RATIO` dari settings dan meneruskannya ke `services/quality` (KB-18); `PeriodCoverage.note` disampaikan ke model untuk CP-03 (KK-F).
-- [ ] **Dok 2:** usulkan revisi QC-02 sesuai KB-18 dan AK-01 menjadi enam endpoint sesuai KK-H (di Google Docs, lalu ekspor ulang).
+- [ ] **Dok 2:** usulkan revisi QC-02 sesuai KB-18, AK-01 menjadi enam endpoint sesuai KK-H, KK-04 sesuai KK-I, dan jumlah dataset 757 → 751 (rekaman 10 Nov 2026) (di Google Docs, lalu ekspor ulang).
 
 ## TODO dari Langkah 3 (10 Nov 2026)
 
 - [ ] **Akhdan, sebelum perekaman:** ~~konfirmasi KK-H~~ (disetujui); isi `MCP_USER_AGENT` di `.env` dengan kontak tim (bukan placeholder); jalankan `uv run python scripts/record_fixtures.py` (dry-run), lalu `--execute`.
-- [ ] **Setelah perekaman:** baca `docs/FIXTURE_REPORT.md`, putuskan KB-17 dan KB-20, pilih slug KM-07/KM-12 bila kandidatnya lebih dari satu, dan tinjau temuan email/telepon sebelum commit `tests/fixtures/recorded/`.
+- [x] **Setelah perekaman:** baca `docs/FIXTURE_REPORT.md`, putuskan KB-17 dan KB-20, pilih slug KM-07/KM-12 bila kandidatnya lebih dari satu, dan tinjau temuan email/telepon sebelum commit `tests/fixtures/recorded/`.
+
+## TODO dari review fixture (10 Nov 2026)
+
+- [ ] **Akhdan:** jalankan `uv run python scripts/record_fixtures.py --only persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor --execute` (KM-12; 2 permintaan, berkas 034 dan 035).
+- [x] **Akhdan:** putuskan redaksi `organisasi_alamat`/`alamat` di fixture (KK-J: diredaksi).
+- [ ] **Langkah 6 (KK-I):** `services/dictionary.column_role` dan perluasan `is_numeric_label_column`; cabut penanda xfail di `tests/unit/test_column_roles.py`.
+- [ ] **Langkah 5:** sinkron katalog memakai field `catalog_slim` (KK-J: tanpa kontak); uji dengan `catalog_slim.json`.
+- [ ] **Langkah 5 (dataset hilang):** portal bisa menghapus dataset (757 pada 5 Nov → 751 pada 10 Nov 2026). Sinkron katalog penuh harus menghapus dari katalog lokal (tabel + indeks FTS5) setiap record yang tidak lagi ada di hasil sinkron; record itu tidak boleh tetap tersaji di `search_datasets`. Penghapusan hanya dilakukan bila sinkron selesai lengkap (semua halaman terbaca, jumlah = `pagination.total_data`); sinkron gagal/terpotong tidak boleh menghapus apa pun. Tes: katalog lama 3 record, sinkron baru 2 record → record ketiga hilang dari tabel dan FTS5; sinkron terpotong → tidak ada yang dihapus.
+- [ ] **Langkah 10:** slug KM-07 = `persentase-kepala-keluarga-miskin-di-kota-bogor`, KM-12 = `persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor`.
 
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
 

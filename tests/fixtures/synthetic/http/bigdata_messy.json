@@ -1,6 +1,6 @@
 {
   "_synthetic": true,
-  "_keterangan": "Isi /bigdata dengan angka teks Indonesia '9.160.885' (NB-07), nilai kosong '', '-', 'None' (NB-02), label segmen beda spasi/tanda hubung (NB-08), kolom id internal (NB-04, KB-17), dan kode BPS teks (NB-05). Bentuk metadata/metadata_filter/pagination rekaan (KB-20).",
+  "_keterangan": "Isi /bigdata dengan angka teks Indonesia '9.160.885' (NB-07), nilai kosong '', '-', 'None' (NB-02), label segmen beda spasi/tanda hubung (NB-08), kolom id internal (NB-04, KB-17), dan kode BPS teks (NB-05). Bentuk metadata (list nama kolom), metadata_filter (list {key, type, value}, tahun bertipe teks), source, dan pagination disamakan dengan rekaman asli 2026-11-10 (KB-20); isi barisnya rekaan.",
   "request": {
     "method": "GET",
     "path": "/bigdata/dishub/kecepatan_lalu_lintas_pajajaran",
@@ -19,13 +19,19 @@
         {"id": 4, "bps_kode_kabupaten_kota": "3271", "segmen": "SIMPANG BARANANGSIANG - SIMPANG EKALOKASARI", "hari_operasional": "HARI LIBUR", "kecepatan": "5.89", "jumlah_kendaraan": "1.234,5", "satuan": "None", "tahun": 2024}
       ],
       "metadata": ["id", "bps_kode_kabupaten_kota", "segmen", "hari_operasional", "kecepatan", "jumlah_kendaraan", "satuan", "tahun"],
-      "metadata_filter": {
-        "segmen": ["SIMPANG EKALOKASARI- SIMPANG BARANANGSIANG", "SIMPANG EKALOKASARI – SIMPANG BARANANGSIANG", "SIMPANG  BARANANGSIANG -\nSIMPANG EKALOKASARI", "SIMPANG BARANANGSIANG - SIMPANG EKALOKASARI"],
-        "hari_operasional": ["HARI KERJA", "HARI LIBUR"],
-        "tahun": [2024, "2025"]
-      },
+      "metadata_filter": [
+        {"key": "id", "type": "free text", "value": []},
+        {"key": "bps_kode_kabupaten_kota", "type": "select", "value": ["3271"]},
+        {"key": "segmen", "type": "select", "value": ["SIMPANG EKALOKASARI- SIMPANG BARANANGSIANG", "SIMPANG EKALOKASARI – SIMPANG BARANANGSIANG", "SIMPANG  BARANANGSIANG -\nSIMPANG EKALOKASARI", "SIMPANG BARANANGSIANG - SIMPANG EKALOKASARI"]},
+        {"key": "hari_operasional", "type": "select", "value": ["HARI KERJA", "HARI LIBUR"]},
+        {"key": "kecepatan", "type": "free text", "value": []},
+        {"key": "jumlah_kendaraan", "type": "free text", "value": []},
+        {"key": "satuan", "type": "select", "value": ["km/jam", "None"]},
+        {"key": "tahun", "type": "select", "value": ["2024", "2025"]}
+      ],
       "error": null,
-      "pagination": {"page": 1, "per_page": 500, "total": 4, "total_page": 1}
+      "source": {"rows": 4, "cols": 8},
+      "pagination": {"page": 1, "per_page": 500, "total_page": 1, "total_data": 4, "has_next": false, "has_previous": false}
     }
   }
 }

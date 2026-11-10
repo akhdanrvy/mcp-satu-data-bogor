@@ -1,10 +1,10 @@
 {
   "_synthetic": true,
-  "_keterangan": "Slug salah menghasilkan 404 (Dok 2: 'Slug salah menghasilkan 404' [Fakta]). Body mengikuti bentuk Profil API {code, message, data, error}; isi teks rekaan sampai 404 asli direkam.",
+  "_keterangan": "Slug salah menghasilkan 404. Body disamakan dengan respons asli (rekaman 2026-11-10, 033_uji-404.json): hanya {message}, tanpa code/data/error.",
   "request": {"method": "GET", "path": "/datasets/slug-yang-tidak-ada", "params": {}},
   "response": {
     "status": 404,
     "headers": {"content-type": "application/json"},
-    "json": {"code": 404, "message": "Data not found", "data": null, "error": "dataset tidak ditemukan"}
+    "json": {"message": "Dataset not found"}
   }
 }

@@ -1,0 +1,301 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/datasets/realisasi-belanja-modal-daerah-di-kota-bogor",
+    "params": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success to get a dataset",
+      "data": {
+        "id": 19259,
+        "name": "Realisasi Belanja Modal Daerah di Kota Bogor",
+        "slug": "realisasi-belanja-modal-daerah-di-kota-bogor",
+        "deskripsi": "<p>Dataset ini berisi data <span id=\"editor-name\">realisasi belanja modal daerah di kota bogor</span> dari tahun <span id=\"editor-yearStart\">2019 </span>s.d. <span id=\"editor-yearEnd\">2025</span>.</p><p>Dataset terkait topik <span id=\"editor-topic\">Keuangan </span>ini dihasilkan oleh <span id=\"editor-organization\">Badan Keuangan dan Aset Daerah </span>yang dikeluarkan dalam periode <span id=\"editor-periode\">1 tahun sekali</span>.</p><p>Penjelasan mengenai variabel di dalam dataset ini:</p><ul><li>kode_provinsi: menyatakan kode Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>nama_provinsi: menyatakan lingkup data berasal dari wilayah Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>bps_kode_kabupaten_kota: menyatakan kode dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>bps_nama_kabupaten_kota: menyatakan lingkup data berasal dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai penamaan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.&nbsp;</li><li>realisasi_belanja: menyatakan &nbsp;<span id=\"editor-name\">realisasi belanja modal daerah </span>dengan tipe data numerik</li><li>satuan: menyatakan satuan dari &nbsp;<span id=\"editor-name\">realisasi belanja modal daerah </span>dalam rupiah dengan tipe data teks.</li><li>tahun: menyatakan tahun produksi data dengan tipe data numerik.</li></ul>",
+        "periode": null,
+        "satuan": null,
+        "image": null,
+        "topik_name": "Keuangan",
+        "topik_image": "static/upload/20260424210644_wallet.png",
+        "topik_slug": "keuangan",
+        "topik_id": 62,
+        "organisasi_name": "Badan Keuangan dan Aset Daerah",
+        "organisasi_slug": "badan_keuangan_dan_aset_daerah",
+        "organisasi_image": "static/upload/d11363150b0f28024873b1507afe09af3a18a1fcf1949ca533c3e291bff3df06.png",
+        "organisasi_notelp": "<redacted>",
+        "organisasi_alamat": "<redacted>",
+        "organisasi_website": "https://bkad.kotabogor.go.id",
+        "organisasi_email": "<redacted>",
+        "organisasi_id": 166,
+        "kode_wilayah": "32.71",
+        "nama_wilayah": "KOTA BOGOR",
+        "wilayah_image": "static/upload/16_kotabogor.png",
+        "wilayah_id": 20,
+        "klasifikasi": "public",
+        "kategori": "indikator",
+        "data_tetap": "tetap",
+        "tags": "data indikator,realisasi belanja modal,bkad",
+        "priority_level": "priority",
+        "data_score_status": "sangat_baik",
+        "count_view_opendata": 18,
+        "count_download_opendata": 4,
+        "count_share_opendata": 0,
+        "count_view_satudata": 10,
+        "count_download_satudata": 1,
+        "count_share_satudata": 0,
+        "schema": "badan_keuangan_dan_aset_daerah",
+        "table": "realisasi_belanja_modal_daerah_di_kota_bogor_2",
+        "validate": "approve",
+        "validate_discontinue": null,
+        "timestamp_discontinue_submit": null,
+        "timestamp_discontinue_approved": null,
+        "cdate": "2025-02-05T10:25:54.746819+07:07",
+        "mdate": "2026-08-11T09:19:09.327954+07:07",
+        "is_highlight": false,
+        "is_realtime": false,
+        "is_active": true,
+        "is_deleted": false,
+        "history_draft": [
+          {
+            "id": 32641,
+            "dataset_id": 19259,
+            "type": "preview",
+            "notes": null,
+            "cdate": "2025-02-05T10:25:55.109779+07:07"
+          },
+          {
+            "id": 32642,
+            "dataset_id": 19259,
+            "type": "verification-new",
+            "notes": null,
+            "cdate": "2025-02-05T10:25:59.147904+07:07"
+          },
+          {
+            "id": 32643,
+            "dataset_id": 19259,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-02-05T21:14:27.415049+07:07"
+          },
+          {
+            "id": 36294,
+            "dataset_id": 19259,
+            "type": "preview",
+            "notes": "Melakukan penambahan pada nilai dataset yang terletak di row nomor 4, 5, 6 dan 7",
+            "cdate": "2025-06-02T11:09:48.589803+07:07"
+          },
+          {
+            "id": 36295,
+            "dataset_id": 19259,
+            "type": "verification-edit",
+            "notes": "Melakukan penambahan pada nilai dataset yang terletak di row nomor 4, 5, 6 dan 7",
+            "cdate": "2025-06-02T11:09:52.643917+07:07"
+          },
+          {
+            "id": 36296,
+            "dataset_id": 19259,
+            "type": "preview",
+            "notes": "Melakukan penambahan pada nilai dataset yang terletak di row nomor 4, 5, 6 dan 7",
+            "cdate": "2025-06-02T11:10:22.176347+07:07"
+          },
+          {
+            "id": 36297,
+            "dataset_id": 19259,
+            "type": "verification-edit",
+            "notes": "Melakukan penambahan pada nilai dataset yang terletak di row nomor 4, 5, 6 dan 7",
+            "cdate": "2025-06-02T11:10:24.813872+07:07"
+          },
+          {
+            "id": 36298,
+            "dataset_id": 19259,
+            "type": "preview",
+            "notes": "Melakukan perubahan pada deskripsi akhir tahun, dimensi awal tahun serta penambahan jenis dan judul data prioritas",
+            "cdate": "2025-06-02T11:15:26.127942+07:07"
+          },
+          {
+            "id": 36299,
+            "dataset_id": 19259,
+            "type": "verification-edit",
+            "notes": "Melakukan perubahan pada deskripsi akhir tahun, dimensi awal tahun serta penambahan jenis dan judul data prioritas",
+            "cdate": "2025-06-02T11:15:30.006458+07:07"
+          },
+          {
+            "id": 36300,
+            "dataset_id": 19259,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-06-02T11:15:38.508170+07:07"
+          },
+          {
+            "id": 36303,
+            "dataset_id": 19259,
+            "type": "preview",
+            "notes": "Melakukan penambahan pada nilai dataset yang terletak di row nomor 4, 5, 6 dan 7",
+            "cdate": "2025-06-02T11:19:17.129804+07:07"
+          },
+          {
+            "id": 36304,
+            "dataset_id": 19259,
+            "type": "verification-edit",
+            "notes": "Melakukan penambahan pada nilai dataset yang terletak di row nomor 4, 5, 6 dan 7",
+            "cdate": "2025-06-02T11:19:19.994463+07:07"
+          },
+          {
+            "id": 36350,
+            "dataset_id": 19259,
+            "type": "preview",
+            "notes": "Perbaikan dimensi data",
+            "cdate": "2025-06-03T11:17:01.211252+07:07"
+          },
+          {
+            "id": 36351,
+            "dataset_id": 19259,
+            "type": "verification-edit",
+            "notes": "Perbaikan dimensi data",
+            "cdate": "2025-06-03T11:17:03.846513+07:07"
+          },
+          {
+            "id": 36352,
+            "dataset_id": 19259,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-06-03T11:17:09.239645+07:07"
+          },
+          {
+            "id": 38628,
+            "dataset_id": 19259,
+            "type": "verification-edit",
+            "notes": "update data tahun 2025",
+            "cdate": "2026-08-11T09:19:01.201157+07:07"
+          },
+          {
+            "id": 38629,
+            "dataset_id": 19259,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2026-08-11T09:19:09.458174+07:07"
+          }
+        ],
+        "history_dataset_discontinue": [],
+        "metadata": [
+          {
+            "id": 196097,
+            "dataset_id": 19259,
+            "type": "bisnis",
+            "key": "Pengukuran Dataset",
+            "value": "Realisasi Belanja Modal Daerah",
+            "cdate": "2026-08-11T09:19:00.389452+07:07",
+            "mdate": null
+          },
+          {
+            "id": 196098,
+            "dataset_id": 19259,
+            "type": "bisnis",
+            "key": "Tingkat Penyajian Dataset",
+            "value": "Kota bogor",
+            "cdate": "2026-08-11T09:19:00.389469+07:07",
+            "mdate": null
+          },
+          {
+            "id": 196099,
+            "dataset_id": 19259,
+            "type": "bisnis",
+            "key": "Cakupan Dataset",
+            "value": "Seluruh Belanja Modal Daerah di Kota Bogor",
+            "cdate": "2026-08-11T09:19:00.389474+07:07",
+            "mdate": null
+          },
+          {
+            "id": 196100,
+            "dataset_id": 19259,
+            "type": "bisnis",
+            "key": "Produsen",
+            "value": "Badan Keuangan dan Aset Daerah",
+            "cdate": "2026-08-11T09:19:00.389479+07:07",
+            "mdate": null
+          },
+          {
+            "id": 196101,
+            "dataset_id": 19259,
+            "type": "bisnis",
+            "key": "Kontak Produsen",
+            "value": "<redacted>",
+            "cdate": "2026-08-11T09:19:00.389483+07:07",
+            "mdate": null
+          },
+          {
+            "id": 196102,
+            "dataset_id": 19259,
+            "type": "bisnis",
+            "key": "Kode Indikator",
+            "value": "None",
+            "cdate": "2026-08-11T09:19:00.389487+07:07",
+            "mdate": null
+          },
+          {
+            "id": 196103,
+            "dataset_id": 19259,
+            "type": "bisnis",
+            "key": "Satuan Dataset",
+            "value": "RUPIAH",
+            "cdate": "2026-08-11T09:19:00.389490+07:07",
+            "mdate": null
+          },
+          {
+            "id": 196104,
+            "dataset_id": 19259,
+            "type": "bisnis",
+            "key": "Frekuensi Dataset",
+            "value": "Tahunan",
+            "cdate": "2026-08-11T09:19:00.389494+07:07",
+            "mdate": null
+          },
+          {
+            "id": 196105,
+            "dataset_id": 19259,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Awal",
+            "value": "2019",
+            "cdate": "2026-08-11T09:19:00.389498+07:07",
+            "mdate": null
+          },
+          {
+            "id": 196106,
+            "dataset_id": 19259,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Akhir",
+            "value": "2025",
+            "cdate": "2026-08-11T09:19:00.389501+07:07",
+            "mdate": null
+          },
+          {
+            "id": 196107,
+            "dataset_id": 19259,
+            "type": "bisnis",
+            "key": "Sumber External",
+            "value": "Badan Keuangan dan Aset Daerah",
+            "cdate": "2026-08-11T09:19:00.389505+07:07",
+            "mdate": null
+          }
+        ],
+        "permission": [],
+        "data_priority": {
+          "name": "Realisasi Belanja Modal Daerah di Kota Bogor",
+          "ids": [
+            "019cb6de-0db3-7fa9-9ed1-515e2c11a766"
+          ],
+          "years": [
+            2025
+          ]
+        }
+      },
+      "error": {}
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:11+07:00"
+}

@@ -1,0 +1,195 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/datasets/tingkat-kemiskinan-di-kota-bogor-2",
+    "params": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success to get a dataset",
+      "data": {
+        "id": 19788,
+        "name": "Tingkat Kemiskinan di Kota Bogor",
+        "slug": "tingkat-kemiskinan-di-kota-bogor-2",
+        "deskripsi": "<p>Dataset ini berisi data <span id=\"editor-name\">tingkat kemiskinan di kota bogor</span> dari tahun <span id=\"editor-yearStart\">2025</span> s.d. <span id=\"editor-yearEnd\">2025</span>.</p><p>Dataset terkait topik <span id=\"editor-topic\">Sosial</span> ini dihasilkan oleh <span id=\"editor-organization\">Dinas Sosial</span> yang dikeluarkan dalam periode <span id=\"editor-periode\">1 tahun sekali</span>.</p><p>Penjelasan mengenai variabel di dalam dataset ini:</p><ul><li>kode_provinsi: menyatakan kode Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>nama_provinsi: menyatakan lingkup data berasal dari wilayah Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>bps_kode_kabupaten_kota: menyatakan kode dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>bps_nama_kabupaten_kota: menyatakan lingkup data berasal dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai penamaan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>tingkat_kemiskinan: menyatakan Persentase penduduk yang berada di bawah garis kemiskinan di Kota Bogor. dengan tipe data numerik.</li><li>satuan: menyatakan satuan ukur dalam Persen dengan tipe data teks.</li><li>tahun: menyatakan tahun produksi data dengan tipe data numerik.</li></ul>",
+        "periode": "2025",
+        "satuan": "Persen",
+        "image": "",
+        "topik_name": "Sosial",
+        "topik_image": "static/upload/904f0a99b1d6ee36e1c93a6a42341baa3a3ea8a6e40a412ffc270ff36862f0f4.png",
+        "topik_slug": "sosial",
+        "topik_id": 90,
+        "organisasi_name": "Dinas Sosial",
+        "organisasi_slug": "dinas_sosial",
+        "organisasi_image": "static/upload/f5cc758f1f502f69f30a5b7e1a4ced1ba69813a472d630ee6472458157c3038a.png",
+        "organisasi_notelp": "<redacted>",
+        "organisasi_alamat": "<redacted>",
+        "organisasi_website": "https://dinsos.kotabogor.go.id",
+        "organisasi_email": "<redacted>",
+        "organisasi_id": 173,
+        "kode_wilayah": "32.71",
+        "nama_wilayah": "KOTA BOGOR",
+        "wilayah_image": "static/upload/16_kotabogor.png",
+        "wilayah_id": 20,
+        "klasifikasi": "public",
+        "kategori": "agregat",
+        "data_tetap": "tetap",
+        "tags": "Sosial",
+        "priority_level": "non-priority",
+        "data_score_status": "sangat_baik",
+        "count_view_opendata": 73,
+        "count_download_opendata": 13,
+        "count_share_opendata": 0,
+        "count_view_satudata": 2,
+        "count_download_satudata": 0,
+        "count_share_satudata": 0,
+        "schema": "dinas_sosial",
+        "table": "tingkat_kemiskinan_di_kota_bogor_1",
+        "validate": "approve",
+        "validate_discontinue": null,
+        "timestamp_discontinue_submit": null,
+        "timestamp_discontinue_approved": null,
+        "cdate": "2026-08-31T14:14:20.063920+07:07",
+        "mdate": "2026-08-31T16:03:02.177258+07:07",
+        "is_highlight": false,
+        "is_realtime": false,
+        "is_active": true,
+        "is_deleted": false,
+        "history_draft": [
+          {
+            "id": 38906,
+            "dataset_id": 19788,
+            "type": "verification-new",
+            "notes": "Generate by AI Agent",
+            "cdate": "2026-08-31T14:14:20.423789+07:07"
+          },
+          {
+            "id": 38914,
+            "dataset_id": 19788,
+            "type": "verification-new",
+            "notes": "Perbaikan score kuaitas data",
+            "cdate": "2026-08-31T16:02:52.662513+07:07"
+          },
+          {
+            "id": 38915,
+            "dataset_id": 19788,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2026-08-31T16:03:02.296522+07:07"
+          }
+        ],
+        "history_dataset_discontinue": [],
+        "metadata": [
+          {
+            "id": 198561,
+            "dataset_id": 19788,
+            "type": "bisnis",
+            "key": "Pengukuran Dataset",
+            "value": "Tingkat Kemiskinan",
+            "cdate": "2026-08-31T16:02:52.344990+07:07",
+            "mdate": null
+          },
+          {
+            "id": 198562,
+            "dataset_id": 19788,
+            "type": "bisnis",
+            "key": "Tingkat Penyajian Dataset",
+            "value": "Kota Bogor",
+            "cdate": "2026-08-31T16:02:52.345002+07:07",
+            "mdate": null
+          },
+          {
+            "id": 198563,
+            "dataset_id": 19788,
+            "type": "bisnis",
+            "key": "Cakupan Dataset",
+            "value": "Seluruh Tingkat Kemiskinan",
+            "cdate": "2026-08-31T16:02:52.345005+07:07",
+            "mdate": null
+          },
+          {
+            "id": 198564,
+            "dataset_id": 19788,
+            "type": "bisnis",
+            "key": "Produsen",
+            "value": "Dinas Sosial",
+            "cdate": "2026-08-31T16:02:52.345008+07:07",
+            "mdate": null
+          },
+          {
+            "id": 198565,
+            "dataset_id": 19788,
+            "type": "bisnis",
+            "key": "Kontak Produsen",
+            "value": "<redacted>",
+            "cdate": "2026-08-31T16:02:52.345012+07:07",
+            "mdate": null
+          },
+          {
+            "id": 198566,
+            "dataset_id": 19788,
+            "type": "bisnis",
+            "key": "Kode Indikator",
+            "value": "IKUKOTA_24",
+            "cdate": "2026-08-31T16:02:52.345014+07:07",
+            "mdate": null
+          },
+          {
+            "id": 198567,
+            "dataset_id": 19788,
+            "type": "bisnis",
+            "key": "Satuan Dataset",
+            "value": "Persen",
+            "cdate": "2026-08-31T16:02:52.345017+07:07",
+            "mdate": null
+          },
+          {
+            "id": 198568,
+            "dataset_id": 19788,
+            "type": "bisnis",
+            "key": "Frekuensi Dataset",
+            "value": "Tahunan",
+            "cdate": "2026-08-31T16:02:52.345020+07:07",
+            "mdate": null
+          },
+          {
+            "id": 198569,
+            "dataset_id": 19788,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Awal",
+            "value": "2025",
+            "cdate": "2026-08-31T16:02:52.345023+07:07",
+            "mdate": null
+          },
+          {
+            "id": 198570,
+            "dataset_id": 19788,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Akhir",
+            "value": "2025",
+            "cdate": "2026-08-31T16:02:52.345025+07:07",
+            "mdate": null
+          },
+          {
+            "id": 198571,
+            "dataset_id": 19788,
+            "type": "bisnis",
+            "key": "Sumber External",
+            "value": "None",
+            "cdate": "2026-08-31T16:02:52.345028+07:07",
+            "mdate": null
+          }
+        ],
+        "permission": [],
+        "data_priority": {}
+      },
+      "error": {}
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:08+07:00"
+}

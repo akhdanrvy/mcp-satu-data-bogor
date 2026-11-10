@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/datasets/slug-sengaja-salah-untuk-uji-404",
+    "params": {}
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "message": "Dataset not found"
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:20+07:00"
+}

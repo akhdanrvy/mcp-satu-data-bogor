@@ -1,0 +1,268 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/datasets/persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor",
+    "params": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success to get a dataset",
+      "data": {
+        "id": 19018,
+        "name": "Persentase Penanganan Pengaduan Masyarakat ke Inspektorat Daerah Kota Bogor",
+        "slug": "persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor",
+        "deskripsi": "<p>Dataset ini berisi data <span id=\"editor-name\">persentase penanganan pengaduan masyarakat yang masuk ke Inspektorat Daerah Kota Bogor</span> dari tahun <span id=\"editor-yearStart\">2019 </span>s.d. <span id=\"editor-yearEnd\">2025</span>.</p><p>Dataset terkait topik Komunikasi dan Informatika ini dihasilkan oleh <span id=\"editor-organization\">Inspektorat Daerah </span>yang dikeluarkan dalam periode <span id=\"editor-periode\">1 tahun sekali</span>.</p><p>Penjelasan mengenai variabel di dalam dataset ini:</p><ul><li>kode_provinsi: menyatakan kode Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik</li><li>nama_provinsi: menyatakan lingkup data berasal dari wilayah Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li>bps_kode_kabupaten_kota: menyatakan kode dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai ketentuan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data numerik.</li><li>bps_nama_kabupaten_kota: menyatakan lingkup data berasal dari setiap kabupaten dan kota di Provinsi Jawa Barat sesuai penamaan BPS merujuk pada aturan Peraturan Badan Pusat Statistik Nomor 3 Tahun 2019 dengan tipe data teks.</li><li><span style=\"background-color:rgb(255,255,255);color:rgb(31,31,31);\">persentase_penanganan: </span>menyatakan persentase penanganan pengaduan masyarakat<span id=\"editor-name\"> </span>dengan tipe data numerik.</li><li>satuan: menyatakan satuan penanganan pengaduan masyaraka<span id=\"editor-name\"> </span>dalam persen dengan tipe data teks.</li><li>tahun: menyatakan tahun produksi data dengan tipe data numerik</li></ul>",
+        "periode": null,
+        "satuan": null,
+        "image": null,
+        "topik_name": "Hukum",
+        "topik_image": "static/upload/75191a538dedae9ed34b701c054bfef9fd1da20d6eb1d17aea9ca7173bf77cd7.png",
+        "topik_slug": "hukum",
+        "topik_id": 98,
+        "organisasi_name": "Inspektorat",
+        "organisasi_slug": "inspektorat",
+        "organisasi_image": "static/upload/ef5a41a15b79730783ded60a768c176c179a403306f242ded5ab532f4a63bd44.png",
+        "organisasi_notelp": "<redacted>",
+        "organisasi_alamat": "<redacted>",
+        "organisasi_website": "https://inspektorat.kotabogor.go.id",
+        "organisasi_email": "<redacted>",
+        "organisasi_id": 183,
+        "kode_wilayah": "32.71",
+        "nama_wilayah": "KOTA BOGOR",
+        "wilayah_image": "static/upload/16_kotabogor.png",
+        "wilayah_id": 20,
+        "klasifikasi": "public",
+        "kategori": "indikator",
+        "data_tetap": "tetap",
+        "tags": "data indikator,inspektorat daerah,penanganan pengaduan masyarakat",
+        "priority_level": "priority",
+        "data_score_status": "sangat_baik",
+        "count_view_opendata": 120,
+        "count_download_opendata": 4,
+        "count_share_opendata": 0,
+        "count_view_satudata": 21,
+        "count_download_satudata": 2,
+        "count_share_satudata": 0,
+        "schema": "inspektorat",
+        "table": "persentase_penanganan_pengaduan_masyarakat_ke_inspekt",
+        "validate": "approve",
+        "validate_discontinue": null,
+        "timestamp_discontinue_submit": null,
+        "timestamp_discontinue_approved": null,
+        "cdate": "2024-10-07T10:00:53.684633+07:07",
+        "mdate": "2026-04-02T08:56:52.238327+07:07",
+        "is_highlight": false,
+        "is_realtime": false,
+        "is_active": true,
+        "is_deleted": false,
+        "history_draft": [
+          {
+            "id": 31759,
+            "dataset_id": 19018,
+            "type": "preview",
+            "notes": null,
+            "cdate": "2024-10-07T10:00:53.932870+07:07"
+          },
+          {
+            "id": 31760,
+            "dataset_id": 19018,
+            "type": "verification-new",
+            "notes": null,
+            "cdate": "2024-10-07T10:00:58.311034+07:07"
+          },
+          {
+            "id": 31764,
+            "dataset_id": 19018,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2024-10-08T08:34:08.790237+07:07"
+          },
+          {
+            "id": 32811,
+            "dataset_id": 19018,
+            "type": "preview",
+            "notes": "melakukan update data",
+            "cdate": "2025-02-11T13:15:21.625592+07:07"
+          },
+          {
+            "id": 32812,
+            "dataset_id": 19018,
+            "type": "verification-edit",
+            "notes": "melakukan update data",
+            "cdate": "2025-02-11T13:15:30.524202+07:07"
+          },
+          {
+            "id": 33060,
+            "dataset_id": 19018,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2025-02-14T15:06:20.046663+07:07"
+          },
+          {
+            "id": 37507,
+            "dataset_id": 19018,
+            "type": "verification-edit",
+            "notes": "menambahkan data tahun 2025",
+            "cdate": "2026-02-24T15:10:20.498773+07:07"
+          },
+          {
+            "id": 37508,
+            "dataset_id": 19018,
+            "type": "verification-edit",
+            "notes": "penambahan data tahun 2025",
+            "cdate": "2026-02-24T15:12:11.946611+07:07"
+          },
+          {
+            "id": 37694,
+            "dataset_id": 19018,
+            "type": "verification-edit",
+            "notes": "Mengedit dataset menghapus baris kosong",
+            "cdate": "2026-03-11T11:55:47.608501+07:07"
+          },
+          {
+            "id": 37695,
+            "dataset_id": 19018,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2026-03-11T11:55:59.993762+07:07"
+          },
+          {
+            "id": 37827,
+            "dataset_id": 19018,
+            "type": "verification-edit",
+            "notes": "Melakukan perubahan pada judul  dan deskripsi dataset",
+            "cdate": "2026-03-31T16:17:30.249870+07:07"
+          },
+          {
+            "id": 37834,
+            "dataset_id": 19018,
+            "type": "approve",
+            "notes": null,
+            "cdate": "2026-04-02T08:56:52.392565+07:07"
+          }
+        ],
+        "history_dataset_discontinue": [],
+        "metadata": [
+          {
+            "id": 191330,
+            "dataset_id": 19018,
+            "type": "bisnis",
+            "key": "Pengukuran Dataset",
+            "value": "Persentase Penanganan Pengaduan Masyarakat",
+            "cdate": "2026-03-31T16:17:29.858175+07:07",
+            "mdate": null
+          },
+          {
+            "id": 191331,
+            "dataset_id": 19018,
+            "type": "bisnis",
+            "key": "Tingkat Penyajian Dataset",
+            "value": "Kota Bogor",
+            "cdate": "2026-03-31T16:17:29.858187+07:07",
+            "mdate": null
+          },
+          {
+            "id": 191332,
+            "dataset_id": 19018,
+            "type": "bisnis",
+            "key": "Cakupan Dataset",
+            "value": "Seluruh Pengaduan Masyarakat di Kota Bogor",
+            "cdate": "2026-03-31T16:17:29.858192+07:07",
+            "mdate": null
+          },
+          {
+            "id": 191333,
+            "dataset_id": 19018,
+            "type": "bisnis",
+            "key": "Produsen",
+            "value": "Inspektorat",
+            "cdate": "2026-03-31T16:17:29.858195+07:07",
+            "mdate": null
+          },
+          {
+            "id": 191334,
+            "dataset_id": 19018,
+            "type": "bisnis",
+            "key": "Kontak Produsen",
+            "value": "<redacted>",
+            "cdate": "2026-03-31T16:17:29.858198+07:07",
+            "mdate": null
+          },
+          {
+            "id": 191335,
+            "dataset_id": 19018,
+            "type": "bisnis",
+            "key": "Kode Indikator",
+            "value": "None",
+            "cdate": "2026-03-31T16:17:29.858201+07:07",
+            "mdate": null
+          },
+          {
+            "id": 191336,
+            "dataset_id": 19018,
+            "type": "bisnis",
+            "key": "Satuan Dataset",
+            "value": "PERSEN",
+            "cdate": "2026-03-31T16:17:29.858204+07:07",
+            "mdate": null
+          },
+          {
+            "id": 191337,
+            "dataset_id": 19018,
+            "type": "bisnis",
+            "key": "Frekuensi Dataset",
+            "value": "Tahunan",
+            "cdate": "2026-03-31T16:17:29.858207+07:07",
+            "mdate": null
+          },
+          {
+            "id": 191338,
+            "dataset_id": 19018,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Awal",
+            "value": "2019",
+            "cdate": "2026-03-31T16:17:29.858209+07:07",
+            "mdate": null
+          },
+          {
+            "id": 191339,
+            "dataset_id": 19018,
+            "type": "bisnis",
+            "key": "Dimensi Dataset Akhir",
+            "value": "2025",
+            "cdate": "2026-03-31T16:17:29.858212+07:07",
+            "mdate": null
+          },
+          {
+            "id": 191340,
+            "dataset_id": 19018,
+            "type": "bisnis",
+            "key": "Sumber External",
+            "value": "None",
+            "cdate": "2026-03-31T16:17:29.858215+07:07",
+            "mdate": null
+          }
+        ],
+        "permission": [],
+        "data_priority": {
+          "name": "Persentase Penanganan Pengaduan Masyarakat di Kota Bogor",
+          "ids": [
+            "0196e427-a9d5-7433-bc0c-fcea826a9a90",
+            "019cb6de-1011-7da4-be5e-1fe7b575db59"
+          ],
+          "years": [
+            2024,
+            2025
+          ]
+        }
+      },
+      "error": {}
+    }
+  },
+  "recorded_at": "2026-11-10T16:19:13+07:00"
+}

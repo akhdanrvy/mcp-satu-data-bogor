@@ -21,3 +21,7 @@ coverage.xml
 htmlcov/
 .pytest_cache/
 .ruff_cache/
+
+# Fixture rekaman: halaman katalog tengah tidak di-commit (Dok 5: hanya halaman 1 dan
+# terakhir). Isinya sudah terwakili di catalog_slim.json; berkas tetap ada di disk.
+tests/fixtures/recorded/2026-11-10/00[2-7]_katalog-hal-*.json

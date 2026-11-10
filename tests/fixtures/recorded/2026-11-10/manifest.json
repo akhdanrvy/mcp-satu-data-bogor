@@ -1,0 +1,332 @@
+{
+  "started_at": "2026-11-10T15:55:58+07:00",
+  "base_url": "https://opendata.kotabogor.go.id/api",
+  "budget": 60,
+  "request_count": 33,
+  "file_count": 33,
+  "stop_reason": null,
+  "incidents": [],
+  "files": [
+    {
+      "file": "001_katalog-hal-1.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets",
+      "params": {
+        "page": 1,
+        "per_page": 100
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:55:59+07:00",
+      "sha256": "e83d5f1d7d92437b45f64a15e1cefed581cd4b4480e811af3449e301328d4191"
+    },
+    {
+      "file": "002_katalog-hal-2.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets",
+      "params": {
+        "page": 2,
+        "per_page": 100
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:00+07:00",
+      "sha256": "6b037c859dac4e8decf1e4de2a980305ee49c139765f0f2b6f8f60ad93b51229"
+    },
+    {
+      "file": "003_katalog-hal-3.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets",
+      "params": {
+        "page": 3,
+        "per_page": 100
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:01+07:00",
+      "sha256": "0b067bcd224ebac28686cb27a4d1754e904132659c57df3895c5498b4e11a6ab"
+    },
+    {
+      "file": "004_katalog-hal-4.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets",
+      "params": {
+        "page": 4,
+        "per_page": 100
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:02+07:00",
+      "sha256": "b86a4b2e6bd34319ad15349511f7b7bfb7135f302da403eb7b234c9aa7b19184"
+    },
+    {
+      "file": "005_katalog-hal-5.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets",
+      "params": {
+        "page": 5,
+        "per_page": 100
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:04+07:00",
+      "sha256": "a92fbd3f642f64181cf1693d118f764e6f6d8719b5fa745bda807c6391fe5098"
+    },
+    {
+      "file": "006_katalog-hal-6.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets",
+      "params": {
+        "page": 6,
+        "per_page": 100
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:05+07:00",
+      "sha256": "3f486df11c7fcf87a6915df4a7a44c6c93b44a6ca37f9f35b18e598cdeb6b073"
+    },
+    {
+      "file": "007_katalog-hal-7.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets",
+      "params": {
+        "page": 7,
+        "per_page": 100
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:06+07:00",
+      "sha256": "2a6c81ada5c938b6d930d6de6460a97a9c0f69eaa0538ff261828ca986983d07"
+    },
+    {
+      "file": "008_katalog-hal-8.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets",
+      "params": {
+        "page": 8,
+        "per_page": 100
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:06+07:00",
+      "sha256": "40434ad64c733cf7909836e7ddc0af740aaba3a075139448c5e74504f47a5994"
+    },
+    {
+      "file": "009_referensi-organisasi.json",
+      "url": "https://opendata.kotabogor.go.id/api/organisasi",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:07+07:00",
+      "sha256": "2cf78293d92c2af35380a1341be52d5f6889f221038ffd2e0f17b752aefeedda"
+    },
+    {
+      "file": "010_referensi-topik.json",
+      "url": "https://opendata.kotabogor.go.id/api/topik",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:07+07:00",
+      "sha256": "3e2c337427c7d73451711816f368abac731afa64815bee8c7d3edd4ce8396730"
+    },
+    {
+      "file": "011_detail-tingkat-kemiskinan-di-kota-bogor-2.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/tingkat-kemiskinan-di-kota-bogor-2",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:08+07:00",
+      "sha256": "4371a28d7e29f7f99946d134be8c5b651a90906673f1d11cf0b1c9450c548f88"
+    },
+    {
+      "file": "012_bigdata-tingkat-kemiskinan-di-kota-bogor-2-hal-1.json",
+      "url": "https://opendata.kotabogor.go.id/api/bigdata/dinas_sosial/tingkat_kemiskinan_di_kota_bogor_1",
+      "params": {
+        "page": 1,
+        "per_page": 1000
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:08+07:00",
+      "sha256": "ae77f9de4351264085d32ec8be08d0e6c53d57a8f3b73738abacb6cd485a8cac"
+    },
+    {
+      "file": "013_detail-kecepatan-lalu-lintas-segmen-1-dan-2-berdasarkan-hari-operasional-di-jala.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/kecepatan-lalu-lintas-segmen-1-dan-2-berdasarkan-hari-operasional-di-jalan-raya-pajajaran-kota-bogor",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:09+07:00",
+      "sha256": "03ed61a194a3ca0fc5e78e774ce36b80f8e76ae80c5565f4a608dcf9809d6049"
+    },
+    {
+      "file": "014_bigdata-kecepatan-lalu-lintas-segmen-1-dan-2-berdasarkan-hari-operasional-di-jal.json",
+      "url": "https://opendata.kotabogor.go.id/api/bigdata/dinas_perhubungan/kecepatan_lalu_lintas_segmen_1_dan_2_berdasarkan_hari",
+      "params": {
+        "page": 1,
+        "per_page": 1000
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:10+07:00",
+      "sha256": "d0bd4a2fb8629a964de832d6a1797b6669a451aeeea638fcf852fd42524b2f92"
+    },
+    {
+      "file": "015_detail-realisasi-pendapatan-asli-daerah-pad-kota-bogor.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/realisasi-pendapatan-asli-daerah-pad-kota-bogor",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:10+07:00",
+      "sha256": "4bfa27b06c6aa70577c05e1287a2bb45b08a0cd8c314983980b3cc9d0f7efcdf"
+    },
+    {
+      "file": "016_bigdata-realisasi-pendapatan-asli-daerah-pad-kota-bogor-hal-1.json",
+      "url": "https://opendata.kotabogor.go.id/api/bigdata/badan_pendapatan_daerah/realisasi_pendapatan_asli_daerah_pad_kota_bogor",
+      "params": {
+        "page": 1,
+        "per_page": 1000
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:11+07:00",
+      "sha256": "f76dc3d68591a2e24e3e60da3ffd9e7699b2000ce942799eee04e0049f0ff963"
+    },
+    {
+      "file": "017_detail-realisasi-belanja-modal-daerah-di-kota-bogor.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/realisasi-belanja-modal-daerah-di-kota-bogor",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:11+07:00",
+      "sha256": "9a58c83730665562cb2a6e9cbaafa4a7cfe9f399713f8a86b6ca27c636122cff"
+    },
+    {
+      "file": "018_bigdata-realisasi-belanja-modal-daerah-di-kota-bogor-hal-1.json",
+      "url": "https://opendata.kotabogor.go.id/api/bigdata/badan_keuangan_dan_aset_daerah/realisasi_belanja_modal_daerah_di_kota_bogor_2",
+      "params": {
+        "page": 1,
+        "per_page": 1000
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:12+07:00",
+      "sha256": "a5aaa2bfde48ad5ea331291652ee0fe9738c0e42c1a826f17cae53c528db2669"
+    },
+    {
+      "file": "019_detail-persentase-sisa-lebih-perhitungan-anggaran-silpa-terhadap-anggaran-pendap.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/persentase-sisa-lebih-perhitungan-anggaran-silpa-terhadap-anggaran-pendapatan-dan-belanja-daerah-apbd-di-kota-bogor",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:12+07:00",
+      "sha256": "de961e23a7a8006d49e54e2004283ecfdedbebb1bd1ebc4a493354ffd3683253"
+    },
+    {
+      "file": "020_bigdata-persentase-sisa-lebih-perhitungan-anggaran-silpa-terhadap-anggaran-penda.json",
+      "url": "https://opendata.kotabogor.go.id/api/bigdata/badan_keuangan_dan_aset_daerah/persentase_sisa_lebih_perhitungan_anggaran_silpa_terhadap_angga",
+      "params": {
+        "page": 1,
+        "per_page": 1000
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:13+07:00",
+      "sha256": "a7039706ed1014a28144cab7f97fb7aea9734dd3603c601f3ba87e3b23ad6e7b"
+    },
+    {
+      "file": "021_detail-perkembangan-jumlah-kunjungan-wisatawan-di-kota-bogor.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/perkembangan-jumlah-kunjungan-wisatawan-di-kota-bogor",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:13+07:00",
+      "sha256": "533a3d1d21ba7d7cc6957e5a42bfd3e6f40af462dd83f8ba508b9ece00ca97ef"
+    },
+    {
+      "file": "022_bigdata-perkembangan-jumlah-kunjungan-wisatawan-di-kota-bogor-hal-1.json",
+      "url": "https://opendata.kotabogor.go.id/api/bigdata/dinas_pariwisata_dan_kebudayaan/perkembangan_jumlah_kunjungan_wisatawan_di_kota_bogor",
+      "params": {
+        "page": 1,
+        "per_page": 1000
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:14+07:00",
+      "sha256": "9a12d2001534c33a1c190ed7ab3bfa8888ebfb885b8fc6c59296dd4d7a02607f"
+    },
+    {
+      "file": "023_detail-tren-kunjungan-pasien-puskesmas-di-kota-bogor.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/tren-kunjungan-pasien-puskesmas-di-kota-bogor",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:15+07:00",
+      "sha256": "d24c4c27e4507bf375af02d154dfc5aad0e47d5d1182b2e48dcbcb5e330c2d1e"
+    },
+    {
+      "file": "024_bigdata-tren-kunjungan-pasien-puskesmas-di-kota-bogor-hal-1.json",
+      "url": "https://opendata.kotabogor.go.id/api/bigdata/dinas_kesehatan/tren_kunjungan_pasien_puskesmas_di_kota_bogor_1",
+      "params": {
+        "page": 1,
+        "per_page": 1000
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:15+07:00",
+      "sha256": "21f44faae3aa0a797eec2624514dedfc11e97ae91bedc7e746fcf492cf4b4d4d"
+    },
+    {
+      "file": "025_detail-volume-lalu-lintas-segmen-1-dan-2-berdasarkan-hari-operasional-di-jalan-p.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/volume-lalu-lintas-segmen-1-dan-2-berdasarkan-hari-operasional-di-jalan-pajajaran--kota-bogor",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:16+07:00",
+      "sha256": "1fed4ba306e2d6a02eaa4189a90b0c2ae10187cb2d559d39cd788d4ad2c46f31"
+    },
+    {
+      "file": "026_bigdata-volume-lalu-lintas-segmen-1-dan-2-berdasarkan-hari-operasional-di-jalan-.json",
+      "url": "https://opendata.kotabogor.go.id/api/bigdata/dinas_perhubungan/volume_lalu_lintas_segmen_1_dan_2_berdasarkan_hari_op",
+      "params": {
+        "page": 1,
+        "per_page": 1000
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:16+07:00",
+      "sha256": "19f64c0d7ecbc44d6fb29d34d9e28ffe2a3414b53f591dcdfc1facd4ba9175bb"
+    },
+    {
+      "file": "027_detail-persentase-realisasi-pendapatan-asli-daerah-pad-kota-bogor.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/persentase-realisasi-pendapatan-asli-daerah-pad-kota-bogor",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:17+07:00",
+      "sha256": "cdfc0756373dfeae9afb9069bba78f29e14cd3e4057bd5530cb2f0882044e79e"
+    },
+    {
+      "file": "028_bigdata-persentase-realisasi-pendapatan-asli-daerah-pad-kota-bogor-hal-1.json",
+      "url": "https://opendata.kotabogor.go.id/api/bigdata/badan_pendapatan_daerah/persentase_realisasi_pendapatan_asli_daerah_pad_kota_bogor",
+      "params": {
+        "page": 1,
+        "per_page": 1000
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:17+07:00",
+      "sha256": "42b4450638886abced362b9c13529e0340635e8971a05076b449dd0a4c087ea3"
+    },
+    {
+      "file": "029_detail-realisasi-penerimaan-pendapatan-asli-daerah-pad-bersumber-dari-retribusi-.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/realisasi-penerimaan-pendapatan-asli-daerah-pad-bersumber-dari-retribusi-daerah-di-kota-bogor",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:18+07:00",
+      "sha256": "b31ff2dfab42aa0760331075e73854e631e6a0e506cf09caae791ba6eccc95f4"
+    },
+    {
+      "file": "030_bigdata-realisasi-penerimaan-pendapatan-asli-daerah-pad-bersumber-dari-retribusi.json",
+      "url": "https://opendata.kotabogor.go.id/api/bigdata/badan_pendapatan_daerah/realisasi_penerimaan_pendapatan_asli_daerah_pad_bersu",
+      "params": {
+        "page": 1,
+        "per_page": 1000
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:19+07:00",
+      "sha256": "aa6746c0d441123eaddfcdb759e7b9e8e522673cda7d6667083ae98c07448154"
+    },
+    {
+      "file": "031_detail-persentase-kepala-keluarga-miskin-di-kota-bogor.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/persentase-kepala-keluarga-miskin-di-kota-bogor",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:19+07:00",
+      "sha256": "9916976a7fe81f47fb13e61806e16770da2fe1086b5dd3e44ea39e271e6c8611"
+    },
+    {
+      "file": "032_bigdata-persentase-kepala-keluarga-miskin-di-kota-bogor-hal-1.json",
+      "url": "https://opendata.kotabogor.go.id/api/bigdata/dinas_sosial/persentase_kepala_keluarga_miskin_di_kota_bogor",
+      "params": {
+        "page": 1,
+        "per_page": 1000
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T15:56:20+07:00",
+      "sha256": "64d19204fccf686a38441511d9d110ba0bf0f8cabfa5bb6e833c8d38554c35fa"
+    },
+    {
+      "file": "033_uji-404.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/slug-sengaja-salah-untuk-uji-404",
+      "params": {},
+      "status": 404,
+      "recorded_at": "2026-11-10T15:56:20+07:00",
+      "sha256": "e5456e08c8d6c152e42db71b502ad69a497db64f612e58397d35ed20ca92bc1d"
+    }
+  ]
+}

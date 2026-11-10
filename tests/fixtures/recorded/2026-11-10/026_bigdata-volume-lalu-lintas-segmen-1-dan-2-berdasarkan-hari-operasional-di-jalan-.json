@@ -1,0 +1,528 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/bigdata/dinas_perhubungan/volume_lalu_lintas_segmen_1_dan_2_berdasarkan_hari_op",
+    "params": {
+      "page": 1,
+      "per_page": 1000
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "json": {
+      "code": 200,
+      "message": "Success",
+      "data": [
+        {
+          "id": 1,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG\n  EKALOKASARI – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI KERJA",
+          "volume": 1936.16,
+          "satuan": "SMP/JAM",
+          "tahun": 2022
+        },
+        {
+          "id": 2,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG EKALOKASARI – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 1943.71,
+          "satuan": "SMP/JAM",
+          "tahun": 2022
+        },
+        {
+          "id": 3,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG\n  BARANANGSIANG – SIMPANG EKALOKASARI",
+          "hari_operasional": "HARI KERJA",
+          "volume": 2138.78,
+          "satuan": "SMP/JAM",
+          "tahun": 2022
+        },
+        {
+          "id": 4,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG BARANANGSIANG – SIMPANG EKALOKASARI",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 2483.93,
+          "satuan": "SMP/JAM",
+          "tahun": 2022
+        },
+        {
+          "id": 5,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG\n  BARANANGSIANG – SIMPANG TUGU KUJANG",
+          "hari_operasional": "HARI KERJA",
+          "volume": 3056.14,
+          "satuan": "SMP/JAM",
+          "tahun": 2022
+        },
+        {
+          "id": 6,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG BARANANGSIANG – SIMPANG TUGU KUJANG",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 2034.08,
+          "satuan": "SMP/JAM",
+          "tahun": 2022
+        },
+        {
+          "id": 7,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG TUGU\n  KUJANG – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI KERJA",
+          "volume": 2176.06,
+          "satuan": "SMP/JAM",
+          "tahun": 2022
+        },
+        {
+          "id": 8,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG TUGU KUJANG – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 1721.03,
+          "satuan": "SMP/JAM",
+          "tahun": 2022
+        },
+        {
+          "id": 9,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG\n  EKALOKASARI – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI KERJA",
+          "volume": 2236.16,
+          "satuan": "SMP/JAM",
+          "tahun": 2023
+        },
+        {
+          "id": 10,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG EKALOKASARI – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 2343.71,
+          "satuan": "SMP/JAM",
+          "tahun": 2023
+        },
+        {
+          "id": 11,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG\n  BARANANGSIANG – SIMPANG EKALOKASARI",
+          "hari_operasional": "HARI KERJA",
+          "volume": 2138.78,
+          "satuan": "SMP/JAM",
+          "tahun": 2023
+        },
+        {
+          "id": 12,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG BARANANGSIANG – SIMPANG EKALOKASARI",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 2483.93,
+          "satuan": "SMP/JAM",
+          "tahun": 2023
+        },
+        {
+          "id": 13,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG\n  BARANANGSIANG – SIMPANG TUGU KUJANG",
+          "hari_operasional": "HARI KERJA",
+          "volume": 2556.14,
+          "satuan": "SMP/JAM",
+          "tahun": 2023
+        },
+        {
+          "id": 14,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG BARANANGSIANG – SIMPANG TUGU KUJANG",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 2334.08,
+          "satuan": "SMP/JAM",
+          "tahun": 2023
+        },
+        {
+          "id": 15,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG TUGU\n  KUJANG – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI KERJA",
+          "volume": 2176.06,
+          "satuan": "SMP/JAM",
+          "tahun": 2023
+        },
+        {
+          "id": 16,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG TUGU KUJANG – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 1821.03,
+          "satuan": "SMP/JAM",
+          "tahun": 2023
+        },
+        {
+          "id": 17,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG\n  EKALOKASARI – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI KERJA",
+          "volume": 0.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2024
+        },
+        {
+          "id": 18,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG EKALOKASARI – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 0.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2024
+        },
+        {
+          "id": 19,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG\n  BARANANGSIANG – SIMPANG EKALOKASARI",
+          "hari_operasional": "HARI KERJA",
+          "volume": 0.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2024
+        },
+        {
+          "id": 20,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG BARANANGSIANG – SIMPANG EKALOKASARI",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 0.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2024
+        },
+        {
+          "id": 21,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG\n  BARANANGSIANG – SIMPANG TUGU KUJANG",
+          "hari_operasional": "HARI KERJA",
+          "volume": 0.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2024
+        },
+        {
+          "id": 22,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG BARANANGSIANG – SIMPANG TUGU KUJANG",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 0.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2024
+        },
+        {
+          "id": 23,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG TUGU\n  KUJANG – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI KERJA",
+          "volume": 0.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2024
+        },
+        {
+          "id": 24,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG TUGU KUJANG – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 0.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2024
+        },
+        {
+          "id": 25,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG\n  EKALOKASARI – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI KERJA",
+          "volume": 2259.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2025
+        },
+        {
+          "id": 26,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG EKALOKASARI – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 2367.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2025
+        },
+        {
+          "id": 27,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG\n  BARANANGSIANG – SIMPANG EKALOKASARI",
+          "hari_operasional": "HARI KERJA",
+          "volume": 2160.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2025
+        },
+        {
+          "id": 28,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG BARANANGSIANG – SIMPANG EKALOKASARI",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 2509.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2025
+        },
+        {
+          "id": 29,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG\n  BARANANGSIANG – SIMPANG TUGU KUJANG",
+          "hari_operasional": "HARI KERJA",
+          "volume": 2582.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2025
+        },
+        {
+          "id": 30,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG BARANANGSIANG – SIMPANG TUGU KUJANG",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 2357.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2025
+        },
+        {
+          "id": 31,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG TUGU\n  KUJANG – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI KERJA",
+          "volume": 2198.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2025
+        },
+        {
+          "id": 32,
+          "kode_provinsi": 32,
+          "nama_provinsi": "JAWA BARAT",
+          "bps_kode_kabupaten_kota": 3271,
+          "bps_nama_kabupaten_kota": "KOTA BOGOR",
+          "segmen": "SIMPANG TUGU KUJANG – SIMPANG BARANANGSIANG",
+          "hari_operasional": "HARI LIBUR",
+          "volume": 1839.0,
+          "satuan": "SMP/JAM",
+          "tahun": 2025
+        }
+      ],
+      "error": {},
+      "pagination": {
+        "page": 1,
+        "per_page": 1000,
+        "total_page": 1,
+        "total_data": 32,
+        "has_next": false,
+        "has_previous": false
+      },
+      "source": {
+        "rows": 32,
+        "cols": 10
+      },
+      "metadata": [
+        "id",
+        "kode_provinsi",
+        "nama_provinsi",
+        "bps_kode_kabupaten_kota",
+        "bps_nama_kabupaten_kota",
+        "segmen",
+        "hari_operasional",
+        "volume",
+        "satuan",
+        "tahun"
+      ],
+      "metadata_filter": [
+        {
+          "key": "kode_provinsi",
+          "type": "select",
+          "value": [
+            "32"
+          ]
+        },
+        {
+          "key": "nama_provinsi",
+          "type": "select",
+          "value": [
+            "JAWA BARAT"
+          ]
+        },
+        {
+          "key": "bps_kode_kabupaten_kota",
+          "type": "select",
+          "value": [
+            "3271"
+          ]
+        },
+        {
+          "key": "bps_nama_kabupaten_kota",
+          "type": "select",
+          "value": [
+            "KOTA BOGOR"
+          ]
+        },
+        {
+          "key": "segmen",
+          "type": "select",
+          "value": [
+            "SIMPANG\n  BARANANGSIANG – SIMPANG EKALOKASARI",
+            "SIMPANG\n  BARANANGSIANG – SIMPANG TUGU KUJANG",
+            "SIMPANG\n  EKALOKASARI – SIMPANG BARANANGSIANG",
+            "SIMPANG BARANANGSIANG – SIMPANG EKALOKASARI",
+            "SIMPANG BARANANGSIANG – SIMPANG TUGU KUJANG",
+            "SIMPANG EKALOKASARI – SIMPANG BARANANGSIANG",
+            "SIMPANG TUGU\n  KUJANG – SIMPANG BARANANGSIANG",
+            "SIMPANG TUGU KUJANG – SIMPANG BARANANGSIANG"
+          ]
+        },
+        {
+          "key": "hari_operasional",
+          "type": "select",
+          "value": [
+            "HARI KERJA",
+            "HARI LIBUR"
+          ]
+        },
+        {
+          "key": "volume",
+          "type": "select",
+          "value": [
+            "1721.03",
+            "1821.03",
+            "1839.0",
+            "1936.16",
+            "1943.71",
+            "2034.08",
+            "2138.78",
+            "2160.0",
+            "2176.06",
+            "2198.0",
+            "2236.16",
+            "2259.0",
+            "2334.08",
+            "2343.71",
+            "2357.0",
+            "2367.0",
+            "2483.93",
+            "2509.0",
+            "2556.14",
+            "2582.0",
+            "3056.14"
+          ]
+        },
+        {
+          "key": "satuan",
+          "type": "select",
+          "value": [
+            "SMP/JAM"
+          ]
+        },
+        {
+          "key": "tahun",
+          "type": "select",
+          "value": [
+            "2022",
+            "2023",
+            "2024",
+            "2025"
+          ]
+        }
+      ]
+    }
+  },
+  "recorded_at": "2026-11-10T15:56:16+07:00"
+}

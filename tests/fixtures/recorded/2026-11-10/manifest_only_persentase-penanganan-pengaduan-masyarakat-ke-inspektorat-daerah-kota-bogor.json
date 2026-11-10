@@ -1,0 +1,33 @@
+{
+  "started_at": "2026-11-10T16:19:13+07:00",
+  "mode": "only",
+  "slug": "persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor",
+  "base_url": "https://opendata.kotabogor.go.id/api",
+  "budget": 60,
+  "request_count": 2,
+  "file_count": 2,
+  "stop_reason": null,
+  "incidents": [],
+  "notes": [],
+  "files": [
+    {
+      "file": "034_detail-persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bog.json",
+      "url": "https://opendata.kotabogor.go.id/api/datasets/persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor",
+      "params": {},
+      "status": 200,
+      "recorded_at": "2026-11-10T16:19:13+07:00",
+      "sha256": "239f8d5d222111f05f43dc410d3ee34849a2730a18ca989da17fe38a2208b519"
+    },
+    {
+      "file": "035_bigdata-persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bo.json",
+      "url": "https://opendata.kotabogor.go.id/api/bigdata/inspektorat/persentase_penanganan_pengaduan_masyarakat_ke_inspekt",
+      "params": {
+        "page": 1,
+        "per_page": 1000
+      },
+      "status": 200,
+      "recorded_at": "2026-11-10T16:19:14+07:00",
+      "sha256": "fd3d2030ccaf4c82807bd29148df1b1d69a9ae8e3878606685849bafd0cc112d"
+    }
+  ]
+}
