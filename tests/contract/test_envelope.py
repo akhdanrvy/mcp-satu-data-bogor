@@ -308,6 +308,7 @@ ENVELOPE_FIELD_TYPES: dict[str, tuple[type, ...]] = {
     "quality_flags": (list,),
     "truncated": (bool,),
     "truncated_reason": (str, type(None)),
+    "notices": (list,),  # KK-R (Langkah 8)
     "result": (dict, type(None)),
 }
 
@@ -391,3 +392,20 @@ def test_json_schema_generation() -> None:
         schema = ToolEnvelope[rtype].model_json_schema()
         assert set(schema["required"]) == {"status"}
         assert set(schema["properties"]) == set(ENVELOPE_FIELD_TYPES)
+
+
+def test_unknown_argument_message_rules() -> None:
+    """KB-42 (revisi): nama argumen asing hanya disebut bila berbentuk identifier."""
+    from mcp_bogor.models.errors import ErrorArgs
+
+    env = error(ErrorCode.INVALID_PARAM, param="where", unknown=True)
+    assert env.error is not None
+    assert env.error.message == "Parameter 'where' tidak valid. Argumen ini tidak dikenal."
+    plain = error(ErrorCode.INVALID_PARAM, param="query", unknown=False)
+    assert plain.error is not None and plain.error.message == "Parameter 'query' tidak valid."
+    with pytest.raises(ValidationError):
+        ErrorArgs(param="where")  # nama asing tanpa unknown=True
+    with pytest.raises(ValidationError):
+        ErrorArgs(param="9.160.885", unknown=True)  # bukan identifier
+    with pytest.raises(ValueError):
+        error(ErrorCode.NO_MATCH, unknown=True)  # templat lain tidak memakai klausa ini

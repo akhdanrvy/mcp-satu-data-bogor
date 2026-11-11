@@ -14,6 +14,7 @@ from pydantic import Field, model_validator
 from mcp_bogor.config import CONTRACT_VERSION
 from mcp_bogor.models.common import ContractModel, NoNumberText, RequestId, WibDatetime
 from mcp_bogor.models.errors import ErrorCode, ToolError, is_code_allowed
+from mcp_bogor.models.notices import Notice
 
 ResultT = TypeVar("ResultT")
 
@@ -93,6 +94,8 @@ class ToolEnvelope(ContractModel, Generic[ResultT]):
     quality_flags: list[QualityFlag] = Field(default_factory=list)
     truncated: bool = False
     truncated_reason: str | None = Field(default=None, min_length=1)
+    # KK-R: catatan bertemplat untuk model (bukan galat); tidak pernah memuat angka data.
+    notices: list[Notice] = Field(default_factory=list)
     result: ResultT | None = None
 
     @model_validator(mode="after")
@@ -125,6 +128,8 @@ class ToolEnvelope(ContractModel, Generic[ResultT]):
             raise ValueError("truncated=true wajib disertai truncated_reason")
         if not self.truncated and self.truncated_reason is not None:
             raise ValueError("truncated_reason hanya diisi bila truncated=true")
+        if self.status == "error" and self.notices:
+            raise ValueError("respons galat tidak membawa notices")
         return self
 
 
@@ -139,6 +144,7 @@ def ok(
     provenance: Provenance | None = None,
     officialness: Officialness | None = None,
     quality_flags: Iterable[QualityFlag] = (),
+    notices: Iterable[Notice] = (),
 ) -> ToolEnvelope[ResultT]:
     return _envelope_cls(result)(
         status="ok",
@@ -147,6 +153,7 @@ def ok(
         provenance=provenance,
         officialness=officialness,
         quality_flags=list(quality_flags),
+        notices=list(notices),
     )
 
 
@@ -159,6 +166,7 @@ def partial(
     quality_flags: Iterable[QualityFlag] = (),
     truncated_reason: str | None = None,
     stale: bool = False,
+    notices: Iterable[Notice] = (),
 ) -> ToolEnvelope[ResultT]:
     """Hasil sebagian: terpotong (truncated_reason), dari cache usang (stale=True
     → error STALE_DATA, provenance.served_from wajib stale_cache), atau sebagian periode
@@ -173,6 +181,7 @@ def partial(
         quality_flags=list(quality_flags),
         truncated=truncated_reason is not None,
         truncated_reason=truncated_reason,
+        notices=list(notices),
     )
 
 
@@ -184,6 +193,7 @@ def error(
     limit: int | None = None,
     periods: list[int] | None = None,
     column: str | None = None,
+    unknown: bool | None = None,
     request_id: str | None = None,
     tool: str | None = None,
     result_type: type[ResultT] | None = None,
@@ -199,7 +209,13 @@ def error(
     if tool is not None and not is_code_allowed(code, tool):
         raise ValueError(f"kode {code} tidak dipakai oleh tool {tool}")
     tool_error = ToolError.from_template(
-        code, slug=slug, param=param, limit=limit, periods=periods, column=column
+        code,
+        slug=slug,
+        param=param,
+        limit=limit,
+        periods=periods,
+        column=column,
+        unknown=unknown,
     )
     cls: type[ToolEnvelope[Any]] = (
         ToolEnvelope if result_type is None else ToolEnvelope[result_type]

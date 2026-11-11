@@ -17,6 +17,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from pydantic_core import PydanticCustomError
 
 from mcp_bogor.models.common import ContractModel, RequestId
 
@@ -31,6 +32,8 @@ MAX_PERIODS = 20
 MAX_FILTER_VALUES = 50
 DEFAULT_SORT = "tahun:asc"
 SORT_PATTERN = r"^[^:\s]+:(asc|desc)$"
+# Disetujui Akhdan 11 Nov 2026 (review 8a); sama untuk ketiga tool.
+REQUEST_ID_DESCRIPTION = "Diisi oleh sistem pemanggil; biarkan kosong."
 
 Year = Annotated[int, Field(ge=YEAR_MIN, le=YEAR_MAX)]
 NonEmptyStr = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
@@ -48,31 +51,46 @@ def _blank_to_none(value: Any) -> Any:
 
 
 class SearchParams(ParamsModel):
-    query: str = Field(min_length=QUERY_MIN_CHARS, max_length=QUERY_MAX_CHARS)
-    opd: str | None = None
-    topik: str | None = None
-    tahun: Year | None = None
-    page: int = Field(default=1, ge=1)
-    page_size: int = Field(default=DEFAULT_PAGE_SIZE, ge=1)
-    request_id: RequestId | None = None
+    query: str = Field(
+        min_length=QUERY_MIN_CHARS,
+        max_length=QUERY_MAX_CHARS,
+        description='Kata kunci topik dalam bahasa Indonesia, mis. "kemiskinan" atau "PAD".',
+    )
+    opd: str | None = Field(default=None, description="Slug atau nama OPD (opsional).")
+    topik: str | None = Field(default=None, description="Nama topik portal (opsional).")
+    tahun: Year | None = Field(
+        default=None, description="Hanya dataset yang rentang tahunnya mencakup tahun ini."
+    )
+    page: int = Field(default=1, ge=1, description="Halaman hasil, mulai 1.")
+    page_size: int = Field(
+        default=DEFAULT_PAGE_SIZE, ge=1, description="Jumlah dataset per halaman."
+    )
+    request_id: RequestId | None = Field(default=None, description=REQUEST_ID_DESCRIPTION)
 
     _blank_optional = field_validator("opd", "topik", mode="before")(_blank_to_none)
 
+    @field_validator("page_size")
+    @classmethod
+    def _page_size_limit(cls, value: int, info: ValidationInfo) -> int:
+        # Hanya berjalan bila page_size diisi pemanggil (nilai bawaan tidak divalidasi).
+        limit = (info.context or {}).get(SEARCH_MAX_PAGE_SIZE_KEY, DEFAULT_SEARCH_MAX_PAGE_SIZE)
+        if value > limit:
+            raise PydanticCustomError("less_than_equal", "page_size maksimal {le}", {"le": limit})
+        return value
+
     @model_validator(mode="after")
-    def _check_page_size(self, info: ValidationInfo) -> SearchParams:
+    def _default_page_size(self, info: ValidationInfo) -> SearchParams:
         limit = (info.context or {}).get(SEARCH_MAX_PAGE_SIZE_KEY, DEFAULT_SEARCH_MAX_PAGE_SIZE)
         if "page_size" not in self.model_fields_set:
-            # Nilai bawaan diturunkan bila batas yang dikonfigurasi lebih kecil.
+            # Nilai bawaan diturunkan bila batas yang dikonfigurasi lebih kecil (KB-12).
             self.page_size = min(self.page_size, limit)
-        elif self.page_size > limit:
-            raise ValueError(f"page_size maksimal {limit}")
         return self
 
 
 class InfoParams(ParamsModel):
     # TODO(Langkah 8): slug harus ada di katalog lokal → DATASET_NOT_FOUND.
     slug: str = Field(min_length=1)
-    request_id: RequestId | None = None
+    request_id: RequestId | None = Field(default=None, description=REQUEST_ID_DESCRIPTION)
 
 
 class DataParams(ParamsModel):
@@ -84,7 +102,7 @@ class DataParams(ParamsModel):
     # TODO(Langkah 8): kolom sort harus ada di dataset → INVALID_PARAM.
     sort: str = Field(default=DEFAULT_SORT, pattern=SORT_PATTERN)
     force_refresh: bool = False
-    request_id: RequestId | None = None
+    request_id: RequestId | None = Field(default=None, description=REQUEST_ID_DESCRIPTION)
 
     @field_validator("periods")
     @classmethod

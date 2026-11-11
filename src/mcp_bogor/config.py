@@ -92,6 +92,8 @@ class Settings(BaseSettings):
 
     # --- Kontrak dan batas (Dok 4 bagian 9) ---
     tool_prefix: str = "satudata_"
+    # KB-42 (revisi): iklankan outputSchema (JSON Schema amplop) di list_tools.
+    expose_output_schema: bool = True
     max_response_tokens: int = Field(default=2000, gt=0)
     search_max_page_size: int = Field(default=20, ge=1)
     top_values: int = Field(default=10, ge=0)

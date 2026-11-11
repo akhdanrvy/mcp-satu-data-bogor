@@ -30,6 +30,7 @@ from mcp_bogor.models.errors import (
     ToolError,
     render_message,
 )
+from mcp_bogor.models.notices import NOTICE_TEMPLATES, Notice, NoticeCode
 from mcp_bogor.models.params import DataParams, InfoParams, SearchParams
 from mcp_bogor.models.results import (
     ColumnInfo,
@@ -44,6 +45,7 @@ __all__ = [
     "ALL_TOOLS",
     "ERROR_SPECS",
     "MESSAGE_TEMPLATES",
+    "NOTICE_TEMPLATES",
     "QUALITY_RULE_OF",
     "ColumnInfo",
     "ContractModel",
@@ -55,6 +57,8 @@ __all__ = [
     "ErrorSpec",
     "InfoParams",
     "InfoResult",
+    "Notice",
+    "NoticeCode",
     "Officialness",
     "Provenance",
     "QualityFlag",

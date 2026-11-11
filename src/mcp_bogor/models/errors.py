@@ -10,6 +10,7 @@ tahun, batas, dan slug, tetapi tidak pernah nilai dari baris data.
 
 from __future__ import annotations
 
+import re
 import string
 from dataclasses import dataclass
 from enum import StrEnum
@@ -26,6 +27,11 @@ ToolName = Literal["search_datasets", "get_dataset_info", "get_dataset_data"]
 
 ALL_TOOLS: frozenset[str] = frozenset(get_args(ToolName))
 _INFO_DATA: frozenset[str] = frozenset({"get_dataset_info", "get_dataset_data"})
+
+# Nama argumen tak dikenal yang boleh disebut di pesan INVALID_PARAM (KB-42 revisi).
+UNKNOWN_ARGUMENT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}$")
+# Pengganti bila nama argumen asing tidak berbentuk identifier (tidak digaungkan).
+UNKNOWN_ARGUMENT_FALLBACK = "argumen_tidak_dikenal"
 
 PARAM_NAMES: frozenset[str] = frozenset(
     {*SearchParams.model_fields, *InfoParams.model_fields, *DataParams.model_fields}
@@ -82,16 +88,25 @@ class ErrorArgs(ContractModel):
     limit: int | None = Field(default=None, ge=0)
     periods: Annotated[list[Year], Field(min_length=1, max_length=MAX_PERIODS)] | None = None
     column: PlaceholderStr | None = None
+    # KB-42 (revisi): argumen di luar skema tool. param boleh nama argumen itu bila
+    # berbentuk identifier (UNKNOWN_ARGUMENT_RE); pesan diberi klausa "tidak dikenal".
+    unknown: bool | None = None
 
-    @field_validator("param")
-    @classmethod
-    def _known_param(cls, value: str | None) -> str | None:
-        if value is not None and value not in PARAM_NAMES:
-            raise ValueError(f"param harus salah satu parameter tool: {sorted(PARAM_NAMES)}")
-        return value
+    @model_validator(mode="after")
+    def _known_param(self) -> ErrorArgs:
+        if self.param is None or self.param in PARAM_NAMES:
+            return self
+        if self.unknown and UNKNOWN_ARGUMENT_RE.match(self.param):
+            return self
+        raise ValueError(
+            f"param harus salah satu parameter tool: {sorted(PARAM_NAMES)}, "
+            "atau nama argumen tidak dikenal berbentuk identifier"
+        )
 
     def formatted(self) -> dict[str, str]:
         values = self.model_dump(exclude_none=True)
+        if not values.get("unknown"):
+            values.pop("unknown", None)
         if "periods" in values:
             values["periods"] = ", ".join(str(p) for p in values["periods"])
         return {k: str(v) for k, v in values.items()}
@@ -109,6 +124,7 @@ class MessageTemplate:
 
 # Klausa tambahan untuk placeholder opsional, dalam urutan tetap.
 OPTIONAL_CLAUSES: dict[str, str] = {
+    "unknown": " Argumen ini tidak dikenal.",
     "column": " Kolom: '{column}'.",
     "limit": " Batas: {limit}.",
     "periods": " Periode: {periods}.",
@@ -118,7 +134,7 @@ OPTIONAL_CLAUSES: dict[str, str] = {
 MESSAGE_TEMPLATES: MappingProxyType[ErrorCode, MessageTemplate] = MappingProxyType(
     {
         ErrorCode.INVALID_PARAM: MessageTemplate(
-            "Parameter '{param}' tidak valid.", frozenset({"column", "limit"})
+            "Parameter '{param}' tidak valid.", frozenset({"unknown", "column", "limit"})
         ),
         ErrorCode.DATASET_NOT_FOUND: MessageTemplate(
             "Dataset '{slug}' tidak ada di katalog Satu Data Kota Bogor."
@@ -204,8 +220,11 @@ class ToolError(ContractModel):
         limit: int | None = None,
         periods: list[int] | None = None,
         column: str | None = None,
+        unknown: bool | None = None,
     ) -> ToolError:
-        args = ErrorArgs(slug=slug, param=param, limit=limit, periods=periods, column=column)
+        args = ErrorArgs(
+            slug=slug, param=param, limit=limit, periods=periods, column=column, unknown=unknown
+        )
         return cls(
             code=code,
             message=render_message(code, args),

@@ -88,7 +88,19 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [ ] **Langkah 8:** pertimbangkan *negative cache* singkat setelah portal gagal agar permintaan beruntun dengan cache usang tidak terus memanggil portal (saat ini dibatasi oleh backoff dan jeda global adaptor saja).
 - [ ] **Langkah 9:** jalankan file server (`fileserver.app.run`) bersama server MCP; lifespan membuat satu `DataCache` per proses.
 - [ ] **Langkah 12 (RUNBOOK):** prosedur rotasi `MCP_DATAREF_SECRET` dengan `MCP_DATAREF_SECRET_PREVIOUS` (KB-33 (5)).
+## TODO dari Langkah 8a (11 Nov 2026)
+
+- [x] **8a:** search_datasets, kerangka tool (`tools/common.py`), amplop + `notices` (KK-R), anggaran token (KB-38), deskripsi tool final, `server.build_server`, KT-01 dan KT-05.
+- [x] **Akhdan:** verifikasi pola `source_url` (KB-40): terverifikasi 11 Nov 2026.
+- [x] **Akhdan:** KB-42 diganti: server low-level SDK dengan handler publik; `MCP_EXPOSE_OUTPUT_SCHEMA` (KB-42 revisi). Deskripsi tool disetujui dengan dua tambahan (notice DICTIONARY_NOT_VALIDATED di data; deskripsi `request_id`).
+- [ ] **8b:** get_dataset_info + `probe` (KK-O) + cache kamus (KB-36); daftarkan di `build_server`, perbarui snapshot KT-01 (review Akhdan).
+- [ ] **8c:** get_dataset_data + seri/subset (KB-37), validasi filter (KB-39), KB-41, KK-P, KK-Q, `DataResult.dictionary_validated`; KT-02..04, KT-06, UT-13, UT-14, golden set level tool, e2e.
+- [ ] **Dok 2/Dok 4:** revisi Dok 4 bagian 2 (`notices`, KK-R) dan bagian 5 (periods/filter lokal, KK-P).
 
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
+
+**Catatan untuk lead technical (ADR-011):** tanpa perubahan backend Citya untuk mengambil `data_ref` (port 8799) dan menghitung titik grafik di server, Citya yang memakai MCP **tidak dapat menyebut angka** sama sekali, karena respons tool sengaja tidak memuat nilai measure. Ini disengaja (angka bukan dari LLM; ADR-005, KT-03) dan perlu disampaikan ke lead technical serta Pak Ridho sebelum integrasi.
+
+**Pertanyaan untuk tim Chat Assistant (Pak Ridho):** apakah klien MCP Citya meneruskan `outputSchema` tool ke konteks model? Bila ya, skema amplop memboroskan token tiap giliran; set `MCP_EXPOSE_OUTPUT_SCHEMA=false` (KB-42 revisi).
 
 Bergantung pada jawaban tim lain (buat bisa dikonfigurasi, jangan menunggu): ADR-011, klien MCP di Citya, perubahan `render_chart`, `num_ctx` (→ `MCP_MAX_RESPONSE_TOKENS`, awal 2.000), lokasi server dan jaringan port 8799.

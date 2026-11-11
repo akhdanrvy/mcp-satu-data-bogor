@@ -32,6 +32,15 @@ def _check(host: str | None) -> None:
         raise NetworkBlockedError(f"Akses jaringan ke {host!r} diblokir di tes non-smoke.")
 
 
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption(
+        "--update-snapshots",
+        action="store_true",
+        default=False,
+        help="tulis ulang snapshot kontrak (KT-01); hasilnya wajib direview Akhdan",
+    )
+
+
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     for item in items:
         if _SMOKE_DIR in Path(item.path).parents:
