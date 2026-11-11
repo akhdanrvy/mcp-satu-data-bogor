@@ -1,0 +1,20 @@
+# Kurasi kamus kolom (KK-07). Skema: services/dictionary.DictionaryOverride.
+#   slug: harus sama dengan nama berkas
+#   note: opsional
+#   columns:
+#     <kolom>:            # harus ada di /bigdata dataset ini, kalau tidak → OverrideError
+#       meaning:          # arti kolom (teks)
+#       role:             # dimension | measure | id
+#       unit:             # satuan kolom measure
+#       reviewed_by:      # siapa yang memverifikasi; wajib berpasangan dengan reviewed_at
+#       reviewed_at:      # tanggal verifikasi, YYYY-MM-DD
+# Measure undocumented hanya dianggap valid (dictionary_validated) bila override kolomnya
+# memuat keempatnya: meaning, unit, reviewed_by, reviewed_at (KB-30 (8)).
+slug: kecepatan-lalu-lintas-segmen-1-dan-2-berdasarkan-hari-operasional-di-jalan-raya-pajajaran-kota-bogor
+note: Contoh Langkah 6 (KK-I). no_segmen adalah nomor urut segmen, bukan nilai ukur.
+columns:
+  no_segmen:
+    meaning: nomor segmen ruas jalan
+    role: dimension
+    reviewed_by: Akhdan
+    reviewed_at: 2026-11-11

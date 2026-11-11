@@ -146,6 +146,9 @@ class WriteCounts:
     inserted: int
     updated: int
     deleted: int
+    # Slug baru dan slug yang dihapus (urut abjad), untuk laporan sinkron.
+    added_slugs: tuple[str, ...] = ()
+    removed_slugs: tuple[str, ...] = ()
 
 
 def write_catalog(
@@ -186,6 +189,8 @@ def write_catalog(
             inserted=len(incoming - existing),
             updated=len(incoming & existing),
             deleted=len(missing),
+            added_slugs=tuple(sorted(incoming - existing)),
+            removed_slugs=tuple(missing),
         )
         if before_commit is not None:
             before_commit(conn, counts)

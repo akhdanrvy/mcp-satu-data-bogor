@@ -5,9 +5,9 @@ measure. preview dan filters_applied hanya boleh memakai kolom berperan dimensio
 dan top_values hanya ada untuk kolom dimension.
 
 Pengaman tambahan: nilai preview/top_values berbentuk angka berformat Indonesia
-("9.160.885", "1.234,5") ditolak kecuali kolomnya `tahun` atau `kode_*`. Angka teks
-seperti itu hampir pasti kolom measure yang salah peran (mis. KM-08), sampai
-Langkah 6 menetapkan peran setelah urai NB-07.
+("9.160.885", "1.234,5") ditolak kecuali kolom label angka KK-I (token `kode`, awalan
+`no_`, `tahun`, `satuan`). Ini lapis kedua; peran kolom yang sebenarnya ditetapkan
+services/dictionary (Langkah 6) setelah urai NB-07.
 """
 
 from __future__ import annotations
@@ -84,7 +84,8 @@ class ColumnInfo(ContractModel):
     type: str | None = None
     meaning: str | None = None
     unit: str | None = None
-    meaning_source: Literal["template", "inferred", "none"] = "none"
+    # KK-M: "override" menggantikan "inferred"; arti tidak pernah ditebak (Dok 2 bagian 4).
+    meaning_source: Literal["template", "override", "none"] = "none"
     top_values: list[DimensionValue] | None = None
 
     @model_validator(mode="after")

@@ -21,7 +21,7 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 ## TODO dari review Langkah 1 (10 Nov 2026)
 
 - [x] **Langkah 2 (UT-01):** offset `+07:07` dari portal dinormalkan dengan `replace(tzinfo=WIB)`, sehingga jam dinding tidak bergeser (bukan `astimezone`). Setelah itu, perbarui tes `test_plus_0707_not_normalized_here` di `tests/unit/test_models.py`, yang saat ini sengaja mengunci pergeseran 7 menit di model.
-- [ ] **Langkah 6:** peran kolom ditentukan setelah urai NB-07. Kolom string yang nilainya hampir semua angka (selain `kode_*` dan `tahun`) diberi peran `measure`. Ini menutup kebocoran KT-03 lewat `preview`/`top_values` (contoh KM-08 "9.160.885"). Pengaman model KB-15 tetap ada sebagai lapis kedua. Penentuan peran memakai `ParseIssue` dari `services/normalize.normalize_rows`.
+- [x] **Langkah 6:** peran kolom ditentukan setelah urai NB-07. Kolom string yang nilainya hampir semua angka (selain `kode_*` dan `tahun`) diberi peran `measure`. Ini menutup kebocoran KT-03 lewat `preview`/`top_values` (contoh KM-08 "9.160.885"). Pengaman model KB-15 tetap ada sebagai lapis kedua. Penentuan peran memakai `ParseIssue` dari `services/normalize.normalize_rows`.
 - [ ] **Langkah 8:** bila `missing_periods` tidak kosong (dan ada periode yang ditemukan), status = `partial`. Dijaga di tool, bukan di amplop.
 
 ## TODO dari Langkah 2 (10 Nov 2026)
@@ -40,7 +40,7 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 
 - [ ] **Akhdan:** jalankan `uv run python scripts/record_fixtures.py --only persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor --execute` (KM-12; 2 permintaan, berkas 034 dan 035).
 - [x] **Akhdan:** putuskan redaksi `organisasi_alamat`/`alamat` di fixture (KK-J: diredaksi).
-- [ ] **Langkah 6 (KK-I):** `services/dictionary.column_role` dan perluasan `is_numeric_label_column`; cabut penanda xfail di `tests/unit/test_column_roles.py`.
+- [x] **Langkah 6 (KK-I):** `services/dictionary.column_role` dan perluasan `is_numeric_label_column`; cabut penanda xfail di `tests/unit/test_column_roles.py`.
 - [x] **Langkah 5:** sinkron katalog memakai field `catalog_slim` (KK-J: tanpa kontak); uji dengan `catalog_slim.json`.
 - [x] **Langkah 5 (dataset hilang):** portal bisa menghapus dataset (757 pada 5 Nov → 751 pada 10 Nov 2026). Sinkron katalog penuh harus menghapus dari katalog lokal (tabel + indeks FTS5) setiap record yang tidak lagi ada di hasil sinkron; record itu tidak boleh tetap tersaji di `search_datasets`. Penghapusan hanya dilakukan bila sinkron selesai lengkap (semua halaman terbaca, jumlah = `pagination.total_data`); sinkron gagal/terpotong tidak boleh menghapus apa pun. Tes: katalog lama 3 record, sinkron baru 2 record → record ketiga hilang dari tabel dan FTS5; sinkron terpotong → tidak ada yang dihapus.
 - [ ] **Langkah 10:** slug KM-07 = `persentase-kepala-keluarga-miskin-di-kota-bogor`, KM-12 = `persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor`.
@@ -68,6 +68,16 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [ ] **Langkah 8:** `search_datasets` memakai `storage.db.connect_read` + `services.catalog.search`; catat `match_mode` di log tool; `CatalogNotReady` → galat INTERNAL dengan pesan templat (katalog belum disinkron).
 - [ ] **Langkah 8:** peringatan katalog usang bila `catalog_synced_at` lebih tua dari `MCP_CATALOG_SYNC_MIN_INTERVAL_H` × 2.
 - [ ] **Langkah 9:** mode terjadwal `sync_worker` (loop/cron) memakai `sync_once` yang sama; satu adaptor per proses (KB-26).
+## TODO dari Langkah 6 (11 Nov 2026)
+
+- [x] **Akhdan:** setujui atau ubah KB-30 dan KK-M (disetujui 11 Nov 2026; override memvalidasi measure hanya bila memuat meaning, unit, reviewed_by, reviewed_at).
+- [x] **Akhdan:** kolom `bulan` di aturan (b): diputuskan `bulan`, `triwulan`, `semester` → dimension (11 Nov 2026).
+- [ ] **Akhdan:** override `total_pendapatan` untuk `realisasi-pendapatan-asli-daerah-pad-kota-bogor` (meaning, unit, reviewed_by, reviewed_at), **setelah** artinya diverifikasi di portal atau ke Bapenda. Belum dibuat; sampai itu kamus dataset ini `dictionary_validated=false`. Lihat `docs/TEMUAN_MUTU_DATA.md` TM-01.
+- [ ] **Akhdan:** tentukan saluran pelaporan `docs/TEMUAN_MUTU_DATA.md` ke Diskominfo/OPD (QC-04, [Belum ditentukan] di Dok 2).
+- [ ] **Langkah 7–8 (KK-08):** jalankan `build_dictionary` saat dataset pertama kali diminta (probe + halaman pertama /bigdata), simpan hasil di cache; baca override lewat `storage.overrides.read_override` + `services.dictionary.parse_override`.
+- [ ] **Langkah 8 (KK-05):** `dictionary_validated=false` → peringatan di `get_dataset_info` dengan alasan (`reasons`), dan larangan visual tanpa konfirmasi; `OverrideError`/`OverrideFileError` → galat INTERNAL (berkas kurasi rusak), dicatat di log.
+- [ ] **Langkah 8:** `preview` dan `filters_applied` memakai peran dari kamus; `top_values` dari `ColumnInfo` hasil kamus (sudah ≤ 10 dan tanpa angka berformat).
+- [ ] **Dok 2/Dok 4:** usulkan revisi KK-04 (aturan a–f, termasuk bulan/triwulan/semester), statistik template (751 dataset, 5.811 baris), dan `meaning_source` (KK-M).
 
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
 

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import dataclasses
+import json
 import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -339,6 +340,44 @@ def test_sync_delay_setting_bounds(tmp_path: Path) -> None:
     assert make_settings(tmp_path).sync_request_delay_s == 0.5
     with pytest.raises(ValueError):
         make_settings(tmp_path, sync_request_delay_s=0.1)
+
+
+def test_report_lists_removed_and_added_slugs(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Langkah 6: laporan sinkron menyebut slug yang hilang dan yang baru."""
+    settings = make_settings(tmp_path)
+    first = _sync(settings, _small_fake(KEMISKINAN, KM07), T0)
+    assert first.added_slugs == sorted([KEMISKINAN, KM07]) and first.removed_slugs == []
+    caplog.set_level("INFO", logger="mcp_bogor.sync_worker")
+    report = _sync(settings, _small_fake(KEMISKINAN, KM12), T0 + timedelta(hours=25))
+    assert (report.removed_slugs, report.added_slugs) == ([KM07], [KM12])
+    assert f"Dataset hilang (1):\n  - {KM07}" in report.summary()
+    assert f"Dataset baru (1):\n  - {KM12}" in report.summary()
+    event = json.loads(caplog.records[-1].getMessage())
+    assert (event["removed_slugs"], event["added_slugs"]) == ([KM07], [KM12])
+
+
+def test_incomplete_snapshot_reports_no_removed(tmp_path: Path) -> None:
+    settings = make_settings(tmp_path)
+    _sync(settings, _small_fake(KEMISKINAN, KM07, KM12), T0)
+    second = _small_fake(KEMISKINAN, KM07, KM12)
+    second.remove(KM12)
+    second.snapshot_complete = False
+    report = _sync(settings, second, T0 + timedelta(hours=25))
+    assert report.removed_slugs == [] and report.added_slugs == []
+
+
+def test_summary_caps_slug_lists_at_twenty() -> None:
+    slugs = [f"dataset-{i:02d}" for i in range(25)]
+    report = sync_worker.SyncReport(
+        status="complete", started_at="x", removed_slugs=slugs, added_slugs=slugs[:3]
+    )
+    text = report.summary()
+    assert "Dataset hilang (25):" in text and "dataset-19" in text
+    assert "dataset-20" not in text and "dan 5 lainnya" in text
+    assert "Dataset baru (3):" in text and "lainnya (lihat" not in text.split("Dataset baru")[1]
+    assert report.to_dict()["removed_slugs"] == slugs  # log JSON memuat semuanya
 
 
 def test_report_summary_text() -> None:

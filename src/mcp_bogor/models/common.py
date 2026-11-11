@@ -49,9 +49,21 @@ def contains_formatted_number(text: str) -> bool:
     return _ID_NUMBER_ANYWHERE.search(text) is not None
 
 
+# KK-I: nama kolom yang selalu dimension apa pun tipenya, dan sah berisi label angka.
+# Langkah 6 (keputusan Akhdan 11 Nov 2026): bulan, triwulan, semester ditambahkan.
+LABEL_COLUMN_NAMES = frozenset({"tahun", "bulan", "triwulan", "semester", "satuan"})
+
+
 def is_numeric_label_column(name: str) -> bool:
-    """Kolom yang sah berisi label berbentuk angka: `tahun` dan `kode_*`."""
-    return name == "tahun" or name.startswith("kode_")
+    """KK-I/KB-15: kolom yang sah berisi label berbentuk angka.
+
+    Nama memuat token `kode` (`kode_*`, `bps_kode_*`, `kemendagri_kode_*`), berawalan `no_`,
+    atau bernama persis `tahun`/`bulan`/`triwulan`/`semester`/`satuan`. Bukan substring
+    bebas: `kodepos`, `nomor`,
+    `nilai_no`, `tahunan` tidak termasuk.
+    """
+    folded = name.casefold()
+    return folded in LABEL_COLUMN_NAMES or "kode" in folded.split("_") or folded.startswith("no_")
 
 
 def reject_formatted_number(value: str) -> str:

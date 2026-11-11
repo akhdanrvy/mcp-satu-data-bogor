@@ -346,7 +346,7 @@ def _guard_columns() -> list[ColumnInfo]:
     return [
         ColumnInfo(name="tahun", role="dimension"),
         ColumnInfo(name="kode_kecamatan", role="dimension"),
-        ColumnInfo(name="bulan", role="dimension"),
+        ColumnInfo(name="kecamatan", role="dimension"),
         ColumnInfo(name="jumlah_kunjungan", role="measure"),
     ]
 
@@ -355,12 +355,12 @@ def _guard_columns() -> list[ColumnInfo]:
 def test_data_result_preview_rejects_formatted_number(value: str) -> None:
     data = {**s.data_result().model_dump(), "columns": _guard_columns(), "filters_applied": {}}
     with pytest.raises(ValidationError, match="angka berformat"):
-        DataResult(**{**data, "preview": [{"tahun": 2024, "bulan": value}]})
+        DataResult(**{**data, "preview": [{"tahun": 2024, "kecamatan": value}]})
 
 
 def test_data_result_preview_allows_label_columns() -> None:
     data = {**s.data_result().model_dump(), "columns": _guard_columns(), "filters_applied": {}}
-    preview = [{"tahun": "2.024", "kode_kecamatan": "32.71.010", "bulan": "Januari"}]
+    preview = [{"tahun": "2.024", "kode_kecamatan": "32.71.010", "kecamatan": "Bogor Barat"}]
     assert DataResult(**{**data, "preview": preview}).preview == preview
 
 

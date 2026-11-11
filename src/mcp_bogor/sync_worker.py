@@ -31,7 +31,7 @@ import sqlite3
 import sys
 import time
 from collections.abc import Callable
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -44,6 +44,8 @@ from mcp_bogor.services.stemming import STEMMER_NAME, stem_text
 from mcp_bogor.storage import db
 
 LOGGER = get_logger(__name__)
+# Batas slug baru/hilang yang dicetak ke stdout per jenis; log JSON memuat semuanya.
+MAX_SLUGS_STDOUT = 20
 INTERRUPTED = "sinkron terhenti sebelum selesai"
 
 # Penyebab galat yang disimpan di sync_runs.error_kind (KB-28).
@@ -89,6 +91,9 @@ class SyncReport:
     duration_s: float = 0.0
     error: str | None = None
     error_kind: str | None = None
+    # Slug yang hilang (dihapus; hanya bila snapshot lengkap) dan yang baru dibanding katalog lokal.
+    removed_slugs: list[str] = field(default_factory=list)
+    added_slugs: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -100,7 +105,19 @@ class SyncReport:
             f"diperbarui {self.updated}, dihapus {self.deleted}, dilewati {self.skipped_records}"
             f" | permintaan {self.requests_sent} | {self.duration_s:.1f} dtk"
             + (f" | {self.error}" if self.error else "")
+            + _slug_lines("Dataset hilang", self.removed_slugs)
+            + _slug_lines("Dataset baru", self.added_slugs)
         )
+
+
+def _slug_lines(label: str, slugs: list[str], limit: int = MAX_SLUGS_STDOUT) -> str:
+    """Daftar slug untuk stdout, maks `limit`; sisanya hanya dihitung (lengkap di log JSON)."""
+    if not slugs:
+        return ""
+    lines = [f"\n{label} ({len(slugs)}):"] + [f"\n  - {slug}" for slug in slugs[:limit]]
+    if len(slugs) > limit:
+        lines.append(f"\n  ... dan {len(slugs) - limit} lainnya (lihat log catalog_sync)")
+    return "".join(lines)
 
 
 @dataclass(frozen=True)
@@ -277,6 +294,8 @@ async def sync_once(
                 counts.updated,
                 counts.deleted,
             )
+            report.removed_slugs = list(counts.removed_slugs)
+            report.added_slugs = list(counts.added_slugs)
             finish(status, error, error_kind_of(snapshot.error, refs_error))
             _update_run(write_conn, run_id, report)
 
@@ -291,6 +310,7 @@ async def sync_once(
             )
         except Exception as exc:  # rollback sudah terjadi; catat kegagalan secara terpisah
             report.inserted = report.updated = report.deleted = 0
+            report.removed_slugs, report.added_slugs = [], []
             finish(
                 "failed",
                 f"penulisan katalog gagal: {type(exc).__name__}: {exc}",

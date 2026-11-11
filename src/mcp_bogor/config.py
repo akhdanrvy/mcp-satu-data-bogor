@@ -61,6 +61,8 @@ class Settings(BaseSettings):
     # --- Penyimpanan ---
     db_path: Path = Path("./var/mcp_bogor.db")
     cache_dir: Path = Path("./var/cache")
+    # KK-07: kurasi kamus kolom per slug (overrides/<slug>.yaml); tidak dibuat otomatis.
+    overrides_dir: Path = Path("./overrides")
     cache_ttl_h: float = Field(default=24, gt=0)
     catalog_sync_min_interval_h: float = Field(default=24, ge=24)  # AK-06: maks 1x/24 jam
     # KB-28: sinkron failed/incomplete (bukan karena 429) boleh diulang setelah ini.
@@ -102,7 +104,7 @@ class Settings(BaseSettings):
     def _strip_trailing_slash(cls, value: str) -> str:
         return value.rstrip("/")
 
-    @field_validator("db_path", "cache_dir")
+    @field_validator("db_path", "cache_dir", "overrides_dir")
     @classmethod
     def _resolve_path(cls, value: Path) -> Path:
         return value.expanduser().resolve()

@@ -48,6 +48,9 @@ def test_paths_resolved_and_created(settings_env: Path, monkeypatch: pytest.Monk
     assert s.db_path == (settings_env / "data" / "x.db").resolve()
     assert s.db_path.parent.is_dir()
     assert s.cache_dir.is_absolute() and s.cache_dir.is_dir()
+    # KK-07: folder override di-resolve tetapi tidak dibuat otomatis.
+    assert s.overrides_dir == (settings_env / "overrides").resolve()
+    assert not s.overrides_dir.exists()
 
 
 def test_env_overrides(settings_env: Path, monkeypatch: pytest.MonkeyPatch) -> None:
