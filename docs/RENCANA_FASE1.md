@@ -41,20 +41,33 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [ ] **Akhdan:** jalankan `uv run python scripts/record_fixtures.py --only persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor --execute` (KM-12; 2 permintaan, berkas 034 dan 035).
 - [x] **Akhdan:** putuskan redaksi `organisasi_alamat`/`alamat` di fixture (KK-J: diredaksi).
 - [ ] **Langkah 6 (KK-I):** `services/dictionary.column_role` dan perluasan `is_numeric_label_column`; cabut penanda xfail di `tests/unit/test_column_roles.py`.
-- [ ] **Langkah 5:** sinkron katalog memakai field `catalog_slim` (KK-J: tanpa kontak); uji dengan `catalog_slim.json`.
-- [ ] **Langkah 5 (dataset hilang):** portal bisa menghapus dataset (757 pada 5 Nov → 751 pada 10 Nov 2026). Sinkron katalog penuh harus menghapus dari katalog lokal (tabel + indeks FTS5) setiap record yang tidak lagi ada di hasil sinkron; record itu tidak boleh tetap tersaji di `search_datasets`. Penghapusan hanya dilakukan bila sinkron selesai lengkap (semua halaman terbaca, jumlah = `pagination.total_data`); sinkron gagal/terpotong tidak boleh menghapus apa pun. Tes: katalog lama 3 record, sinkron baru 2 record → record ketiga hilang dari tabel dan FTS5; sinkron terpotong → tidak ada yang dihapus.
+- [x] **Langkah 5:** sinkron katalog memakai field `catalog_slim` (KK-J: tanpa kontak); uji dengan `catalog_slim.json`.
+- [x] **Langkah 5 (dataset hilang):** portal bisa menghapus dataset (757 pada 5 Nov → 751 pada 10 Nov 2026). Sinkron katalog penuh harus menghapus dari katalog lokal (tabel + indeks FTS5) setiap record yang tidak lagi ada di hasil sinkron; record itu tidak boleh tetap tersaji di `search_datasets`. Penghapusan hanya dilakukan bila sinkron selesai lengkap (semua halaman terbaca, jumlah = `pagination.total_data`); sinkron gagal/terpotong tidak boleh menghapus apa pun. Tes: katalog lama 3 record, sinkron baru 2 record → record ketiga hilang dari tabel dan FTS5; sinkron terpotong → tidak ada yang dihapus.
 - [ ] **Langkah 10:** slug KM-07 = `persentase-kepala-keluarga-miskin-di-kota-bogor`, KM-12 = `persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor`.
 
 ## TODO dari Langkah 4 (10 Nov 2026)
 
-- [ ] **Langkah 5:** `sync_worker` memanggil `list_datasets()` lewat `asyncio.run`; hapus record lokal yang tidak ada di snapshot **hanya bila** `snapshot.complete` (KK-K). Uji dengan `FakeSourceAdapter.remove(slug)` dan snapshot tidak lengkap dari adaptor (respx).
-- [ ] **Langkah 5:** peta `opd`/`topik` di katalog memakai `list_organisasi()`/`list_topik()` (KK-H).
-- [ ] **Langkah 5 (KB-26):** `sync_worker` membuat **satu** instans `OpenDataJabarAdapter` untuk seluruh proses, dengan env baru `MCP_SYNC_REQUEST_DELAY_S` (bawaan 0,5, minimal 0,2) sebagai jeda antarpermintaan; tambahkan ke `config.py`, `.env.example`, dan tes config.
-- [ ] **Langkah 5 (KK-K f):** laporan sinkron memuat `pages_read`, `total_data`, jumlah record, `duplicates`, `skipped`, `complete`, `error`, dan jumlah record yang dihapus.
+- [x] **Langkah 5:** `sync_worker` memanggil `list_datasets()` lewat `asyncio.run`; hapus record lokal yang tidak ada di snapshot **hanya bila** `snapshot.complete` (KK-K). Uji dengan `FakeSourceAdapter.remove(slug)` dan snapshot tidak lengkap dari adaptor (respx).
+- [x] **Langkah 5:** peta `opd`/`topik` di katalog memakai `list_organisasi()`/`list_topik()` (KK-H).
+- [x] **Langkah 5 (KB-26):** `sync_worker` membuat **satu** instans `OpenDataJabarAdapter` untuk seluruh proses, dengan env baru `MCP_SYNC_REQUEST_DELAY_S` (bawaan 0,5, minimal 0,2) sebagai jeda antarpermintaan; tambahkan ke `config.py`, `.env.example`, dan tes config.
+- [x] **Langkah 5 (KK-K f):** laporan sinkron memuat `pages_read`, `total_data`, jumlah record, `duplicates`, `skipped`, `complete`, `error`, dan jumlah record yang dihapus.
 - [ ] **Langkah 8:** petakan galat adaptor ke `ErrorCode`: `SourceNotFound` → `DATASET_NOT_FOUND`; `SourceUnavailable` → `SOURCE_UNAVAILABLE` (atau `STALE_DATA` bila cache ada); `SourceRateLimited` → `RATE_LIMITED`; `InvalidSourceRequest` → `INVALID_PARAM`; `SourceProtocolError` → `INTERNAL`. Pakai `FakeSourceAdapter.fail_with` untuk UT-14.
 - [ ] **Langkah 9:** konfigurasi handler log JSON (`mcp_bogor.logging`) untuk server; tutup adaptor (`aclose`) saat server berhenti.
 - [ ] **Langkah 9 (KB-26):** server membuat **satu** instans `OpenDataJabarAdapter` saat start (lifespan FastMCP) dan memakainya bersama untuk semua tool call; jangan membuat adaptor per permintaan, karena pembatas laju dan jeda global 429 (KB-25) hanya berlaku per instans.
 - [x] **Akhdan:** putuskan KK-L (kolom `alamat`/`email` di baris data publik): disetujui.
+
+## TODO dari Langkah 5 (10 Nov 2026)
+
+- [ ] **Akhdan:** jalankan `uv run python -m mcp_bogor.sync_worker --once` (±10 permintaan, jeda 0,5 dtk). Kode keluar 0 = complete/incomplete/skipped, 1 = failed, 2 = galat konfigurasi.
+- [x] **Akhdan:** putuskan KB-28 (ulang sinkron lebih cepat setelah gagal) dan KB-29 (perbaikan relevansi; dua kasus golden set xfail).
+- [x] **Akhdan:** setujui atau tolak dependensi PySastrawi (KB-29.2): disetujui; `pysastrawi==1.2.1` ditambahkan, stem hanya di nama, skema v3.
+- [ ] **Akhdan:** tinjau aturan indeks stem KB-29 (a) tanpa hitung ganda dan (b) awalan pe-/per- tidak di-stem.
+- [ ] **Langkah 10 (KB-29.4):** sinonim kartu metrik (mis. "miskin" → KM-06, "PAD" → KM-01) dicek sebelum FTS.
+- [ ] **Langkah 10 (KB-29):** sinonim KM-01 untuk "pendapatan asli daerah" (kasus relevansi N-03 yang masih xfail); setelah lulus, cabut xfail di `tests/unit/test_catalog_search.py`.
+- [ ] **Catatan migrasi:** katalog lokal skema v1 (bila sinkron sudah dijalankan) otomatis dimigrasikan ke v2 dan FTS-nya dibangun ulang saat `sync_worker` berikutnya membuka DB.
+- [ ] **Langkah 8:** `search_datasets` memakai `storage.db.connect_read` + `services.catalog.search`; catat `match_mode` di log tool; `CatalogNotReady` → galat INTERNAL dengan pesan templat (katalog belum disinkron).
+- [ ] **Langkah 8:** peringatan katalog usang bila `catalog_synced_at` lebih tua dari `MCP_CATALOG_SYNC_MIN_INTERVAL_H` × 2.
+- [ ] **Langkah 9:** mode terjadwal `sync_worker` (loop/cron) memakai `sync_once` yang sama; satu adaptor per proses (KB-26).
 
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
 

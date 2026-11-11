@@ -63,6 +63,11 @@ class Settings(BaseSettings):
     cache_dir: Path = Path("./var/cache")
     cache_ttl_h: float = Field(default=24, gt=0)
     catalog_sync_min_interval_h: float = Field(default=24, ge=24)  # AK-06: maks 1x/24 jam
+    # KB-28: sinkron failed/incomplete (bukan karena 429) boleh diulang setelah ini.
+    catalog_sync_retry_after_h: float = Field(default=6, gt=0)
+    # KB-26: jeda antarpermintaan sync_worker (proses terpisah dari server; pembatas laju
+    # tidak lintas proses), lebih longgar agar laju gabungan tetap sopan.
+    sync_request_delay_s: float = Field(default=0.5, ge=0.2)
 
     # --- Transport ---
     transport: Literal["stdio", "streamable-http"] = "stdio"
@@ -101,6 +106,15 @@ class Settings(BaseSettings):
     @classmethod
     def _resolve_path(cls, value: Path) -> Path:
         return value.expanduser().resolve()
+
+    @model_validator(mode="after")
+    def _retry_within_interval(self) -> Settings:
+        if self.catalog_sync_retry_after_h > self.catalog_sync_min_interval_h:
+            raise ValueError(
+                "MCP_CATALOG_SYNC_RETRY_AFTER_H tidak boleh melebihi "
+                "MCP_CATALOG_SYNC_MIN_INTERVAL_H"
+            )
+        return self
 
     @model_validator(mode="after")
     def _ensure_dirs(self) -> Settings:

@@ -11,6 +11,7 @@ from mcp_bogor.models import DataRef
 from mcp_bogor.services.normalize import (
     ParseIssue,
     clean_empty,
+    html_to_text,
     is_code_column,
     normalize_label,
     normalize_row,
@@ -233,3 +234,25 @@ def test_segment_labels_grouped() -> None:
 
 def test_label_without_dash() -> None:
     assert normalize_label(" Bogor\tBarat ") == ("Bogor Barat", " Bogor\tBarat ")
+
+
+# ---------------------------------------------------------------- deskripsi HTML
+
+
+def test_html_to_text_keeps_list_items_and_entities() -> None:
+    html = (
+        "<p>Dataset ini&nbsp;berisi data <span>kemiskinan</span> &amp; lainnya.</p>"
+        "<p>Penjelasan:</p><ul><li>tahun: menyatakan tahun</li>"
+        "<li>nilai:  menyatakan   nilai</li></ul>"
+    )
+    assert html_to_text(html) == (
+        "Dataset ini berisi data kemiskinan & lainnya.\n"
+        "Penjelasan:\n"
+        "- tahun: menyatakan tahun\n"
+        "- nilai: menyatakan nilai"
+    )
+
+
+@pytest.mark.parametrize("raw", [None, "", "-", "None", "<p></p>", "<br/><p> </p>"])
+def test_html_to_text_empty(raw: str | None) -> None:
+    assert html_to_text(raw) is None

@@ -261,7 +261,13 @@ class FakeSourceAdapter:
         self._catalog = list(self._portal.slim_records)
         self._removed: set[str] = set()
         self.fail_with: SourceError | None = None
+        self.snapshot_complete = True  # False: tiru sinkron terpotong (complete=False)
         self.calls: list[str] = []
+
+    @property
+    def requests_sent(self) -> int:
+        """Setara penghitung adaptor asli: panggilan selain health."""
+        return sum(1 for call in self.calls if call != "health")
 
     @classmethod
     def from_recorded(cls) -> FakeSourceAdapter:
@@ -279,6 +285,15 @@ class FakeSourceAdapter:
         self._enter("list_datasets")
         records = [parse_dataset(r) for r in self._catalog if r["slug"] not in self._removed]
         pages = total_pages(len(records), CATALOG_PER_PAGE)
+        if not self.snapshot_complete:
+            return CatalogSnapshot(
+                records=records,
+                total_data=len(records) + 1,
+                pages_read=pages,
+                total_page=pages + 1,
+                complete=False,
+                error="SourceUnavailable: simulasi halaman terakhir gagal",
+            )
         return CatalogSnapshot(
             records=records,
             total_data=len(records),

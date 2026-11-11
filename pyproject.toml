@@ -12,6 +12,7 @@ dependencies = [
     "starlette>=0.37",         # file server :8799 (ikut mcp; eksplisit karena diimpor langsung)
     "uvicorn>=0.30",           # menjalankan file server dan transport HTTP
     "pyyaml>=6",               # kartu metrik YAML (Langkah 10)
+    "pysastrawi==1.2.1",       # stemmer bahasa Indonesia (KB-29), MIT; dikunci: tidak lagi dikembangkan
 ]
 
 [project.scripts]

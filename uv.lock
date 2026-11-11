@@ -484,6 +484,7 @@ dependencies = [
     { name = "mcp" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "pysastrawi" },
     { name = "pyyaml" },
     { name = "starlette" },
     { name = "uvicorn" },
@@ -503,6 +504,7 @@ requires-dist = [
     { name = "mcp", specifier = ">=1.10,<2" },
     { name = "pydantic", specifier = ">=2.7,<3" },
     { name = "pydantic-settings", specifier = ">=2.3" },
+    { name = "pysastrawi", specifier = "==1.2.1" },
     { name = "pyyaml", specifier = ">=6" },
     { name = "starlette", specifier = ">=0.37" },
     { name = "uvicorn", specifier = ">=0.30" },
@@ -730,6 +732,15 @@ wheels = [
 [package.optional-dependencies]
 crypto = [
     { name = "cryptography" },
+]
+
+[[package]]
+name = "pysastrawi"
+version = "1.2.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4c/25/caf2775adac97432e0fb74c3df3d83627ac1a1bced7b7f997356cf0d3af7/pysastrawi-1.2.1.tar.gz", hash = "sha256:55112f8c92811a7f7c622bbce608b42d3390faf3b96abf1d06f52b13f989710e", size = 191180, upload-time = "2026-05-21T04:59:06.903Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f4/df/668d3b19c6215bd7224eeaa88ad3cb8d20a22657b0ac0526258421f4807a/pysastrawi-1.2.1-py2.py3-none-any.whl", hash = "sha256:312ab1519fd76bc9e7ec46a40e750043e088b1409d9e8c5fd63e20d24cd2724f", size = 211176, upload-time = "2026-05-21T04:59:04.847Z" },
 ]
 
 [[package]]

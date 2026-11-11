@@ -271,6 +271,8 @@ class OpenDataJabarAdapter:
         # Jeda global (monotonic) setelah 429, atau 503 dengan Retry-After: berlaku untuk
         # SEMUA panggilan di instans ini, bukan hanya panggilan yang menerima respons itu.
         self._blocked_until: float | None = None
+        # Jumlah permintaan HTTP yang benar-benar dikirim (untuk AK-06 di sync_worker).
+        self.requests_sent = 0
         self._health_cache: tuple[float, SourceHealth] | None = None
         self._client = httpx.AsyncClient(
             base_url=settings.source_base_url,
@@ -381,6 +383,7 @@ class OpenDataJabarAdapter:
         for attempt in range(1, attempts + 1):
             await self._throttle(path)
             started = self._monotonic()
+            self.requests_sent += 1
             try:
                 response = await self._client.get(path, params=dict(params or {}))
             except httpx.TransportError as exc:

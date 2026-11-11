@@ -7,6 +7,7 @@ ParseIssue tanpa menyalin nilai mentahnya (log tidak berisi isi baris data).
 
 from __future__ import annotations
 
+import html
 import re
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
@@ -194,3 +195,28 @@ def normalize_label(value: str) -> tuple[str, str]:
     """
     collapsed = _WHITESPACE.sub(" ", value)
     return _DASH.sub(" - ", collapsed).strip(), value
+
+
+# ---------------------------------------------------------------- deskripsi HTML (Dok 2 bagian 2)
+
+_BLOCK_TAGS = re.compile(r"<\s*(br|/p|/li|/ul|/ol|/h[1-6]|/div)\s*/?\s*>", re.IGNORECASE)
+_LIST_ITEM = re.compile(r"<\s*li[^>]*>", re.IGNORECASE)
+_ANY_TAG = re.compile(r"<[^>]+>")
+_SPACES = re.compile(r"[ \t\r\f\v\u00a0]+")  # termasuk NBSP
+_BLANK_LINES = re.compile(r"\n\s*\n+")
+
+
+def html_to_text(value: str | None) -> str | None:
+    """Deskripsi HTML portal → teks polos: tag dibuang, entitas diurai, spasi dirapatkan.
+
+    Paragraf dan butir daftar menjadi baris baru (butir diawali "- "), agar template kamus
+    kolom "- nama_kolom: menyatakan ..." tetap terbaca di Langkah 6. Kosong → None.
+    """
+    if is_empty(value):
+        return None
+    text = _LIST_ITEM.sub("\n- ", str(value))
+    text = _BLOCK_TAGS.sub("\n", text)
+    text = html.unescape(_ANY_TAG.sub("", text))
+    lines = [_SPACES.sub(" ", line).strip() for line in text.splitlines()]
+    text = _BLANK_LINES.sub("\n", "\n".join(line for line in lines if line)).strip()
+    return text or None
