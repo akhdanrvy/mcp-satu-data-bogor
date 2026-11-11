@@ -194,6 +194,7 @@ def error(
     periods: list[int] | None = None,
     column: str | None = None,
     unknown: bool | None = None,
+    latest: int | None = None,
     request_id: str | None = None,
     tool: str | None = None,
     result_type: type[ResultT] | None = None,
@@ -216,6 +217,7 @@ def error(
         periods=periods,
         column=column,
         unknown=unknown,
+        latest=latest,
     )
     cls: type[ToolEnvelope[Any]] = (
         ToolEnvelope if result_type is None else ToolEnvelope[result_type]

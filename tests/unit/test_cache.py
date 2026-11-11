@@ -536,7 +536,7 @@ def test_dictionary_cache_rebuilt_when_source_changes(tmp_path: Path) -> None:
     assert store.get(SLUG, data_updated_at=updated, override_digest="abc") is None
     store.put(SLUG, {"y": 2}, data_updated_at=None, override_digest="abc")
     assert store.get(SLUG, data_updated_at=None, override_digest="abc") == {"y": 2}
-    path = tmp_path / "cache" / "dictionary" / f"{SLUG}.json"
+    path = store.path_for(SLUG)
     raw = json.loads(path.read_text("utf-8"))
     path.write_text(json.dumps({**raw, "format": 99}), encoding="utf-8")
     assert store.get(SLUG, data_updated_at=None, override_digest="abc") is None

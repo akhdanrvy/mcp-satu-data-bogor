@@ -95,3 +95,11 @@ def settings_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 def anyio_backend() -> str:
     """Tes async (pytest.mark.anyio) hanya memakai asyncio, sama seperti FastMCP."""
     return "asyncio"
+
+
+@pytest.fixture(scope="session")
+def catalog_db(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Katalog SQLite dari 751 record rekaman (sinkron FakeSourceAdapter), dipakai bersama."""
+    from tests.tool_support import synced_settings
+
+    return synced_settings(tmp_path_factory.mktemp("katalog-sesi")).db_path

@@ -103,13 +103,35 @@ class InfoParams(ParamsModel):
 
 class DataParams(ParamsModel):
     # Slug tidak ada di katalog lokal → DATASET_NOT_FOUND di tool, tanpa memanggil portal.
-    slug: str = Field(min_length=1, max_length=SLUG_MAX_CHARS, pattern=SLUG_PATTERN)
-    periods: Annotated[list[Year], Field(min_length=1, max_length=MAX_PERIODS)] | None = None
-    # TODO(Langkah 8): kunci filters harus kolom berperan dimension → INVALID_PARAM.
-    filters: dict[NonEmptyStr, FilterValues] | None = None
-    # TODO(Langkah 8): kolom sort harus ada di dataset → INVALID_PARAM.
-    sort: str = Field(default=DEFAULT_SORT, pattern=SORT_PATTERN)
-    force_refresh: bool = False
+    slug: str = Field(
+        min_length=1,
+        max_length=SLUG_MAX_CHARS,
+        pattern=SLUG_PATTERN,
+        description="Slug dataset dari hasil pencarian dataset.",
+    )
+    periods: Annotated[list[Year], Field(min_length=1, max_length=MAX_PERIODS)] | None = Field(
+        default=None,
+        description="Tahun yang ditanyakan pengguna; kosongkan untuk semua tahun.",
+    )
+    # Kunci harus kolom dimension menurut kamus; diperiksa di tool (KB-39) → INVALID_PARAM
+    # atau LEVEL_NOT_AVAILABLE. Kunci "tahun" dipindah ke periods.
+    filters: dict[NonEmptyStr, FilterValues] | None = Field(
+        default=None,
+        description=(
+            "Filter kolom dimensi: {nama_kolom: [nilai, ...]}, mis. "
+            '{"hari_operasional": ["HARI KERJA"]}. Hanya kolom role=dimension.'
+        ),
+    )
+    # Kolom sort harus ada dan bukan id; diperiksa di tool (KB-39) → INVALID_PARAM.
+    sort: str = Field(
+        default=DEFAULT_SORT,
+        pattern=SORT_PATTERN,
+        description="Urutan baris, format kolom:asc atau kolom:desc.",
+    )
+    force_refresh: bool = Field(
+        default=False,
+        description="Ambil ulang dari portal; dibatasi, biasanya tidak perlu.",
+    )
     request_id: RequestId | None = Field(default=None, description=REQUEST_ID_DESCRIPTION)
 
     @field_validator("periods")

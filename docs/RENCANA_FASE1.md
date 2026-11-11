@@ -95,7 +95,9 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [x] **Akhdan:** KB-42 diganti: server low-level SDK dengan handler publik; `MCP_EXPOSE_OUTPUT_SCHEMA` (KB-42 revisi). Deskripsi tool disetujui dengan dua tambahan (notice DICTIONARY_NOT_VALIDATED di data; deskripsi `request_id`).
 - [x] **8b:** get_dataset_info + `probe` (KK-O) + cache kamus (KB-36); terdaftar di `build_server`; snapshot KT-01 diperbarui (menunggu review Akhdan).
 - [ ] **Akhdan:** review snapshot `tool_schemas.json` (tool info) dan setujui KB-43 (slug ≤ 255, placeholder 200 → 255).
-- [ ] **8c:** get_dataset_data + seri/subset (KB-37), validasi filter (KB-39), KB-41, KK-P, KK-Q, `DataResult.dictionary_validated`; KT-02..04, KT-06, UT-13, UT-14, golden set level tool, e2e.
+- [x] **8c:** get_dataset_data + seri/subset (KB-37), validasi filter (KB-39), KB-41, KK-P, KK-Q, `DataResult.dictionary_validated`; KT-02..04, KT-06, UT-13, UT-14, golden set level tool, e2e. Anotasi tool: readOnly ketiganya; openWorld false (search) / true (info, data).
+- [ ] **Akhdan:** setujui KB-44 (path cache pendek untuk MAX_PATH Windows) dan KB-45 (rincian get_dataset_data); review snapshot `tool_schemas.json` bagian data.
+- [ ] **Langkah 9:** `ToolDeps` dibuat di lifespan server (satu adaptor, satu `DataCache`, satu `DataRefSigner`, satu `DictionaryCache`); file server :8799 berjalan bersama.
 - [ ] **Dok 2/Dok 4:** revisi Dok 4 bagian 2 (`notices`, KK-R) dan bagian 5 (periods/filter lokal, KK-P).
 
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.

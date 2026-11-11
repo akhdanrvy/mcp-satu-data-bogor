@@ -109,6 +109,8 @@ class QueryKey:
     periods: tuple[int, ...] = ()
     filters: tuple[tuple[str, tuple[FilterValue, ...]], ...] = ()
     sort: str | None = None
+    # KB-37: pembeda jenis entri (mis. "seri-lokal", "seri-portal", "subset:<cache_id seri>").
+    variant: str = ""
 
     @classmethod
     def build(
@@ -117,6 +119,7 @@ class QueryKey:
         periods: Iterable[int] | None = None,
         filters: Mapping[str, Iterable[FilterValue]] | None = None,
         sort: str | None = None,
+        variant: str = "",
     ) -> QueryKey:
         if not _SLUG_RE.match(slug):
             raise ValueError("slug tidak sah untuk kunci cache")
@@ -141,6 +144,7 @@ class QueryKey:
             periods=tuple(sorted(clean_periods)),
             filters=tuple(sorted(clean_filters.items())),
             sort=sort_clean,
+            variant=variant,
         )
 
     def params(self) -> dict[str, Any]:
@@ -152,7 +156,7 @@ class QueryKey:
 
     def canonical(self) -> str:
         return json.dumps(
-            {"slug": self.slug, **self.params()},
+            {"slug": self.slug, **self.params(), "variant": self.variant},
             ensure_ascii=False,
             sort_keys=True,
             separators=(",", ":"),
@@ -215,6 +219,8 @@ class FetchedData:
     # provenance.retrieved_at diisi cache saat menulis (KB-34).
     payload: Mapping[str, Any]
     data_updated_at: datetime | None = None
+    # KB-37: subset turunan seri memakai retrieved_at seri (TTL dan provenance ikut seri).
+    retrieved_at: datetime | None = None
 
 
 @dataclass(frozen=True)
@@ -313,7 +319,8 @@ class _Files:
             (self.root / name).mkdir(parents=True, exist_ok=True)
 
     def write(self, target: Path, content: bytes) -> None:
-        tmp = self.tmp / f"{target.name}.{uuid.uuid4().hex}.tmp"
+        # KB-44: nama tmp pendek (tanpa nama target) agar path tidak melewati MAX_PATH Windows.
+        tmp = self.tmp / f"{uuid.uuid4().hex}.tmp"
         with open(tmp, "wb") as handle:
             handle.write(content)
             handle.flush()
@@ -466,7 +473,7 @@ class DataCache:
         if len(rows) > self.max_rows:
             raise CacheTooLarge(len(rows), self.max_rows)
 
-        retrieved_at = self._now()
+        retrieved_at = fetched.retrieved_at or self._now()
         clean, dropped = _drop_account_keys(payload)
         if dropped:
             log_event(LOGGER, "cache_account_keys_dropped", slug=key.slug, count=dropped)
@@ -722,10 +729,15 @@ class DictionaryCache:
         self._files = _Files(cache_dir, sleep)
         self._files.ensure("dictionary")
 
-    def _path(self, slug: str) -> Path:
+    def path_for(self, slug: str) -> Path:
+        """KB-44: nama berkas = sha256(slug) (40 heksa), bukan slug yang bisa sampai 255
+        karakter; path penuh tetap di bawah MAX_PATH Windows. Slug asli disimpan di isinya."""
         if not _SLUG_RE.match(slug):
             raise ValueError("slug tidak sah untuk cache kamus")
-        return self.root / "dictionary" / f"{slug}.json"
+        digest = hashlib.sha256(slug.encode("utf-8")).hexdigest()[:40]
+        return self.root / "dictionary" / f"{digest}.json"
+
+    _path = path_for
 
     def get(
         self,

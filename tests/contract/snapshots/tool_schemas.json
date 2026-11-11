@@ -1,4 +1,764 @@
 {
+  "satudata_get_dataset_data": {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true,
+      "readOnlyHint": true
+    },
+    "description": "Siapkan data satu dataset untuk dihitung dan digambar oleh sistem. Respons tool ini TIDAK berisi angka: backend mengambil baris lengkap lewat `data_ref` lalu menghitung dan menggambar sendiri. Jangan menulis, memperkirakan, atau mengarang angka apa pun dari respons ini. `preview` hanya berisi kolom dimensi untuk memastikan filter benar.\n\nIsi `periods` dengan tahun yang ditanyakan pengguna; kosongkan untuk semua tahun. `filters` hanya untuk kolom dengan `role=dimension` dari satudata_get_dataset_info (mis. {\"hari_operasional\": [\"HARI KERJA\"]}). Jangan menulis kolom nilai sebagai filter.\n\nCara membaca hasil:\n- `missing_periods` tidak kosong: tahun itu belum tersedia di portal. Katakan demikian; status `partial` berarti sebagian tahun ada. Jangan menambal tahun kosong dengan dataset lain, perkiraan, atau tren.\n- Galat PERIOD_NOT_AVAILABLE: tidak satu pun tahun yang diminta tersedia; sebut tahun terakhir yang ada, tanpa angka.\n- `quality_flags` tidak kosong: sebutkan catatan mutunya per tahun (mis. nilai nol mencurigakan, kemungkinan salah skala, atau pencilan). Data tidak diubah; sertakan catatan mutu itu di narasi; periode yang bertanda tidak digambar sebagai nilai biasa, melainkan sebagai celah dengan catatan.\n- Status `partial` dengan galat STALE_DATA: data dari simpanan lama karena portal tidak bisa dihubungi; sebutkan \"data per <retrieved_at>\".\n- Galat LEVEL_NOT_AVAILABLE: dataset tidak menyajikan wilayah itu; jangan membaginya sendiri.\n- Notice DICTIONARY_NOT_VALIDATED atau `dictionary_validated=false`: arti kolom nilai belum terverifikasi; sampaikan keterbatasan itu dan jangan membuat grafik tanpa konfirmasi pengguna.\n\nSatu jawaban atau grafik hanya memakai satu dataset untuk satu indikator. Jangan menyambung tren dari dataset berbeda walau namanya mirip (mis. \"Tingkat Kemiskinan\" dan \"Persentase Kepala Keluarga Miskin\" adalah indikator berbeda), dan jangan membandingkan nilainya seolah-olah satu seri.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "filters": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "items": {
+                  "anyOf": [
+                    {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    }
+                  ]
+                },
+                "maxItems": 50,
+                "minItems": 1,
+                "type": "array"
+              },
+              "propertyNames": {
+                "minLength": 1
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Filter kolom dimensi: {nama_kolom: [nilai, ...]}, mis. {\"hari_operasional\": [\"HARI KERJA\"]}. Hanya kolom role=dimension.",
+          "title": "Filters"
+        },
+        "force_refresh": {
+          "default": false,
+          "description": "Ambil ulang dari portal; dibatasi, biasanya tidak perlu.",
+          "title": "Force Refresh",
+          "type": "boolean"
+        },
+        "periods": {
+          "anyOf": [
+            {
+              "items": {
+                "maximum": 2100,
+                "minimum": 2000,
+                "type": "integer"
+              },
+              "maxItems": 20,
+              "minItems": 1,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tahun yang ditanyakan pengguna; kosongkan untuk semua tahun.",
+          "title": "Periods"
+        },
+        "request_id": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Diisi oleh sistem pemanggil; biarkan kosong.",
+          "title": "Request Id"
+        },
+        "slug": {
+          "description": "Slug dataset dari hasil pencarian dataset.",
+          "maxLength": 255,
+          "minLength": 1,
+          "pattern": "^[a-z0-9_-]+$",
+          "title": "Slug",
+          "type": "string"
+        },
+        "sort": {
+          "default": "tahun:asc",
+          "description": "Urutan baris, format kolom:asc atau kolom:desc.",
+          "pattern": "^[^:\\s]+:(asc|desc)$",
+          "title": "Sort",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slug"
+      ],
+      "title": "DataParams",
+      "type": "object"
+    },
+    "outputSchema": {
+      "$defs": {
+        "ColumnInfo": {
+          "additionalProperties": false,
+          "properties": {
+            "meaning": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Meaning"
+            },
+            "meaning_source": {
+              "default": "none",
+              "enum": [
+                "template",
+                "override",
+                "none"
+              ],
+              "title": "Meaning Source",
+              "type": "string"
+            },
+            "name": {
+              "minLength": 1,
+              "title": "Name",
+              "type": "string"
+            },
+            "role": {
+              "enum": [
+                "dimension",
+                "measure",
+                "id"
+              ],
+              "title": "Role",
+              "type": "string"
+            },
+            "top_values": {
+              "anyOf": [
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Top Values"
+            },
+            "type": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Type"
+            },
+            "unit": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Unit"
+            }
+          },
+          "required": [
+            "name",
+            "role"
+          ],
+          "title": "ColumnInfo",
+          "type": "object"
+        },
+        "DataRef": {
+          "additionalProperties": false,
+          "properties": {
+            "expires_at": {
+              "title": "Expires At",
+              "type": "string"
+            },
+            "format": {
+              "const": "json",
+              "default": "json",
+              "title": "Format",
+              "type": "string"
+            },
+            "row_count": {
+              "minimum": 0,
+              "title": "Row Count",
+              "type": "integer"
+            },
+            "url": {
+              "minLength": 1,
+              "title": "Url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "url",
+            "expires_at",
+            "row_count"
+          ],
+          "title": "DataRef",
+          "type": "object"
+        },
+        "DataResult": {
+          "additionalProperties": false,
+          "properties": {
+            "columns": {
+              "items": {
+                "$ref": "#/$defs/ColumnInfo"
+              },
+              "title": "Columns",
+              "type": "array"
+            },
+            "data_ref": {
+              "$ref": "#/$defs/DataRef"
+            },
+            "dictionary_validated": {
+              "title": "Dictionary Validated",
+              "type": "boolean"
+            },
+            "filters_applied": {
+              "additionalProperties": {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              "title": "Filters Applied",
+              "type": "object"
+            },
+            "missing_periods": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Missing Periods"
+            },
+            "periods_found": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Periods Found"
+            },
+            "periods_requested": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Periods Requested"
+            },
+            "preview": {
+              "items": {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              "maxItems": 5,
+              "title": "Preview",
+              "type": "array"
+            },
+            "time_dimension": {
+              "default": true,
+              "title": "Time Dimension",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "data_ref",
+            "columns",
+            "dictionary_validated"
+          ],
+          "title": "DataResult",
+          "type": "object"
+        },
+        "ErrorCode": {
+          "enum": [
+            "INVALID_PARAM",
+            "DATASET_NOT_FOUND",
+            "NO_MATCH",
+            "PERIOD_NOT_AVAILABLE",
+            "SOURCE_UNAVAILABLE",
+            "STALE_DATA",
+            "RATE_LIMITED",
+            "RESPONSE_TOO_LARGE",
+            "INTERNAL",
+            "LEVEL_NOT_AVAILABLE"
+          ],
+          "title": "ErrorCode",
+          "type": "string"
+        },
+        "Notice": {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "$ref": "#/$defs/NoticeCode"
+            },
+            "column": {
+              "anyOf": [
+                {
+                  "maxLength": 255,
+                  "pattern": "^\\S+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Column"
+            },
+            "message": {
+              "minLength": 1,
+              "title": "Message",
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "title": "Notice",
+          "type": "object"
+        },
+        "NoticeCode": {
+          "enum": [
+            "DICTIONARY_NOT_VALIDATED",
+            "NO_MEASURE_COLUMN",
+            "REFRESH_THROTTLED",
+            "NO_TIME_DIMENSION",
+            "EMPTY_RESULT",
+            "CATALOG_STALE",
+            "UNIT_CONFLICT"
+          ],
+          "title": "NoticeCode",
+          "type": "string"
+        },
+        "Officialness": {
+          "additionalProperties": false,
+          "description": "Keresmian (FR-07). basis boleh null di ringkasan item search_datasets.",
+          "properties": {
+            "basis": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Basis"
+            },
+            "status": {
+              "enum": [
+                "resmi",
+                "draf"
+              ],
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "status"
+          ],
+          "title": "Officialness",
+          "type": "object"
+        },
+        "Provenance": {
+          "additionalProperties": false,
+          "description": "Asal data (FR-06, KS-01..05, KK-B).",
+          "properties": {
+            "change_notes": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Change Notes"
+            },
+            "data_updated_at": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Data Updated At"
+            },
+            "freshness_source": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "approve",
+                    "mdate"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Freshness Source"
+            },
+            "metadata_changed_after_approve": {
+              "default": false,
+              "title": "Metadata Changed After Approve",
+              "type": "boolean"
+            },
+            "opd": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Opd"
+            },
+            "period_end": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Period End"
+            },
+            "period_start": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Period Start"
+            },
+            "retrieved_at": {
+              "title": "Retrieved At",
+              "type": "string"
+            },
+            "served_from": {
+              "enum": [
+                "live",
+                "cache",
+                "stale_cache"
+              ],
+              "title": "Served From",
+              "type": "string"
+            },
+            "source_url": {
+              "minLength": 1,
+              "title": "Source Url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "source_url",
+            "retrieved_at",
+            "served_from"
+          ],
+          "title": "Provenance",
+          "type": "object"
+        },
+        "QualityFlag": {
+          "additionalProperties": false,
+          "description": "Tanda mutu (ADR-007, KK-E). Nilai data asli tidak pernah ikut di sini.",
+          "properties": {
+            "code": {
+              "enum": [
+                "suspect_zero_period",
+                "suspect_scale",
+                "suspect_outlier"
+              ],
+              "title": "Code",
+              "type": "string"
+            },
+            "column": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Column"
+            },
+            "detail": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Detail"
+            },
+            "period": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Period"
+            },
+            "rule": {
+              "enum": [
+                "QC-01",
+                "QC-02"
+              ],
+              "title": "Rule",
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "rule"
+          ],
+          "title": "QualityFlag",
+          "type": "object"
+        },
+        "ToolError": {
+          "additionalProperties": false,
+          "description": "Isi field `error` di amplop. Dibangun lewat from_template, bukan teks bebas.",
+          "properties": {
+            "code": {
+              "$ref": "#/$defs/ErrorCode"
+            },
+            "message": {
+              "minLength": 1,
+              "title": "Message",
+              "type": "string"
+            },
+            "retryable": {
+              "title": "Retryable",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "retryable"
+          ],
+          "title": "ToolError",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "0.1",
+          "default": "0.1",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ToolError"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "notices": {
+          "items": {
+            "$ref": "#/$defs/Notice"
+          },
+          "title": "Notices",
+          "type": "array"
+        },
+        "officialness": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Officialness"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Provenance"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "quality_flags": {
+          "items": {
+            "$ref": "#/$defs/QualityFlag"
+          },
+          "title": "Quality Flags",
+          "type": "array"
+        },
+        "request_id": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Request Id"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DataResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "partial",
+            "error"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "truncated": {
+          "default": false,
+          "title": "Truncated",
+          "type": "boolean"
+        },
+        "truncated_reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Truncated Reason"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "ToolEnvelope[DataResult]",
+      "type": "object"
+    }
+  },
   "satudata_get_dataset_info": {
     "annotations": {
       "destructiveHint": false,

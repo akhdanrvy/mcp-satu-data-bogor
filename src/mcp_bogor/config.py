@@ -71,6 +71,8 @@ class Settings(BaseSettings):
     cache_max_rows: int = Field(default=50_000, ge=1)
     # KB-36: baris sampel /bigdata halaman 1 untuk peran kolom (kamus, KK-08).
     dictionary_sample_rows: int = Field(default=100, ge=1, le=1000)
+    # KB-37: seri diambil tanpa filter lalu disaring lokal bila total baris ≤ ini.
+    series_local_max_rows: int = Field(default=5_000, ge=1)
     catalog_sync_min_interval_h: float = Field(default=24, ge=24)  # AK-06: maks 1x/24 jam
     # KB-28: sinkron failed/incomplete (bukan karena 429) boleh diulang setelah ini.
     catalog_sync_retry_after_h: float = Field(default=6, gt=0)

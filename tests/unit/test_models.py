@@ -389,6 +389,7 @@ def test_data_result_has_no_measure_value_fields() -> None:
         "time_dimension",
         "preview",
         "filters_applied",
+        "dictionary_validated",  # KK-R (Langkah 8c): bool, bukan nilai data
     }
     assert set(DataRef.model_fields) == {"url", "expires_at", "row_count", "format"}
     with pytest.raises(ValidationError, match="extra"):

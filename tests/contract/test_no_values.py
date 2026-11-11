@@ -151,3 +151,48 @@ def test_kt03_get_dataset_info(deps: ToolDeps, slug: str) -> None:
     # (b) nilai khas measure
     values = [row[measure] for row in _recorded_rows()[slug]]
     assert find_leaks(out, values) == []
+
+
+# ---------------------------------------------------------------- get_dataset_data (8c)
+
+DATA_VARIANTS: list[tuple[str, dict[str, Any]]] = [
+    ("semua", {}),
+    ("periode", {"periods": [2024, 2025]}),
+    ("filter", {"filters": {"hari_operasional": ["HARI KERJA"]}}),
+]
+
+
+def _search_text(out: dict[str, Any]) -> dict[str, Any]:
+    """URL data_ref (cache_id + exp + sig) adalah token bertanda tangan acak, bukan data;
+    dikeluarkan dari pencarian lapis (b) agar digit acak di sig tidak menjadi positif palsu.
+    Lapis (a) tetap memastikan data_ref hanya berisi url, expires_at, row_count, format."""
+    clone = json.loads(json.dumps(out))
+    if clone.get("result") and clone["result"].get("data_ref"):
+        ref = clone["result"]["data_ref"]
+        assert set(ref) == {"url", "expires_at", "row_count", "format"}
+        ref["url"] = ref["expires_at"] = "<data_ref>"
+    return clone
+
+
+@pytest.mark.parametrize("variant", [v[0] for v in DATA_VARIANTS])
+@pytest.mark.parametrize("slug", sorted(MEASURES))
+def test_kt03_get_dataset_data(catalog_db: Path, tmp_path: Path, slug: str, variant: str) -> None:
+    from tests.tool_support import ToolEnv
+
+    args = dict(DATA_VARIANTS[[v[0] for v in DATA_VARIANTS].index(variant)][1])
+    if "filters" in args and "hari_operasional" not in json.dumps(_recorded_rows()[slug][0]):
+        pytest.skip("dataset tanpa kolom hari_operasional")
+    env = ToolEnv(catalog_db, tmp_path, overrides_dir=ROOT / "overrides")
+    out = env.data(slug=slug, **args)
+    measure = MEASURES[slug]
+    if out["result"] is not None:
+        result = out["result"]
+        # (a) struktural
+        dims = {c["name"] for c in result["columns"] if c["role"] == "dimension"}
+        assert measure not in dims
+        assert all(set(row) <= dims for row in result["preview"])
+        assert set(result["filters_applied"]) <= dims
+        assert all(c["top_values"] is None for c in result["columns"])
+    # (b) nilai khas measure, juga di respons galat
+    values = [row[measure] for row in _recorded_rows()[slug]]
+    assert find_leaks(_search_text(out), values) == []

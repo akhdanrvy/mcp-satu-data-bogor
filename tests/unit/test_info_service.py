@@ -153,10 +153,23 @@ def test_dictionary_cache_get_any(tmp_path: Path) -> None:
     assert record is not None and record.payload == {"a": 1}
     assert record.data_updated_at == NOW - timedelta(days=1)
     assert (record.override_digest, record.built_at) == ("d", NOW)
-    path = tmp_path / "dictionary" / "contoh.json"
+    path = store.path_for("contoh")
     path.write_text('{"format": 1, "payload": [1]}', encoding="utf-8")
     assert store.get_any("contoh") is None
     path.write_text('{"format": 9, "payload": {}}', encoding="utf-8")
     assert store.get_any("contoh") is None
     path.write_text('{"format": 1, "payload": {}, "built_at": "bukan-waktu"}', encoding="utf-8")
     assert store.get_any("contoh") is None
+
+
+def test_dictionary_cache_long_slug_short_path(tmp_path: Path) -> None:
+    """KB-44: slug portal sampai 202 karakter; nama berkas tetap pendek (MAX_PATH Windows)."""
+    slug = "a" * 202
+    deep = tmp_path / ("d" * 30)
+    store = DictionaryCache(deep)
+    store.put(slug, {"ok": True}, data_updated_at=None, built_at=NOW)
+    assert store.get(slug, data_updated_at=None) == {"ok": True}
+    path = store.path_for(slug)
+    assert len(path.name) == len("x" * 40 + ".json") and slug not in str(path)
+    assert path.parent == deep / "dictionary"
+    assert list((deep / "tmp").iterdir()) == []

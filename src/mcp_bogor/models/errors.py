@@ -91,6 +91,8 @@ class ErrorArgs(ContractModel):
     # KB-42 (revisi): argumen di luar skema tool. param boleh nama argumen itu bila
     # berbentuk identifier (UNKNOWN_ARGUMENT_RE); pesan diberi klausa "tidak dikenal".
     unknown: bool | None = None
+    # KB-41: tahun terakhir yang tersedia (tahun boleh di pesan, KB-10).
+    latest: Year | None = None
 
     @model_validator(mode="after")
     def _known_param(self) -> ErrorArgs:
@@ -129,6 +131,7 @@ OPTIONAL_CLAUSES: dict[str, str] = {
     "limit": " Batas: {limit}.",
     "periods": " Periode: {periods}.",
     "slug": " Dataset: '{slug}'.",
+    "latest": " Tahun terakhir yang tersedia: {latest}.",
 }
 
 MESSAGE_TEMPLATES: MappingProxyType[ErrorCode, MessageTemplate] = MappingProxyType(
@@ -143,7 +146,7 @@ MESSAGE_TEMPLATES: MappingProxyType[ErrorCode, MessageTemplate] = MappingProxyTy
             "Tidak ada dataset yang cocok di portal Satu Data Kota Bogor."
         ),
         ErrorCode.PERIOD_NOT_AVAILABLE: MessageTemplate(
-            "Periode {periods} tidak tersedia di dataset '{slug}'."
+            "Periode {periods} tidak tersedia di dataset '{slug}'.", frozenset({"latest"})
         ),
         ErrorCode.SOURCE_UNAVAILABLE: MessageTemplate(
             "Portal Satu Data sedang tidak bisa dihubungi dan belum ada cache.",
@@ -221,9 +224,16 @@ class ToolError(ContractModel):
         periods: list[int] | None = None,
         column: str | None = None,
         unknown: bool | None = None,
+        latest: int | None = None,
     ) -> ToolError:
         args = ErrorArgs(
-            slug=slug, param=param, limit=limit, periods=periods, column=column, unknown=unknown
+            slug=slug,
+            param=param,
+            limit=limit,
+            periods=periods,
+            column=column,
+            unknown=unknown,
+            latest=latest,
         )
         return cls(
             code=code,

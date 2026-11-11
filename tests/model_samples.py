@@ -127,4 +127,5 @@ def data_result() -> DataResult:
         missing_periods=[2026],
         preview=[{"tahun": 2025, "kecamatan": None}],
         filters_applied={"tahun": [2025, 2026]},
+        dictionary_validated=True,
     )

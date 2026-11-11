@@ -207,7 +207,7 @@ def test_broken_override_is_internal(env: Env) -> None:
 
 def test_corrupt_cached_bundle_is_rebuilt(env: Env) -> None:
     env.call(slug=KEMISKINAN)
-    path = env.settings.cache_dir / "dictionary" / f"{KEMISKINAN}.json"
+    path = env.deps.require_dictionary_cache().path_for(KEMISKINAN)
     raw = json.loads(path.read_text(encoding="utf-8"))
     raw["payload"]["format"] = 99
     path.write_text(json.dumps(raw), encoding="utf-8")

@@ -149,6 +149,8 @@ class DataResult(ContractModel):
         default_factory=list, max_length=MAX_PREVIEW_ROWS
     )
     filters_applied: dict[str, list[str | int]] = Field(default_factory=dict)
+    # KK-R: false → arti kolom nilai belum terverifikasi; visual hanya dengan konfirmasi (KK-05).
+    dictionary_validated: bool
 
     @model_validator(mode="after")
     def _check(self) -> DataResult:

@@ -24,6 +24,7 @@ from pydantic import BaseModel, ValidationError
 
 from mcp_bogor.adapters.base import SourceAdapter
 from mcp_bogor.config import WIB, Settings
+from mcp_bogor.fileserver.signing import DataRefSigner
 from mcp_bogor.logging import get_logger, log_event
 from mcp_bogor.models.envelope import ToolEnvelope, error
 from mcp_bogor.models.errors import (
@@ -35,7 +36,7 @@ from mcp_bogor.models.errors import (
 )
 from mcp_bogor.services.budget import compact_json_bytes
 from mcp_bogor.storage import db
-from mcp_bogor.storage.cache import DictionaryCache
+from mcp_bogor.storage.cache import DataCache, DictionaryCache
 
 LOGGER = get_logger(__name__)
 
@@ -92,6 +93,10 @@ class ToolDeps:
     adapter: SourceAdapter | None = None
     dictionary_cache: DictionaryCache | None = None
     locks: KeyedLocks = field(default_factory=KeyedLocks)
+    # Butuh MCP_DATAREF_SECRET (KB-06); dibuat saat pertama dibutuhkan agar search/info tetap
+    # jalan tanpa secret. Secret tidak sah → ConfigError → INTERNAL.
+    data_cache: DataCache | None = None
+    signer: DataRefSigner | None = None
 
     def __post_init__(self) -> None:
         if self.dictionary_cache is None:
@@ -105,6 +110,16 @@ class ToolDeps:
         if self.adapter is None:
             raise RuntimeError("adaptor sumber belum dikonfigurasi")
         return self.adapter
+
+    def require_data_cache(self) -> DataCache:
+        if self.data_cache is None:
+            self.data_cache = DataCache.from_settings(self.settings, now=self.now)
+        return self.data_cache
+
+    def require_signer(self) -> DataRefSigner:
+        if self.signer is None:
+            self.signer = DataRefSigner(self.settings)
+        return self.signer
 
     def require_dictionary_cache(self) -> DictionaryCache:
         assert self.dictionary_cache is not None  # diisi __post_init__

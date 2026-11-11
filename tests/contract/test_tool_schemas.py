@@ -25,7 +25,7 @@ from tests.fakes import make_settings
 from tests.tool_support import deps_for, synced_settings
 
 SNAPSHOTS = Path(__file__).parent / "snapshots"
-REGISTERED = ["search_datasets", "get_dataset_info"]  # 8c: get_dataset_data
+REGISTERED = ["search_datasets", "get_dataset_info", "get_dataset_data"]
 
 
 def check_snapshot(request: pytest.FixtureRequest, name: str, data: Any) -> None:
@@ -140,7 +140,11 @@ def test_kt05_tool_names_use_prefix(tmp_path: Path, prefix: str) -> None:
 
 def test_default_prefix_is_satudata(tmp_path: Path) -> None:
     names = [t.name for t in _list_tools(make_settings(tmp_path))]
-    assert names == ["satudata_search_datasets", "satudata_get_dataset_info"]
+    assert names == [
+        "satudata_search_datasets",
+        "satudata_get_dataset_info",
+        "satudata_get_dataset_data",
+    ]
 
 
 # ---------------------------------------------------------------- e2e lewat MCP
@@ -258,6 +262,7 @@ def test_streamable_http_transport_supported(catalog_root: Path) -> None:
         assert [t["name"] for t in tools] == [
             "satudata_search_datasets",
             "satudata_get_dataset_info",
+            "satudata_get_dataset_data",
         ]
         call = rpc(
             client,
@@ -301,3 +306,43 @@ def test_e2e_info_through_mcp(catalog_root: Path) -> None:
     assert missing.isError is False
     assert missing.structuredContent["error"]["code"] == "DATASET_NOT_FOUND"
     assert deps.adapter.calls == ["probe"]
+
+
+def test_data_schema_and_annotations(tmp_path: Path) -> None:
+    data = _list_tools(make_settings(tmp_path))[2]
+    assert data.name == "satudata_get_dataset_data"
+    props = data.inputSchema["properties"]
+    assert set(props) == {"slug", "periods", "filters", "sort", "force_refresh", "request_id"}
+    assert data.inputSchema["required"] == ["slug"]
+    assert all("description" in prop for prop in props.values())
+    assert data.annotations.readOnlyHint is True and data.annotations.openWorldHint is True
+    tools = _list_tools(make_settings(tmp_path))
+    assert [t.annotations.openWorldHint for t in tools] == [False, True, True]
+    assert all(t.annotations.readOnlyHint for t in tools)
+
+
+def test_e2e_data_through_mcp(catalog_root: Path) -> None:
+    from mcp_bogor.models import DataResult
+    from tests.fakes import FakeSourceAdapter
+    from tests.tool_support import SECRET
+
+    deps = deps_for(make_settings(catalog_root, dataref_secret=SECRET))
+    deps.adapter = FakeSourceAdapter()
+
+    async def action(client: Any) -> Any:
+        return await client.call_tool(
+            "satudata_get_dataset_data",
+            {
+                "slug": "tingkat-kemiskinan-di-kota-bogor-2",
+                "periods": [2025, 2026],
+                "request_id": "rq-d",
+            },
+        )
+
+    call = asyncio.run(_with_client(deps, action))
+    assert call.isError is False
+    envelope = ToolEnvelope[DataResult].model_validate(call.structuredContent)
+    assert envelope.status == "partial" and envelope.request_id == "rq-d"
+    assert envelope.result is not None and envelope.result.missing_periods == [2026]
+    assert "/d/" in envelope.result.data_ref.url
+    assert deps.adapter.calls == ["probe", "query_rows"]

@@ -12,7 +12,7 @@ handler publik `list_tools` dan `call_tool`, tanpa menyentuh atribut privat Fast
 - Amplop dikembalikan sebagai `structuredContent` + teks JSON-nya; `isError` tetap false
   untuk galat kontrak (galatnya ada di amplop).
 
-Langkah 8a: search_datasets; 8b: get_dataset_info; 8c menambah data di `_tool_specs`. Transport
+Langkah 8a: search_datasets; 8b: get_dataset_info; 8c: get_dataset_data. Transport
 (stdio, streamable-http :8800) di Langkah 9; server low-level ini dipakai langsung oleh
 `StreamableHTTPSessionManager(app=...)` dan klien in-memory SDK.
 """
@@ -29,9 +29,10 @@ from pydantic import BaseModel
 
 from mcp_bogor.config import Settings
 from mcp_bogor.models.envelope import ToolEnvelope
-from mcp_bogor.models.params import DEFAULT_PAGE_SIZE, InfoParams, SearchParams
-from mcp_bogor.models.results import InfoResult, SearchResult
+from mcp_bogor.models.params import DEFAULT_PAGE_SIZE, DataParams, InfoParams, SearchParams
+from mcp_bogor.models.results import DataResult, InfoResult, SearchResult
 from mcp_bogor.tools.common import ToolDeps
+from mcp_bogor.tools.data import get_dataset_data
 from mcp_bogor.tools.descriptions import descriptions, tool_name
 from mcp_bogor.tools.info import get_dataset_info
 from mcp_bogor.tools.search import search_datasets
@@ -64,6 +65,7 @@ def _tool_specs() -> list[ToolSpec]:
     return [
         ToolSpec("search_datasets", SearchParams, SearchResult, search_datasets, READ_ONLY_LOCAL),
         ToolSpec("get_dataset_info", InfoParams, InfoResult, get_dataset_info, READ_ONLY_PORTAL),
+        ToolSpec("get_dataset_data", DataParams, DataResult, get_dataset_data, READ_ONLY_PORTAL),
     ]
 
 
