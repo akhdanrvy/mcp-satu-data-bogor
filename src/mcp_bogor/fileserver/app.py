@@ -23,6 +23,7 @@ from starlette.routing import Route
 
 from mcp_bogor.config import Settings
 from mcp_bogor.fileserver.signing import verification_keys, verify
+from mcp_bogor.health import fileserver_health
 from mcp_bogor.logging import get_logger, log_event
 from mcp_bogor.storage.cache import is_valid_cache_id, read_data_file
 
@@ -89,10 +90,19 @@ def create_app(
         response = Response(body, media_type="application/json", headers=SECURITY_HEADERS)
         return 200, len(body), response
 
-    return Starlette(routes=[Route("/d/{cache_id}", serve, methods=["GET", "HEAD"])])
+    async def healthz(request: Request) -> Response:
+        status, body = fileserver_health(root)
+        return JSONResponse(body, status_code=status, headers=SECURITY_HEADERS)
+
+    return Starlette(
+        routes=[
+            Route("/d/{cache_id}", serve, methods=["GET", "HEAD"]),
+            Route("/healthz", healthz, methods=["GET"]),
+        ]
+    )
 
 
-def run(settings: Settings) -> None:  # pragma: no cover - dijalankan manual / Langkah 9
+def run(settings: Settings) -> None:  # pragma: no cover - dijalankan lewat __main__
     """Jalankan file server di MCP_FILESERVER_HOST:MCP_FILESERVER_PORT (bawaan 127.0.0.1)."""
     import uvicorn
 
@@ -103,4 +113,5 @@ def run(settings: Settings) -> None:  # pragma: no cover - dijalankan manual / L
         port=settings.fileserver_port,
         access_log=False,  # access log uvicorn memuat query string (sig, exp)
         server_header=False,
+        log_config=None,  # pakai handler JSON stderr (KB-48)
     )

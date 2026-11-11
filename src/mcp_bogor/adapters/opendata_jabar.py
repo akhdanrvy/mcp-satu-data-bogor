@@ -563,6 +563,13 @@ class OpenDataJabarAdapter:
         self._health_cache = (self._monotonic(), result)
         return result
 
+    def last_health(self) -> tuple[SourceHealth, float] | None:
+        """Baca-saja: hasil health() terakhir + umurnya (detik); tidak pernah mengirim GET."""
+        if self._health_cache is None:
+            return None
+        checked_at, result = self._health_cache
+        return result, max(0.0, self._monotonic() - checked_at)
+
     async def list_organisasi(self) -> list[dict[str, Any]]:
         return parse_reference(await self._get("/organisasi"), "/organisasi")
 

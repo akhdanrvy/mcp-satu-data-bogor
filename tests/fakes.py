@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from functools import cache
@@ -349,8 +350,17 @@ class FakeSourceAdapter:
     async def health(self) -> SourceHealth:
         self.calls.append("health")
         if self.fail_with is not None:
-            return SourceHealth(ok=False, detail=f"{type(self.fail_with).__name__}")
-        return SourceHealth(ok=True, status=200, latency_s=0.0)
+            result = SourceHealth(ok=False, detail=f"{type(self.fail_with).__name__}")
+        else:
+            result = SourceHealth(ok=True, status=200, latency_s=0.0)
+        self._last_health = (time.monotonic(), result)
+        return result
+
+    def last_health(self) -> tuple[SourceHealth, float] | None:
+        last = getattr(self, "_last_health", None)
+        if last is None:
+            return None
+        return last[1], time.monotonic() - last[0]
 
     async def list_organisasi(self) -> list[dict[str, Any]]:
         self._enter("list_organisasi")

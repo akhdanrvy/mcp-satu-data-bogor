@@ -161,6 +161,10 @@ class SourceAdapter(Protocol):
         """Untuk membedakan sumber mati dari dataset kosong."""
         ...
 
+    def last_health(self) -> tuple[SourceHealth, float] | None:
+        """Hasil health() terakhir + umurnya (detik), tanpa mengirim permintaan; None bila belum."""
+        ...
+
     async def list_organisasi(self) -> list[dict[str, Any]]:
         """Referensi OPD (KK-H), tanpa kontak/alamat (KK-J)."""
         ...

@@ -84,6 +84,12 @@ class Settings(BaseSettings):
     transport: Literal["stdio", "streamable-http"] = "stdio"
     http_host: str = "127.0.0.1"
     http_port: int = Field(default=8800, ge=1, le=65535)
+    # KB-47: proteksi DNS rebinding SDK. Daftar dipisah koma; Host 127.0.0.1:<port> dan
+    # localhost:<port> selalu diizinkan. Origin kosong = permintaan ber-Origin ditolak.
+    http_allowed_hosts: str = ""
+    http_allowed_origins: str = ""
+    # KB-47: bila diisi, /mcp wajib "Authorization: Bearer <token>" (/healthz dikecualikan).
+    http_auth_token: SecretStr = SecretStr("")
     fileserver_host: str = "127.0.0.1"
     fileserver_port: int = Field(default=8799, ge=1, le=65535)
     fileserver_public_url: str = "http://localhost:8799"
@@ -142,6 +148,14 @@ class Settings(BaseSettings):
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         return self
+
+    def allowed_hosts(self) -> list[str]:
+        defaults = [f"127.0.0.1:{self.http_port}", f"localhost:{self.http_port}"]
+        extra = [h.strip() for h in self.http_allowed_hosts.split(",") if h.strip()]
+        return list(dict.fromkeys(defaults + extra))
+
+    def allowed_origins(self) -> list[str]:
+        return [o.strip() for o in self.http_allowed_origins.split(",") if o.strip()]
 
     def require_dataref_secret(self) -> bytes:
         """Kunci HMAC data_ref; gagal bila kosong, placeholder, atau terlalu pendek.

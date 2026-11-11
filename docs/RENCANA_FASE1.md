@@ -52,8 +52,8 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [x] **Langkah 5 (KB-26):** `sync_worker` membuat **satu** instans `OpenDataJabarAdapter` untuk seluruh proses, dengan env baru `MCP_SYNC_REQUEST_DELAY_S` (bawaan 0,5, minimal 0,2) sebagai jeda antarpermintaan; tambahkan ke `config.py`, `.env.example`, dan tes config.
 - [x] **Langkah 5 (KK-K f):** laporan sinkron memuat `pages_read`, `total_data`, jumlah record, `duplicates`, `skipped`, `complete`, `error`, dan jumlah record yang dihapus.
 - [ ] **Langkah 8:** petakan galat adaptor ke `ErrorCode`: `SourceNotFound` → `DATASET_NOT_FOUND`; `SourceUnavailable` → `SOURCE_UNAVAILABLE` (atau `STALE_DATA` bila cache ada); `SourceRateLimited` → `RATE_LIMITED`; `InvalidSourceRequest` → `INVALID_PARAM`; `SourceProtocolError` → `INTERNAL`. Pakai `FakeSourceAdapter.fail_with` untuk UT-14.
-- [ ] **Langkah 9:** konfigurasi handler log JSON (`mcp_bogor.logging`) untuk server; tutup adaptor (`aclose`) saat server berhenti.
-- [ ] **Langkah 9 (KB-26):** server membuat **satu** instans `OpenDataJabarAdapter` saat start (lifespan FastMCP) dan memakainya bersama untuk semua tool call; jangan membuat adaptor per permintaan, karena pembatas laju dan jeda global 429 (KB-25) hanya berlaku per instans.
+- [x] **Langkah 9:** konfigurasi handler log JSON (`mcp_bogor.logging`) untuk server; tutup adaptor (`aclose`) saat server berhenti (KB-48, KB-47).
+- [x] **Langkah 9 (KB-26):** server membuat **satu** instans `OpenDataJabarAdapter` saat start (lifespan FastMCP) dan memakainya bersama untuk semua tool call; jangan membuat adaptor per permintaan, karena pembatas laju dan jeda global 429 (KB-25) hanya berlaku per instans.
 - [x] **Akhdan:** putuskan KK-L (kolom `alamat`/`email` di baris data publik): disetujui.
 
 ## TODO dari Langkah 5 (10 Nov 2026)
@@ -86,7 +86,7 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [ ] **Langkah 8 (data):** `get_dataset_data` memakai `DataCache.get_or_fetch(QueryKey.build(...), fetch, force_refresh=..., fallback_errors=(SourceUnavailable, SourceRateLimited))`; `served_from=stale_cache` → status partial + `STALE_DATA`; `CacheTooLarge` → `RESPONSE_TOO_LARGE`; `refresh_throttled` disebut di respons. data_ref dari `DataRefSigner.make_data_ref`. Isi berkas mengikuti Dok 4 bagian 6 (KK-N).
 - [ ] **Langkah 8 (info):** kamus lewat `DictionaryCache.get/put` dengan `data_updated_at` dari katalog dan `DictionaryOverride.digest()`; `DictionaryResult.from_dict` gagal → buat ulang.
 - [ ] **Langkah 8:** pertimbangkan *negative cache* singkat setelah portal gagal agar permintaan beruntun dengan cache usang tidak terus memanggil portal (saat ini dibatasi oleh backoff dan jeda global adaptor saja).
-- [ ] **Langkah 9:** jalankan file server (`fileserver.app.run`) bersama server MCP; lifespan membuat satu `DataCache` per proses.
+- [x] **Langkah 9:** file server = proses terpisah `python -m mcp_bogor.fileserver`; satu `DataCache` per proses (KB-47).
 - [ ] **Langkah 12 (RUNBOOK):** prosedur rotasi `MCP_DATAREF_SECRET` dengan `MCP_DATAREF_SECRET_PREVIOUS` (KB-33 (5)).
 ## TODO dari Langkah 8a (11 Nov 2026)
 
@@ -97,8 +97,14 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [ ] **Akhdan:** review snapshot `tool_schemas.json` (tool info) dan setujui KB-43 (slug ≤ 255, placeholder 200 → 255).
 - [x] **8c:** get_dataset_data + seri/subset (KB-37), validasi filter (KB-39), KB-41, KK-P, KK-Q, `DataResult.dictionary_validated`; KT-02..04, KT-06, UT-13, UT-14, golden set level tool, e2e. Anotasi tool: readOnly ketiganya; openWorld false (search) / true (info, data).
 - [x] **Akhdan:** KB-44, KB-45, dan snapshot data disetujui (11 Nov 2026); tambahan KB-46 (angka di teks bebas disamarkan di respons; arti hanya untuk measure di data) dan asersi golden N-03.
-- [ ] **Langkah 9:** `ToolDeps` dibuat di lifespan server (satu adaptor, satu `DataCache`, satu `DataRefSigner`, satu `DictionaryCache`); file server :8799 berjalan bersama.
+- [x] **Langkah 9:** `ToolDeps` dibuat saat start (`runtime.build_deps`): satu adaptor, `DataCache`, `DataRefSigner`, `DictionaryCache`.
 - [ ] **Dok 2/Dok 4:** revisi Dok 4 bagian 2 (`notices`, KK-R) dan bagian 5 (periods/filter lokal, KK-P).
+## TODO dari Langkah 9 (11 Nov 2026)
+
+- [x] **Langkah 9:** stdio + streamable-http :8800 (stateless, JSON), file server :8799 terpisah, /healthz, DNS rebinding, token bearer opsional, log JSON ke stderr; tes HTTP sungguhan, stdio subprocess, token, /healthz.
+- [ ] **Akhdan:** uji manual dengan MCP Inspector (stdio dan streamable-http) dan catat hasilnya di README (Langkah 12).
+- [ ] **Langkah 9 lanjutan (bila perlu):** mode terjadwal `sync_worker` (loop/cron, KB-28); saat ini `--once` dijalankan manual atau oleh penjadwal OS.
+- [ ] **Langkah 12 (RUNBOOK):** cara menjalankan dua proses (server + file server) sebagai layanan, rotasi `MCP_HTTP_AUTH_TOKEN`, dan pemantauan `/healthz`.
 
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
 

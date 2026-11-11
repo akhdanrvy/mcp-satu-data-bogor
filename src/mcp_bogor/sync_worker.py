@@ -26,7 +26,6 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import logging
 import sqlite3
 import sys
 import time
@@ -38,7 +37,7 @@ from typing import Any
 from mcp_bogor.adapters.base import CatalogSnapshot, SourceAdapter, SourceError
 from mcp_bogor.adapters.opendata_jabar import OpenDataJabarAdapter
 from mcp_bogor.config import WIB, ConfigError, Settings
-from mcp_bogor.logging import get_logger, log_event
+from mcp_bogor.logging import configure_logging, get_logger, log_event
 from mcp_bogor.services.catalog import WriteCounts, build_dataset_row, write_catalog
 from mcp_bogor.services.stemming import STEMMER_NAME, stem_text
 from mcp_bogor.storage import db
@@ -358,7 +357,7 @@ def main(argv: list[str] | None = None) -> int:
         print("Mode terjadwal belum ada (Langkah 9); jalankan dengan --once atau --reindex.")
         return 2
     settings = Settings()
-    logging.basicConfig(level=settings.log_level, format="%(message)s")
+    configure_logging(settings.log_level)
     try:
         if args.reindex:
             result = reindex(settings)

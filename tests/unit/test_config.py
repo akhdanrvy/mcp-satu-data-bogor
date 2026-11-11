@@ -111,3 +111,18 @@ def test_qc_ratio(settings_env: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("MCP_QC_RATIO", "1")
     with pytest.raises(ValidationError):
         _settings()
+
+
+def test_http_security_settings(settings_env: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """KB-47: host lokal selalu diizinkan; daftar tambahan dipisah koma; token rahasia."""
+    s = _settings()
+    assert s.allowed_hosts() == ["127.0.0.1:8800", "localhost:8800"]
+    assert s.allowed_origins() == [] and s.http_auth_token.get_secret_value() == ""
+    monkeypatch.setenv("MCP_HTTP_PORT", "9000")
+    monkeypatch.setenv("MCP_HTTP_ALLOWED_HOSTS", " mcp-bogor:9000 , ,127.0.0.1:9000")
+    monkeypatch.setenv("MCP_HTTP_ALLOWED_ORIGINS", "http://citya.internal")
+    monkeypatch.setenv("MCP_HTTP_AUTH_TOKEN", "rahasia-token")
+    s = _settings()
+    assert s.allowed_hosts() == ["127.0.0.1:9000", "localhost:9000", "mcp-bogor:9000"]
+    assert s.allowed_origins() == ["http://citya.internal"]
+    assert "rahasia-token" not in repr(s)
