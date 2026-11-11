@@ -312,7 +312,8 @@ def test_truncation_steps(catalog_db: Path, tmp_path: Path) -> None:
             "expires_at": out["result"]["data_ref"]["expires_at"],
         }
         assert out["result"]["periods_found"] == full["result"]["periods_found"]
-    assert seen[0] == "preview_dipangkas" and "arti_kolom_dipangkas" in seen
+    assert seen[0] == "preview_dipangkas"
+    assert set(seen) <= {"preview_dipangkas", "arti_kolom_dipangkas", "notices_dipangkas"}
 
 
 def test_single_flight_series(env: ToolEnv) -> None:

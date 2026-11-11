@@ -197,6 +197,31 @@ def normalize_label(value: str) -> tuple[str, str]:
     return _DASH.sub(" - ", collapsed).strip(), value
 
 
+# ---------------------------------------------------------------- KB-46: teks bebas di respons
+
+NUMBER_MASK = "[angka]"
+_NUMBER_RUN = re.compile(r"\d+(?:[.,]\d+)*")
+_YEAR_MIN, _YEAR_MAX = 1900, 2100
+
+
+def mask_free_text(text: str | None) -> str | None:
+    """KB-46: deret angka di teks bebas portal → "[angka]", kecuali tahun 4 digit 1900 s.d. 2100.
+
+    Dipakai hanya untuk respons tool (change_notes, description, meaning); berkas data_ref
+    dan cache menyimpan teks aslinya. Menutup celah KT-03 lewat metadata teks bebas.
+    """
+    if text is None:
+        return None
+
+    def replace(match: re.Match[str]) -> str:
+        token = match.group(0)
+        if len(token) == 4 and token.isdigit() and _YEAR_MIN <= int(token) <= _YEAR_MAX:
+            return token
+        return NUMBER_MASK
+
+    return _NUMBER_RUN.sub(replace, text)
+
+
 # ---------------------------------------------------------------- deskripsi HTML (Dok 2 bagian 2)
 
 _BLOCK_TAGS = re.compile(r"<\s*(br|/p|/li|/ul|/ol|/h[1-6]|/div)\s*/?\s*>", re.IGNORECASE)

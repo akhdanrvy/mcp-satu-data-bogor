@@ -90,8 +90,10 @@ class ColumnInfo(ContractModel):
 
     @model_validator(mode="after")
     def _check(self) -> ColumnInfo:
-        if (self.meaning is None) != (self.meaning_source == "none"):
-            raise ValueError("meaning=null tepat bila meaning_source='none' (KK, tanpa tebakan)")
+        # KK: arti tanpa sumber tidak boleh (tanpa tebakan). Arti boleh ditahan (null) walau
+        # sumbernya ada: get_dataset_data hanya mengisi arti kolom measure (KB-46).
+        if self.meaning is not None and self.meaning_source == "none":
+            raise ValueError("meaning terisi wajib punya meaning_source (KK, tanpa tebakan)")
         if self.top_values is not None and self.role != "dimension":
             raise ValueError("top_values hanya untuk kolom dimension (KT-03)")
         if self.top_values is not None:

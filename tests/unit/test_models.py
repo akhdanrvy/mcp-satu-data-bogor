@@ -317,8 +317,8 @@ def test_column_info_rules() -> None:
         ColumnInfo(name="nilai", role="measure", top_values=[1, 2])
     with pytest.raises(ValidationError, match="meaning"):
         ColumnInfo(name="x", role="id", meaning="Arti", meaning_source="none")
-    with pytest.raises(ValidationError, match="meaning"):
-        ColumnInfo(name="x", role="id", meaning_source="template")
+    # KB-46: arti boleh ditahan walau sumbernya ada (kolom dimension di get_dataset_data)
+    assert ColumnInfo(name="x", role="id", meaning_source="template").meaning is None
     assert ColumnInfo(name="x", role="dimension").meaning_source == "none"
 
 

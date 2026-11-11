@@ -20,6 +20,7 @@ from mcp_bogor.models.results import ColumnInfo, InfoResult
 from mcp_bogor.services.budget import TruncatedReason, truncate_text
 from mcp_bogor.services.catalog import CatalogDataset
 from mcp_bogor.services.dictionary import DictionaryResult
+from mcp_bogor.services.normalize import mask_free_text
 from mcp_bogor.services.periods import PERIOD_COLUMN, periods_available
 
 INFO_BUNDLE_FORMAT = 1
@@ -120,7 +121,9 @@ def build_provenance(
     retrieved_at: datetime,
     served_from: ServedFrom,
     periods: Sequence[int] | None,
+    mask_text: bool = True,
 ) -> Provenance:
+    """mask_text=True untuk respons tool (KB-46); False untuk berkas data_ref (teks asli)."""
     start, end = (min(periods), max(periods)) if periods else (None, None)
     if start is None:
         start, end = dataset.tahun_awal, dataset.tahun_akhir
@@ -132,7 +135,7 @@ def build_provenance(
         data_updated_at=dataset.data_updated_at,
         freshness_source=dataset.freshness_source,  # type: ignore[arg-type]
         metadata_changed_after_approve=dataset.metadata_changed_after_approve,
-        change_notes=dataset.change_notes,
+        change_notes=mask_free_text(dataset.change_notes) if mask_text else dataset.change_notes,
         retrieved_at=retrieved_at,
         period_start=start,
         period_end=end,
@@ -167,6 +170,11 @@ def dictionary_notices(dictionary: DictionaryResult) -> list[Notice]:
 # ---------------------------------------------------------------- result + pemangkasan (KB-38)
 
 
+def mask_column(column: ColumnInfo) -> ColumnInfo:
+    """KB-46: arti kolom di respons tool tanpa deret angka."""
+    return column.model_copy(update={"meaning": mask_free_text(column.meaning)})
+
+
 def _cap_top_values(column: ColumnInfo, limit: int) -> ColumnInfo:
     if column.top_values is None:
         return column
@@ -187,13 +195,13 @@ def build_info_result(
         opd=dataset.opd,
         topik=dataset.topik,
         kategori=dataset.kategori,
-        description=truncate_text(dataset.deskripsi_text, description_max_chars),
+        description=truncate_text(mask_free_text(dataset.deskripsi_text), description_max_chars),
         satuan=dataset.satuan,
         frekuensi=dataset.frekuensi,
         tingkat_penyajian=dataset.tingkat_penyajian,
         cakupan=dataset.cakupan,
         periods_available=bundle.periods_available or [],
-        columns=[_cap_top_values(c, top_values) for c in bundle.dictionary.columns],
+        columns=[mask_column(_cap_top_values(c, top_values)) for c in bundle.dictionary.columns],
         row_count=bundle.row_count,
         dictionary_validated=bundle.dictionary.dictionary_validated,
     )

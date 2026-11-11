@@ -26,6 +26,7 @@ from mcp_bogor.services.normalize import (
     INTERNAL_ID_COLUMNS,
     is_code_column,
     is_empty,
+    mask_free_text,
     normalize_label,
     normalize_rows,
 )
@@ -178,6 +179,15 @@ def _display_value(value: Any) -> DimensionValue:
 def data_columns(dictionary: DictionaryResult) -> list[ColumnInfo]:
     """Kolom berkas data_ref dan respons data: tanpa kolom id (NB-04), tanpa top_values."""
     return [c.model_copy(update={"top_values": None}) for c in dictionary.columns if c.role != "id"]
+
+
+def response_columns(columns: Sequence[ColumnInfo]) -> list[ColumnInfo]:
+    """KB-46: kolom di respons get_dataset_data. Arti hanya untuk measure (disamarkan);
+    dimension meaning=null dengan meaning_source tetap. Berkas data_ref memuat arti lengkap."""
+    return [
+        c.model_copy(update={"meaning": mask_free_text(c.meaning) if c.role == "measure" else None})
+        for c in columns
+    ]
 
 
 @dataclass(frozen=True)

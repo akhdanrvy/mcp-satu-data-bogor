@@ -2,6 +2,8 @@
 
 rows cocok row_count; columns, provenance (tanpa served_from, KB-34), officialness,
 quality_flags, periods_*, filters_applied, dictionary_validated sama dengan respons tool.
+Perbedaan yang disengaja (KB-46): respons menyamarkan angka di teks bebas (change_notes,
+meaning) dan hanya mengisi arti kolom measure; berkas menyimpan teks asli dan arti lengkap.
 Tanpa jaringan: file server Starlette lewat TestClient, data dari FakeSourceAdapter.
 """
 
@@ -17,6 +19,7 @@ from starlette.testclient import TestClient
 
 from mcp_bogor.adapters.base import SourceUnavailable
 from mcp_bogor.fileserver.app import create_app
+from mcp_bogor.services.normalize import mask_free_text
 from tests.tool_support import ToolEnv
 
 KEMISKINAN = "tingkat-kemiskinan-di-kota-bogor-2"
@@ -54,9 +57,17 @@ def download(env: ToolEnv, url: str) -> dict[str, Any]:
 def assert_matches_tool(out: dict[str, Any], body: dict[str, Any]) -> None:
     result = out["result"]
     assert len(body["rows"]) == result["data_ref"]["row_count"]
-    assert body["columns"] == result["columns"]
+    assert [c["name"] for c in body["columns"]] == [c["name"] for c in result["columns"]]
+    for file_col, tool_col in zip(body["columns"], result["columns"], strict=True):
+        assert {k: v for k, v in file_col.items() if k != "meaning"} == {
+            k: v for k, v in tool_col.items() if k != "meaning"
+        }
+        expected = mask_free_text(file_col["meaning"]) if file_col["role"] == "measure" else None
+        assert tool_col["meaning"] == expected, file_col["name"]
+    file_prov = dict(body["provenance"])
+    file_prov["change_notes"] = mask_free_text(file_prov.get("change_notes"))
     expected_prov = {k: v for k, v in out["provenance"].items() if k != "served_from"}
-    assert body["provenance"] == expected_prov
+    assert file_prov == expected_prov
     assert "served_from" not in body["provenance"]
     assert body["officialness"] == out["officialness"]
     assert body["quality_flags"] == out["quality_flags"]
@@ -123,3 +134,15 @@ def test_stale_response_file_has_no_served_from(catalog_db: Path, tmp_path: Path
     out = env.data(slug=KEMISKINAN, periods=[2025])
     assert out["provenance"]["served_from"] == "stale_cache"
     assert_matches_tool(out, download(env, out["result"]["data_ref"]["url"]))
+
+
+def test_file_keeps_full_meaning_and_original_text(catalog_db: Path, tmp_path: Path) -> None:
+    """KB-46: berkas data_ref menyimpan arti lengkap semua kolom dan teks asli."""
+    env = ToolEnv(catalog_db, tmp_path)
+    out = env.data(slug=KEMISKINAN, periods=[2025])
+    body = download(env, out["result"]["data_ref"]["url"])
+    by_name = {c["name"]: c for c in body["columns"]}
+    assert "Nomor 3 Tahun 2019" in by_name["kode_provinsi"]["meaning"]
+    tool = {c["name"]: c for c in out["result"]["columns"]}
+    assert tool["kode_provinsi"]["meaning"] is None
+    assert tool["kode_provinsi"]["meaning_source"] == "template"

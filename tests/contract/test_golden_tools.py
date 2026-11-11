@@ -94,6 +94,13 @@ def _ok_with_periods(case_id: str) -> Callable[[ToolEnv], None]:
             assert set(exp["periods_found"]) <= set(out["result"]["periods_found"])
         assert out["result"]["missing_periods"] == exp["missing_periods"]
         assert _flags(out) == []  # golden N-*: tanpa catatan mutu untuk periode diminta
+        if case_id == "N-03":  # TM-01: total_pendapatan tidak dijelaskan di deskripsi portal
+            assert out["result"]["dictionary_validated"] is False
+            assert [(n["code"], n["column"]) for n in out["notices"]] == [
+                ("DICTIONARY_NOT_VALIDATED", exp["measure"])
+            ]
+        else:
+            assert out["result"]["dictionary_validated"] is True
         _measure_is_measure(env, case_id)
 
     return run

@@ -45,6 +45,7 @@ from mcp_bogor.services.data import (
     normalize_series,
     plan_query,
     preview_rows,
+    response_columns,
 )
 from mcp_bogor.services.info import (
     InfoBundle,
@@ -150,6 +151,7 @@ def _provenance_dict(
         retrieved_at=deps.now(),
         served_from="live",
         periods=periods,
+        mask_text=False,  # berkas data_ref menyimpan teks asli (KB-46)
     )
     return provenance.model_dump(mode="json", exclude={"served_from"})
 
@@ -319,7 +321,7 @@ async def handle_data(params: DataParams, deps: ToolDeps) -> ToolEnvelope[DataRe
     )
     result = DataResult(
         data_ref=data_ref,
-        columns=columns,
+        columns=response_columns(columns),
         periods_requested=coverage.periods_requested,
         periods_found=coverage.periods_found,
         missing_periods=coverage.missing_periods,

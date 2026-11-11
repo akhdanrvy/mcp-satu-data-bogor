@@ -120,7 +120,13 @@ def _truncated_search(env: ToolEnv) -> dict[str, Any]:
 
 
 def _truncated_data(env: ToolEnv) -> dict[str, Any]:
-    env.settings.max_response_tokens = 1450
+    from mcp_bogor.services.budget import estimate_tokens
+
+    slug = (
+        "kecepatan-lalu-lintas-segmen-1-dan-2-berdasarkan-hari-operasional-di-jalan-raya-"
+        "pajajaran-kota-bogor"
+    )
+    env.settings.max_response_tokens = estimate_tokens(env.data(slug=slug)) - 1
     return env.data(
         slug="kecepatan-lalu-lintas-segmen-1-dan-2-berdasarkan-hari-operasional-di-jalan-raya-pajajaran-kota-bogor"
     )
