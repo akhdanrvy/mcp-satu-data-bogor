@@ -1,6 +1,6 @@
 # Rencana Langkah 8 — Tiga Tool MCP Kota Bogor
 
-Status: **disetujui Akhdan 11 Nov 2026 dengan perubahan** (deskripsi tool, seri tanpa filter, aturan KT-03, KB-40 menunggu verifikasi). Pelaksanaan bertahap: **8a** (search + kerangka) selesai; 8b (info) dan 8c (data) menyusul.
+Status: **disetujui Akhdan 11 Nov 2026 dengan perubahan** (deskripsi tool, seri tanpa filter, aturan KT-03, KB-40 menunggu verifikasi). Pelaksanaan bertahap: **8a** (search + kerangka) dan **8b** (info + probe + cache kamus) selesai; 8c (data) menyusul.
 
 Perubahan dari usulan awal, atas keputusan Akhdan:
 1. Teks deskripsi bagian 7 direvisi. Teks final ada di `src/mcp_bogor/tools/descriptions.py` dan dikunci snapshot `tests/contract/snapshots/tool_descriptions.json`; perubahan berikutnya harus disetujui Akhdan.

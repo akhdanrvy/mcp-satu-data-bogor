@@ -270,7 +270,7 @@ def test_error_rejects_free_text() -> None:
         (ErrorCode.INTERNAL, {"limit": 5}, "tidak memakai"),
         (ErrorCode.DATASET_NOT_FOUND, {"slug": "9.160.885"}, "angka berformat"),
         (ErrorCode.DATASET_NOT_FOUND, {"slug": "dua kata"}, "pattern"),
-        (ErrorCode.DATASET_NOT_FOUND, {"slug": "x" * 201}, "at most"),
+        (ErrorCode.DATASET_NOT_FOUND, {"slug": "x" * 256}, "at most"),
         (ErrorCode.LEVEL_NOT_AVAILABLE, {"slug": SLUG, "column": "1.234,5"}, "angka berformat"),
         (ErrorCode.INVALID_PARAM, {"param": "where"}, "parameter tool"),
         (ErrorCode.INVALID_PARAM, {"param": "page", "limit": -1}, "greater than"),

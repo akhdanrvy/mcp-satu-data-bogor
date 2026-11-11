@@ -90,11 +90,14 @@ WibDatetime = Annotated[
 ]
 """Datetime yang selalu disimpan di WIB dan diserialisasi 'YYYY-MM-DDTHH:MM:SS+07:00'."""
 
+# KB-43: slug portal terpanjang di rekaman 10 Nov = 202 karakter; KB-10 semula 200.
+PLACEHOLDER_MAX_CHARS = 255
+
 RequestId = Annotated[str, StringConstraints(min_length=1, max_length=64)]
 NoNumberText = Annotated[str, StringConstraints(min_length=1), AfterValidator(reject_numbers)]
 PlaceholderStr = Annotated[
     str,
-    StringConstraints(pattern=r"^\S+$", max_length=200),
+    StringConstraints(pattern=r"^\S+$", max_length=PLACEHOLDER_MAX_CHARS),
     AfterValidator(reject_formatted_number),
 ]
 """Nilai placeholder pesan galat (slug, column): satu token, bukan angka berformat."""

@@ -153,6 +153,10 @@ class SourceAdapter(Protocol):
         """Baris mentah dengan filter dan urutan dijalankan di sumber."""
         ...
 
+    async def probe(self, dataset: RawDataset, per_page: int = 100) -> tuple[ColumnProbe, RowPage]:
+        """KK-O: satu GET halaman 1 → nama kolom + metadata_filter + sampel baris."""
+        ...
+
     async def health(self) -> SourceHealth:
         """Untuk membedakan sumber mati dari dataset kosong."""
         ...

@@ -1,4 +1,704 @@
 {
+  "satudata_get_dataset_info": {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true,
+      "readOnlyHint": true
+    },
+    "description": "Ambil penjelasan satu dataset berdasarkan slug dari satudata_search_datasets: arti dataset, kolom, satuan, OPD, status resmi, dan tahun yang tersedia. Tool ini tidak mengembalikan angka data.\n\nBaca `columns`: `role=measure` adalah kolom nilai, `role=dimension` adalah kolom pengelompokan (tahun, wilayah, kategori) yang boleh dipakai sebagai filter. Bila `meaning` bernilai null, artinya tidak diketahui; jangan menebak.\n\n`periods_available` adalah tahun yang benar-benar ada. Jangan meminta atau menyebut tahun lain seolah-olah ada; bila tahun yang ditanya tidak tercantum, katakan belum tersedia dan sebut tahun terakhir yang ada.\n\nBila `dictionary_validated=false` atau ada notice DICTIONARY_NOT_VALIDATED, kolom nilai belum terverifikasi: sampaikan keterbatasan itu dan jangan membuat grafik tanpa konfirmasi pengguna.\n\n`tingkat_penyajian` menunjukkan level wilayah. Dataset tingkat kota tidak bisa dipecah per kecamatan atau kelurahan.\n\nStatus `partial` dengan galat STALE_DATA berarti portal sedang tidak bisa dihubungi dan penjelasan berasal dari simpanan lama; sebutkan tanggal `retrieved_at`.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "request_id": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Diisi oleh sistem pemanggil; biarkan kosong.",
+          "title": "Request Id"
+        },
+        "slug": {
+          "description": "Slug dataset dari hasil pencarian dataset.",
+          "maxLength": 255,
+          "minLength": 1,
+          "pattern": "^[a-z0-9_-]+$",
+          "title": "Slug",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slug"
+      ],
+      "title": "InfoParams",
+      "type": "object"
+    },
+    "outputSchema": {
+      "$defs": {
+        "ColumnInfo": {
+          "additionalProperties": false,
+          "properties": {
+            "meaning": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Meaning"
+            },
+            "meaning_source": {
+              "default": "none",
+              "enum": [
+                "template",
+                "override",
+                "none"
+              ],
+              "title": "Meaning Source",
+              "type": "string"
+            },
+            "name": {
+              "minLength": 1,
+              "title": "Name",
+              "type": "string"
+            },
+            "role": {
+              "enum": [
+                "dimension",
+                "measure",
+                "id"
+              ],
+              "title": "Role",
+              "type": "string"
+            },
+            "top_values": {
+              "anyOf": [
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Top Values"
+            },
+            "type": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Type"
+            },
+            "unit": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Unit"
+            }
+          },
+          "required": [
+            "name",
+            "role"
+          ],
+          "title": "ColumnInfo",
+          "type": "object"
+        },
+        "ErrorCode": {
+          "enum": [
+            "INVALID_PARAM",
+            "DATASET_NOT_FOUND",
+            "NO_MATCH",
+            "PERIOD_NOT_AVAILABLE",
+            "SOURCE_UNAVAILABLE",
+            "STALE_DATA",
+            "RATE_LIMITED",
+            "RESPONSE_TOO_LARGE",
+            "INTERNAL",
+            "LEVEL_NOT_AVAILABLE"
+          ],
+          "title": "ErrorCode",
+          "type": "string"
+        },
+        "InfoResult": {
+          "additionalProperties": false,
+          "properties": {
+            "cakupan": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Cakupan"
+            },
+            "columns": {
+              "items": {
+                "$ref": "#/$defs/ColumnInfo"
+              },
+              "title": "Columns",
+              "type": "array"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Description"
+            },
+            "dictionary_validated": {
+              "title": "Dictionary Validated",
+              "type": "boolean"
+            },
+            "frekuensi": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Frekuensi"
+            },
+            "kategori": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Kategori"
+            },
+            "name": {
+              "title": "Name",
+              "type": "string"
+            },
+            "opd": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Opd"
+            },
+            "periods_available": {
+              "items": {
+                "type": "integer"
+              },
+              "title": "Periods Available",
+              "type": "array"
+            },
+            "row_count": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Row Count"
+            },
+            "satuan": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Satuan"
+            },
+            "slug": {
+              "minLength": 1,
+              "title": "Slug",
+              "type": "string"
+            },
+            "tingkat_penyajian": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Tingkat Penyajian"
+            },
+            "topik": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Topik"
+            }
+          },
+          "required": [
+            "slug",
+            "name",
+            "columns",
+            "dictionary_validated"
+          ],
+          "title": "InfoResult",
+          "type": "object"
+        },
+        "Notice": {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "$ref": "#/$defs/NoticeCode"
+            },
+            "column": {
+              "anyOf": [
+                {
+                  "maxLength": 255,
+                  "pattern": "^\\S+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Column"
+            },
+            "message": {
+              "minLength": 1,
+              "title": "Message",
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "title": "Notice",
+          "type": "object"
+        },
+        "NoticeCode": {
+          "enum": [
+            "DICTIONARY_NOT_VALIDATED",
+            "NO_MEASURE_COLUMN",
+            "REFRESH_THROTTLED",
+            "NO_TIME_DIMENSION",
+            "EMPTY_RESULT",
+            "CATALOG_STALE",
+            "UNIT_CONFLICT"
+          ],
+          "title": "NoticeCode",
+          "type": "string"
+        },
+        "Officialness": {
+          "additionalProperties": false,
+          "description": "Keresmian (FR-07). basis boleh null di ringkasan item search_datasets.",
+          "properties": {
+            "basis": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Basis"
+            },
+            "status": {
+              "enum": [
+                "resmi",
+                "draf"
+              ],
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "status"
+          ],
+          "title": "Officialness",
+          "type": "object"
+        },
+        "Provenance": {
+          "additionalProperties": false,
+          "description": "Asal data (FR-06, KS-01..05, KK-B).",
+          "properties": {
+            "change_notes": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Change Notes"
+            },
+            "data_updated_at": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Data Updated At"
+            },
+            "freshness_source": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "approve",
+                    "mdate"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Freshness Source"
+            },
+            "metadata_changed_after_approve": {
+              "default": false,
+              "title": "Metadata Changed After Approve",
+              "type": "boolean"
+            },
+            "opd": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Opd"
+            },
+            "period_end": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Period End"
+            },
+            "period_start": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Period Start"
+            },
+            "retrieved_at": {
+              "title": "Retrieved At",
+              "type": "string"
+            },
+            "served_from": {
+              "enum": [
+                "live",
+                "cache",
+                "stale_cache"
+              ],
+              "title": "Served From",
+              "type": "string"
+            },
+            "source_url": {
+              "minLength": 1,
+              "title": "Source Url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "source_url",
+            "retrieved_at",
+            "served_from"
+          ],
+          "title": "Provenance",
+          "type": "object"
+        },
+        "QualityFlag": {
+          "additionalProperties": false,
+          "description": "Tanda mutu (ADR-007, KK-E). Nilai data asli tidak pernah ikut di sini.",
+          "properties": {
+            "code": {
+              "enum": [
+                "suspect_zero_period",
+                "suspect_scale",
+                "suspect_outlier"
+              ],
+              "title": "Code",
+              "type": "string"
+            },
+            "column": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Column"
+            },
+            "detail": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Detail"
+            },
+            "period": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Period"
+            },
+            "rule": {
+              "enum": [
+                "QC-01",
+                "QC-02"
+              ],
+              "title": "Rule",
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "rule"
+          ],
+          "title": "QualityFlag",
+          "type": "object"
+        },
+        "ToolError": {
+          "additionalProperties": false,
+          "description": "Isi field `error` di amplop. Dibangun lewat from_template, bukan teks bebas.",
+          "properties": {
+            "code": {
+              "$ref": "#/$defs/ErrorCode"
+            },
+            "message": {
+              "minLength": 1,
+              "title": "Message",
+              "type": "string"
+            },
+            "retryable": {
+              "title": "Retryable",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "retryable"
+          ],
+          "title": "ToolError",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "0.1",
+          "default": "0.1",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ToolError"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "notices": {
+          "items": {
+            "$ref": "#/$defs/Notice"
+          },
+          "title": "Notices",
+          "type": "array"
+        },
+        "officialness": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Officialness"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Provenance"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "quality_flags": {
+          "items": {
+            "$ref": "#/$defs/QualityFlag"
+          },
+          "title": "Quality Flags",
+          "type": "array"
+        },
+        "request_id": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Request Id"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InfoResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "partial",
+            "error"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "truncated": {
+          "default": false,
+          "title": "Truncated",
+          "type": "boolean"
+        },
+        "truncated_reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Truncated Reason"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "ToolEnvelope[InfoResult]",
+      "type": "object"
+    }
+  },
   "satudata_search_datasets": {
     "annotations": {
       "destructiveHint": false,
@@ -122,7 +822,7 @@
             "column": {
               "anyOf": [
                 {
-                  "maxLength": 200,
+                  "maxLength": 255,
                   "pattern": "^\\S+$",
                   "type": "string"
                 },

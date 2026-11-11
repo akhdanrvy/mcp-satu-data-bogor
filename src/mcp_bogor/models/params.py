@@ -32,6 +32,9 @@ MAX_PERIODS = 20
 MAX_FILTER_VALUES = 50
 DEFAULT_SORT = "tahun:asc"
 SORT_PATTERN = r"^[^:\s]+:(asc|desc)$"
+# Bentuk slug portal (rekaman 10 Nov: 751 slug, terpanjang 202 karakter; KB-43).
+SLUG_PATTERN = r"^[a-z0-9_-]+$"
+SLUG_MAX_CHARS = 255
 # Disetujui Akhdan 11 Nov 2026 (review 8a); sama untuk ketiga tool.
 REQUEST_ID_DESCRIPTION = "Diisi oleh sistem pemanggil; biarkan kosong."
 
@@ -88,14 +91,19 @@ class SearchParams(ParamsModel):
 
 
 class InfoParams(ParamsModel):
-    # TODO(Langkah 8): slug harus ada di katalog lokal → DATASET_NOT_FOUND.
-    slug: str = Field(min_length=1)
+    # Slug tidak ada di katalog lokal → DATASET_NOT_FOUND di tool, tanpa memanggil portal.
+    slug: str = Field(
+        min_length=1,
+        max_length=SLUG_MAX_CHARS,
+        pattern=SLUG_PATTERN,
+        description="Slug dataset dari hasil pencarian dataset.",
+    )
     request_id: RequestId | None = Field(default=None, description=REQUEST_ID_DESCRIPTION)
 
 
 class DataParams(ParamsModel):
-    # TODO(Langkah 8): slug harus ada di katalog lokal → DATASET_NOT_FOUND.
-    slug: str = Field(min_length=1)
+    # Slug tidak ada di katalog lokal → DATASET_NOT_FOUND di tool, tanpa memanggil portal.
+    slug: str = Field(min_length=1, max_length=SLUG_MAX_CHARS, pattern=SLUG_PATTERN)
     periods: Annotated[list[Year], Field(min_length=1, max_length=MAX_PERIODS)] | None = None
     # TODO(Langkah 8): kunci filters harus kolom berperan dimension → INVALID_PARAM.
     filters: dict[NonEmptyStr, FilterValues] | None = None

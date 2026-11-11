@@ -335,6 +335,69 @@ def _item(row: sqlite3.Row) -> SearchItem:
     )
 
 
+@dataclass(frozen=True)
+class CatalogDataset:
+    """Satu record katalog lokal untuk get_dataset_info/get_dataset_data (tanpa kontak, KK-J)."""
+
+    slug: str
+    name: str
+    opd: str | None
+    topik: str | None
+    kategori: str | None
+    schema: str | None
+    table: str | None
+    satuan: str | None
+    frekuensi: str | None
+    tahun_awal: int | None
+    tahun_akhir: int | None
+    tingkat_penyajian: str | None
+    cakupan: str | None
+    deskripsi_html: str | None
+    deskripsi_text: str | None
+    data_updated_at: datetime | None
+    freshness_source: str | None
+    metadata_changed_after_approve: bool
+    change_notes: str | None
+    official_status: str
+    official_basis: str | None
+
+    def raw_dataset(self) -> RawDataset:
+        """Bentuk yang dipakai adaptor /bigdata (schema dan table dari katalog)."""
+        record = {"slug": self.slug, "schema": self.schema, "table": self.table}
+        return RawDataset(slug=self.slug, record=record, metadata={META_SATUAN: self.satuan})
+
+
+def get_dataset(conn: sqlite3.Connection, slug: str) -> CatalogDataset | None:
+    """Record katalog lokal untuk slug, atau None (→ DATASET_NOT_FOUND tanpa portal)."""
+    row = conn.execute("SELECT * FROM datasets WHERE slug = ?", (slug,)).fetchone()
+    if row is None:
+        return None
+    updated = row["data_updated_at"]
+    return CatalogDataset(
+        slug=row["slug"],
+        name=row["name"],
+        opd=row["organisasi_name"],
+        topik=row["topik_name"],
+        kategori=row["kategori"],
+        schema=row["schema_name"],
+        table=row["table_name"],
+        satuan=row["satuan"],
+        frekuensi=row["frekuensi"],
+        tahun_awal=row["tahun_awal"],
+        tahun_akhir=row["tahun_akhir"],
+        tingkat_penyajian=row["tingkat_penyajian"],
+        cakupan=row["cakupan"],
+        deskripsi_html=row["deskripsi_html"],
+        deskripsi_text=row["deskripsi_text"],
+        data_updated_at=datetime.fromisoformat(updated) if updated else None,
+        freshness_source=row["freshness_source"],
+        metadata_changed_after_approve=bool(row["metadata_changed_after_approve"]),
+        change_notes=row["change_notes"],
+        official_status=row["official_status"],
+        official_basis=row["official_basis"],
+    )
+
+
 def catalog_synced_at(conn: sqlite3.Connection) -> datetime | None:
     """Waktu selesai sinkron complete terakhir (untuk peringatan katalog usang)."""
     value = conn.execute(

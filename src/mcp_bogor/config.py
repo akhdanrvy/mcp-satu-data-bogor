@@ -69,6 +69,8 @@ class Settings(BaseSettings):
     # KB-32: batas total ukuran cache data (MB) dan batas baris per cache.
     cache_max_mb: float = Field(default=500, gt=0)
     cache_max_rows: int = Field(default=50_000, ge=1)
+    # KB-36: baris sampel /bigdata halaman 1 untuk peran kolom (kamus, KK-08).
+    dictionary_sample_rows: int = Field(default=100, ge=1, le=1000)
     catalog_sync_min_interval_h: float = Field(default=24, ge=24)  # AK-06: maks 1x/24 jam
     # KB-28: sinkron failed/incomplete (bukan karena 429) boleh diulang setelah ini.
     catalog_sync_retry_after_h: float = Field(default=6, gt=0)

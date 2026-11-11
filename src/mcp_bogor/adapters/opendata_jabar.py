@@ -539,6 +539,12 @@ class OpenDataJabarAdapter:
         body = await self._get(self._bigdata_path(dataset), params)
         return parse_row_page(body)
 
+    async def probe(self, dataset: RawDataset, per_page: int = 100) -> tuple[ColumnProbe, RowPage]:
+        """KK-O: satu GET halaman 1 untuk kamus (nama kolom, metadata_filter, sampel baris)."""
+        params = build_query_params(None, None, 1, per_page)
+        body = await self._get(self._bigdata_path(dataset), params)
+        return parse_columns(body), parse_row_page(body)
+
     async def health(self) -> SourceHealth:
         """Satu GET murah tanpa retry; hasil (sehat atau tidak) di-cache health_ttl_s detik."""
         now = self._monotonic()

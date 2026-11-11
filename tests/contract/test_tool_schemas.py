@@ -25,7 +25,7 @@ from tests.fakes import make_settings
 from tests.tool_support import deps_for, synced_settings
 
 SNAPSHOTS = Path(__file__).parent / "snapshots"
-REGISTERED_8A = ["search_datasets"]  # 8b: get_dataset_info, 8c: get_dataset_data
+REGISTERED = ["search_datasets", "get_dataset_info"]  # 8c: get_dataset_data
 
 
 def check_snapshot(request: pytest.FixtureRequest, name: str, data: Any) -> None:
@@ -82,7 +82,7 @@ def test_kt01_all_descriptions_snapshot(request: pytest.FixtureRequest) -> None:
 
 
 def test_input_schema_follows_settings(tmp_path: Path) -> None:
-    (tool,) = _list_tools(make_settings(tmp_path, search_max_page_size=5))
+    tool = _list_tools(make_settings(tmp_path, search_max_page_size=5))[0]
     page_size = tool.inputSchema["properties"]["page_size"]
     assert (page_size["maximum"], page_size["default"]) == (5, 5)
     assert tool.inputSchema["required"] == ["query"]
@@ -135,11 +135,12 @@ def test_descriptions_carry_agreed_rules() -> None:
 @pytest.mark.parametrize("prefix", ["satudata_", "uji_"])
 def test_kt05_tool_names_use_prefix(tmp_path: Path, prefix: str) -> None:
     tools = _list_tools(make_settings(tmp_path, tool_prefix=prefix))
-    assert [t.name for t in tools] == [prefix + base for base in REGISTERED_8A]
+    assert [t.name for t in tools] == [prefix + base for base in REGISTERED]
 
 
 def test_default_prefix_is_satudata(tmp_path: Path) -> None:
-    assert [t.name for t in _list_tools(make_settings(tmp_path))] == ["satudata_search_datasets"]
+    names = [t.name for t in _list_tools(make_settings(tmp_path))]
+    assert names == ["satudata_search_datasets", "satudata_get_dataset_info"]
 
 
 # ---------------------------------------------------------------- e2e lewat MCP
@@ -170,10 +171,11 @@ def test_e2e_search_returns_envelope_as_structured_content(catalog_root: Path) -
 
 
 def test_output_schema_can_be_hidden(tmp_path: Path) -> None:
-    (shown,) = _list_tools(make_settings(tmp_path))
-    (hidden,) = _list_tools(make_settings(tmp_path, expose_output_schema=False))
-    assert shown.outputSchema is not None and hidden.outputSchema is None
-    assert hidden.inputSchema == shown.inputSchema
+    shown = _list_tools(make_settings(tmp_path))
+    hidden = _list_tools(make_settings(tmp_path, expose_output_schema=False))
+    for a, b in zip(shown, hidden, strict=True):
+        assert a.outputSchema is not None and b.outputSchema is None
+        assert a.inputSchema == b.inputSchema
 
 
 def test_e2e_without_output_schema_still_returns_envelope(catalog_root: Path) -> None:
@@ -253,7 +255,10 @@ def test_streamable_http_transport_supported(catalog_root: Path) -> None:
         )
         assert init["serverInfo"]["name"] == "mcp-kota-bogor"
         tools = rpc(client, "tools/list", {}, 2)["tools"]
-        assert [t["name"] for t in tools] == ["satudata_search_datasets"]
+        assert [t["name"] for t in tools] == [
+            "satudata_search_datasets",
+            "satudata_get_dataset_info",
+        ]
         call = rpc(
             client,
             "tools/call",
@@ -261,3 +266,38 @@ def test_streamable_http_transport_supported(catalog_root: Path) -> None:
             3,
         )
         assert call["isError"] is False and call["structuredContent"]["status"] == "ok"
+
+
+def test_info_schema_and_annotations(tmp_path: Path) -> None:
+    info = _list_tools(make_settings(tmp_path))[1]
+    assert info.name == "satudata_get_dataset_info"
+    assert info.inputSchema["required"] == ["slug"]
+    assert info.inputSchema["properties"]["slug"]["pattern"] == "^[a-z0-9_-]+$"
+    assert info.inputSchema["properties"]["slug"]["maxLength"] == 255
+    assert info.inputSchema["additionalProperties"] is False
+    assert info.annotations.readOnlyHint is True and info.annotations.openWorldHint is True
+
+
+def test_e2e_info_through_mcp(catalog_root: Path) -> None:
+    from mcp_bogor.models import InfoResult
+    from tests.fakes import FakeSourceAdapter
+
+    deps = deps_for(make_settings(catalog_root))
+    deps.adapter = FakeSourceAdapter()
+
+    async def action(client: Any) -> Any:
+        ok_call = await client.call_tool(
+            "satudata_get_dataset_info",
+            {"slug": "realisasi-pendapatan-asli-daerah-pad-kota-bogor", "request_id": "rq-i"},
+        )
+        missing = await client.call_tool("satudata_get_dataset_info", {"slug": "tidak-ada"})
+        return ok_call, missing
+
+    ok_call, missing = asyncio.run(_with_client(deps, action))
+    envelope = ToolEnvelope[InfoResult].model_validate(ok_call.structuredContent)
+    assert ok_call.isError is False and envelope.status == "ok"
+    assert envelope.result is not None and envelope.result.dictionary_validated is False
+    assert [n.code.value for n in envelope.notices] == ["DICTIONARY_NOT_VALIDATED"]
+    assert missing.isError is False
+    assert missing.structuredContent["error"]["code"] == "DATASET_NOT_FOUND"
+    assert deps.adapter.calls == ["probe"]

@@ -11,15 +11,18 @@ Setiap tool dijalankan lewat `run_tool`, yang menjamin:
 
 from __future__ import annotations
 
+import asyncio
 import sqlite3
 import time
-from collections.abc import Awaitable, Callable, Mapping
+from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
+from mcp_bogor.adapters.base import SourceAdapter
 from mcp_bogor.config import WIB, Settings
 from mcp_bogor.logging import get_logger, log_event
 from mcp_bogor.models.envelope import ToolEnvelope, error
@@ -32,6 +35,7 @@ from mcp_bogor.models.errors import (
 )
 from mcp_bogor.services.budget import compact_json_bytes
 from mcp_bogor.storage import db
+from mcp_bogor.storage.cache import DictionaryCache
 
 LOGGER = get_logger(__name__)
 
@@ -50,17 +54,61 @@ def _now() -> datetime:
     return datetime.now(WIB)
 
 
+class KeyedLocks:
+    """Single-flight per kunci di dalam proses (mis. satu probe kamus per slug)."""
+
+    def __init__(self) -> None:
+        self._locks: dict[str, tuple[asyncio.Lock, int]] = {}
+
+    @asynccontextmanager
+    async def hold(self, key: str) -> AsyncIterator[None]:
+        lock, users = self._locks.get(key, (asyncio.Lock(), 0))
+        self._locks[key] = (lock, users + 1)
+        try:
+            async with lock:
+                yield
+        finally:
+            lock, users = self._locks[key]
+            if users <= 1:
+                del self._locks[key]
+            else:
+                self._locks[key] = (lock, users - 1)
+
+    def __len__(self) -> int:
+        return len(self._locks)
+
+
 @dataclass
 class ToolDeps:
-    """Dependensi tool satu proses (KB-26). Langkah 8b/8c menambah adaptor dan cache."""
+    """Dependensi tool satu proses (KB-26): satu adaptor, satu cache kamus, kunci bersama.
+
+    Langkah 8c menambah cache data dan penanda tangan data_ref; Langkah 9 membuatnya di
+    lifespan server.
+    """
 
     settings: Settings
     now: Callable[[], datetime] = _now
     monotonic: Callable[[], float] = field(default=time.monotonic)
+    adapter: SourceAdapter | None = None
+    dictionary_cache: DictionaryCache | None = None
+    locks: KeyedLocks = field(default_factory=KeyedLocks)
+
+    def __post_init__(self) -> None:
+        if self.dictionary_cache is None:
+            self.dictionary_cache = DictionaryCache(self.settings.cache_dir)
 
     def open_catalog(self) -> sqlite3.Connection:
         """Katalog baca saja (ADR-010). CatalogNotReady → INTERNAL di run_tool."""
         return db.connect_read(self.settings.db_path)
+
+    def require_adapter(self) -> SourceAdapter:
+        if self.adapter is None:
+            raise RuntimeError("adaptor sumber belum dikonfigurasi")
+        return self.adapter
+
+    def require_dictionary_cache(self) -> DictionaryCache:
+        assert self.dictionary_cache is not None  # diisi __post_init__
+        return self.dictionary_cache
 
 
 class ToolFailure(Exception):

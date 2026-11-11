@@ -701,6 +701,14 @@ class DataCache:
 # ---------------------------------------------------------------- kamus kolom (KK-08)
 
 
+@dataclass(frozen=True)
+class DictionaryRecord:
+    payload: Mapping[str, Any]
+    data_updated_at: datetime | None
+    override_digest: str | None
+    built_at: datetime | None
+
+
 class DictionaryCache:
     """Hasil services/dictionary per slug. Dibuat ulang bila data_updated_at sumber berubah.
 
@@ -735,6 +743,24 @@ class DictionaryCache:
             return None
         payload = raw.get("payload")
         return payload if isinstance(payload, Mapping) else None
+
+    def get_any(self, slug: str) -> DictionaryRecord | None:
+        """Versi tersimpan apa pun data_updated_at-nya (untuk STALE_DATA saat portal gagal)."""
+        raw = self._files.read_json(self._path(slug))
+        if not isinstance(raw, Mapping) or raw.get("format") != DICTIONARY_FORMAT:
+            return None
+        payload = raw.get("payload")
+        if not isinstance(payload, Mapping):
+            return None
+        try:
+            return DictionaryRecord(
+                payload=payload,
+                data_updated_at=_parse_iso(raw.get("data_updated_at")),
+                override_digest=raw.get("override_digest"),
+                built_at=_parse_iso(raw.get("built_at")),
+            )
+        except ValueError:
+            return None
 
     def put(
         self,

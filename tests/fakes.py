@@ -340,6 +340,12 @@ class FakeSourceAdapter:
         build_query_params(where, sort, page, per_page)  # validasi sama dengan adaptor asli
         return parse_row_page(apply_query(self._body(dataset), where, sort, page, per_page))
 
+    async def probe(self, dataset: RawDataset, per_page: int = 100) -> tuple[ColumnProbe, RowPage]:
+        self._enter("probe")
+        build_query_params(None, None, 1, per_page)
+        body = apply_query(self._body(dataset), None, None, 1, per_page)
+        return parse_columns(body), parse_row_page(body)
+
     async def health(self) -> SourceHealth:
         self.calls.append("health")
         if self.fail_with is not None:

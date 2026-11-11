@@ -93,7 +93,8 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [x] **8a:** search_datasets, kerangka tool (`tools/common.py`), amplop + `notices` (KK-R), anggaran token (KB-38), deskripsi tool final, `server.build_server`, KT-01 dan KT-05.
 - [x] **Akhdan:** verifikasi pola `source_url` (KB-40): terverifikasi 11 Nov 2026.
 - [x] **Akhdan:** KB-42 diganti: server low-level SDK dengan handler publik; `MCP_EXPOSE_OUTPUT_SCHEMA` (KB-42 revisi). Deskripsi tool disetujui dengan dua tambahan (notice DICTIONARY_NOT_VALIDATED di data; deskripsi `request_id`).
-- [ ] **8b:** get_dataset_info + `probe` (KK-O) + cache kamus (KB-36); daftarkan di `build_server`, perbarui snapshot KT-01 (review Akhdan).
+- [x] **8b:** get_dataset_info + `probe` (KK-O) + cache kamus (KB-36); terdaftar di `build_server`; snapshot KT-01 diperbarui (menunggu review Akhdan).
+- [ ] **Akhdan:** review snapshot `tool_schemas.json` (tool info) dan setujui KB-43 (slug ≤ 255, placeholder 200 → 255).
 - [ ] **8c:** get_dataset_data + seri/subset (KB-37), validasi filter (KB-39), KB-41, KK-P, KK-Q, `DataResult.dictionary_validated`; KT-02..04, KT-06, UT-13, UT-14, golden set level tool, e2e.
 - [ ] **Dok 2/Dok 4:** revisi Dok 4 bagian 2 (`notices`, KK-R) dan bagian 5 (periods/filter lokal, KK-P).
 

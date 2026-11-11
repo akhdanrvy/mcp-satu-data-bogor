@@ -163,3 +163,18 @@ async def test_references(adapter: Any) -> None:
     assert {"id", "name", "slug"} <= set(organisasi[0]) and {"id", "name", "slug"} <= set(topik[0])
     assert any(o["name"] == "Inspektorat" for o in organisasi)
     assert _private(organisasi) == [] and _private(topik) == []
+
+
+async def test_probe_one_request_columns_and_sample(adapter: Any) -> None:
+    """KK-O: satu GET halaman 1 memberi nama kolom, metadata_filter, dan sampel baris."""
+    dataset = await adapter.get_dataset(PAJAJARAN)
+    before = adapter.requests_sent
+    probe, page = await adapter.probe(dataset, per_page=10)
+    assert adapter.requests_sent == before + 1
+    assert isinstance(probe, ColumnProbe) and isinstance(page, RowPage)
+    assert probe.columns[-1] == "tahun" and probe.total_rows == 88
+    assert probe.metadata_filter["hari_operasional"] == ["HARI KERJA", "HARI LIBUR"]
+    assert len(page.rows) == 10 and page.columns == probe.columns
+    assert _private(page.rows) == []
+    with pytest.raises(InvalidSourceRequest):
+        await adapter.probe(dataset, per_page=1001)
