@@ -64,6 +64,11 @@ class Settings(BaseSettings):
     # KK-07: kurasi kamus kolom per slug (overrides/<slug>.yaml); tidak dibuat otomatis.
     overrides_dir: Path = Path("./overrides")
     cache_ttl_h: float = Field(default=24, gt=0)
+    # KB-32: batas umur cache usang yang masih boleh disajikan saat portal gagal (KS-05).
+    cache_stale_max_h: float = Field(default=168, gt=0)
+    # KB-32: batas total ukuran cache data (MB) dan batas baris per cache.
+    cache_max_mb: float = Field(default=500, gt=0)
+    cache_max_rows: int = Field(default=50_000, ge=1)
     catalog_sync_min_interval_h: float = Field(default=24, ge=24)  # AK-06: maks 1x/24 jam
     # KB-28: sinkron failed/incomplete (bukan karena 429) boleh diulang setelah ini.
     catalog_sync_retry_after_h: float = Field(default=6, gt=0)
@@ -81,6 +86,8 @@ class Settings(BaseSettings):
 
     # --- data_ref (ADR-008, Dok 4 bagian 6) ---
     dataref_secret: SecretStr = SecretStr("")
+    # KB-33: secret lama saat rotasi; hanya untuk verifikasi, tidak pernah untuk menandatangani.
+    dataref_secret_previous: SecretStr = SecretStr("")
     dataref_ttl_seconds: int = Field(default=900, gt=0)
 
     # --- Kontrak dan batas (Dok 4 bagian 9) ---
@@ -119,6 +126,12 @@ class Settings(BaseSettings):
         return self
 
     @model_validator(mode="after")
+    def _stale_after_ttl(self) -> Settings:
+        if self.cache_stale_max_h < self.cache_ttl_h:
+            raise ValueError("MCP_CACHE_STALE_MAX_H tidak boleh lebih kecil dari MCP_CACHE_TTL_H")
+        return self
+
+    @model_validator(mode="after")
     def _ensure_dirs(self) -> Settings:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
@@ -130,13 +143,24 @@ class Settings(BaseSettings):
         Dipanggil saat file server atau penanda tangan data_ref dibuat, bukan saat
         konfigurasi dimuat, agar mode stdio untuk pengembangan tetap bisa jalan.
         """
-        raw = self.dataref_secret.get_secret_value()
-        if not raw or raw == _SECRET_PLACEHOLDER:
-            raise ConfigError("MCP_DATAREF_SECRET belum diisi.")
-        key = raw.encode("utf-8")
-        if len(key) < _SECRET_MIN_BYTES:
-            raise ConfigError(f"MCP_DATAREF_SECRET minimal {_SECRET_MIN_BYTES} byte.")
-        return key
+        return _check_secret(self.dataref_secret.get_secret_value(), "MCP_DATAREF_SECRET")
+
+    def dataref_previous_secret(self) -> bytes | None:
+        """Secret lama untuk verifikasi saja (KB-33); None bila kosong. Syarat KB-06 sama."""
+        raw = self.dataref_secret_previous.get_secret_value()
+        if not raw:
+            return None
+        return _check_secret(raw, "MCP_DATAREF_SECRET_PREVIOUS")
+
+
+def _check_secret(raw: str, name: str) -> bytes:
+    """KB-06: wajib terisi, bukan placeholder, minimal 32 byte."""
+    if not raw or raw == _SECRET_PLACEHOLDER:
+        raise ConfigError(f"{name} belum diisi.")
+    key = raw.encode("utf-8")
+    if len(key) < _SECRET_MIN_BYTES:
+        raise ConfigError(f"{name} minimal {_SECRET_MIN_BYTES} byte.")
+    return key
 
 
 @lru_cache(maxsize=1)

@@ -41,6 +41,12 @@ addopts = "-ra -m 'not smoke'"
 markers = [
     "smoke: memanggil portal asli; hanya dijalankan atas izin Akhdan",
 ]
+# Starlette 1.10: TestClient memperingatkan httpx usang dan menyarankan httpx2. Tidak menambah
+# dependensi (keputusan Akhdan 11 Nov 2026); diredam persis pesan ini saja. TODO: cabut saat
+# Starlette/TestClient diperbarui (lihat RENCANA_FASE1, TODO Langkah 7).
+filterwarnings = [
+    'ignore:Using `httpx` with `starlette\.testclient` is deprecated; install `httpx2` instead\.:starlette.exceptions.StarletteDeprecationWarning',
+]
 
 [tool.coverage.run]
 source = ["mcp_bogor"]

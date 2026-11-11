@@ -17,9 +17,10 @@ Prinsip:
 
 from __future__ import annotations
 
+import hashlib
 import re
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import date
 from difflib import SequenceMatcher
 from typing import Any, Literal
@@ -82,6 +83,9 @@ _ALIAS_INDEX = {name: group for group in REGION_ALIAS_GROUPS for name in group}
 
 # Aturan (c): kolom nama wilayah.
 _REGION_NAME = re.compile(r"^(nama_provinsi|(bps|kemendagri)_nama_[a-z0-9_]+)$")
+
+# Naikkan bila bentuk DictionaryResult berubah; kamus lama di cache otomatis dibuat ulang.
+DICTIONARY_RESULT_FORMAT = 1
 
 TemplateType = Literal["number", "string", "category", "unknown"]
 ColumnStatus = Literal["documented", "undocumented"]
@@ -286,6 +290,10 @@ class DictionaryOverride(BaseModel):
     note: str | None = None
     columns: dict[str, ColumnOverride] = Field(min_length=1)
 
+    def digest(self) -> str:
+        """Sidik isi override; kamus di cache dibuat ulang bila berubah (KK-08)."""
+        return hashlib.sha256(self.model_dump_json().encode("utf-8")).hexdigest()
+
     @field_validator("columns")
     @classmethod
     def _non_empty_entries(cls, value: dict[str, ColumnOverride]) -> dict[str, ColumnOverride]:
@@ -367,6 +375,37 @@ class DictionaryResult:
 
     def status_of(self, name: str) -> ColumnStatus | None:
         return next((r.status for r in self.reports if r.name == name), None)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Bentuk JSON untuk cache kamus (storage.cache.DictionaryCache, KK-08)."""
+        data = asdict(self)
+        data["columns"] = [c.model_dump(mode="json") for c in self.columns]
+        return {"format": DICTIONARY_RESULT_FORMAT, **data}
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> DictionaryResult:
+        """Kebalikan to_dict. Format lain → ValueError (pemanggil membuat ulang kamus)."""
+        if data.get("format") != DICTIONARY_RESULT_FORMAT:
+            raise ValueError("format kamus di cache tidak dikenal")
+        try:
+            return cls(
+                columns=[ColumnInfo.model_validate(c) for c in data["columns"]],
+                reports=[ColumnReport(**r) for r in data["reports"]],
+                orphans=list(data["orphans"]),
+                value_labels=list(data["value_labels"]),
+                duplicates=list(data["duplicates"]),
+                suggestions=[Suggestion(**x) for x in data["suggestions"]],
+                dictionary_validated=bool(data["dictionary_validated"]),
+                reasons=[ValidationReason(**r) for r in data["reasons"]],
+                template_lines=int(data["template_lines"]),
+                template_unparsed=int(data["template_unparsed"]),
+                unit_source=data["unit_source"],
+                unit_values=list(data["unit_values"]),
+                unit_differs_from_dataset=bool(data["unit_differs_from_dataset"]),
+                top_values_withheld=list(data["top_values_withheld"]),
+            )
+        except (KeyError, TypeError, ValidationError) as exc:
+            raise ValueError("isi kamus di cache tidak sah") from exc
 
 
 # ---------------------------------------------------------------- bantuan

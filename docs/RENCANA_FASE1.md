@@ -78,6 +78,16 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [ ] **Langkah 8 (KK-05):** `dictionary_validated=false` → peringatan di `get_dataset_info` dengan alasan (`reasons`), dan larangan visual tanpa konfirmasi; `OverrideError`/`OverrideFileError` → galat INTERNAL (berkas kurasi rusak), dicatat di log.
 - [ ] **Langkah 8:** `preview` dan `filters_applied` memakai peran dari kamus; `top_values` dari `ColumnInfo` hasil kamus (sudah ≤ 10 dan tanpa angka berformat).
 - [ ] **Dok 2/Dok 4:** usulkan revisi KK-04 (aturan a–f, termasuk bulan/triwulan/semester), statistik template (751 dataset, 5.811 baris), dan `meaning_source` (KK-M).
+## TODO dari Langkah 7 (11 Nov 2026)
+
+- [x] **Akhdan:** setujui atau ubah KB-32, KB-33, dan KK-N (disetujui 11 Nov 2026; `served_from` dihapus dari berkas data_ref, KB-34).
+- [x] **Akhdan:** peringatan TestClient/httpx2: tidak menambah dependensi; diredam persis di `pyproject.toml` (KB-35).
+- [ ] **Saat Starlette diperbarui:** cabut `filterwarnings` KB-35 di `pyproject.toml` dan cek ulang peringatan TestClient.
+- [ ] **Langkah 8 (data):** `get_dataset_data` memakai `DataCache.get_or_fetch(QueryKey.build(...), fetch, force_refresh=..., fallback_errors=(SourceUnavailable, SourceRateLimited))`; `served_from=stale_cache` → status partial + `STALE_DATA`; `CacheTooLarge` → `RESPONSE_TOO_LARGE`; `refresh_throttled` disebut di respons. data_ref dari `DataRefSigner.make_data_ref`. Isi berkas mengikuti Dok 4 bagian 6 (KK-N).
+- [ ] **Langkah 8 (info):** kamus lewat `DictionaryCache.get/put` dengan `data_updated_at` dari katalog dan `DictionaryOverride.digest()`; `DictionaryResult.from_dict` gagal → buat ulang.
+- [ ] **Langkah 8:** pertimbangkan *negative cache* singkat setelah portal gagal agar permintaan beruntun dengan cache usang tidak terus memanggil portal (saat ini dibatasi oleh backoff dan jeda global adaptor saja).
+- [ ] **Langkah 9:** jalankan file server (`fileserver.app.run`) bersama server MCP; lifespan membuat satu `DataCache` per proses.
+- [ ] **Langkah 12 (RUNBOOK):** prosedur rotasi `MCP_DATAREF_SECRET` dengan `MCP_DATAREF_SECRET_PREVIOUS` (KB-33 (5)).
 
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
 

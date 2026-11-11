@@ -604,3 +604,35 @@ def test_read_override_file_errors(tmp_path: Path) -> None:
         read_override(tmp_path, "rusak")
     with pytest.raises(OverrideFileError):
         read_override(tmp_path, "../keluar")
+
+
+# ---------------------------------------------------------------- KK-08: bentuk cache
+
+
+@pytest.mark.parametrize("slug", [PAD, PAJAJARAN_SPEED, KUNJUNGAN])
+def test_dictionary_result_round_trip(slug: str, tmp_path: Path) -> None:
+    from mcp_bogor.storage.cache import DictionaryCache
+
+    result = _build_recorded(slug)
+    store = DictionaryCache(tmp_path)
+    store.put(slug, result.to_dict(), data_updated_at=None)
+    cached = store.get(slug, data_updated_at=None)
+    assert cached is not None
+    assert DictionaryResult.from_dict(cached) == result
+
+
+def test_dictionary_result_from_dict_rejects_unknown_shape() -> None:
+    data = _build_recorded(PAD).to_dict()
+    with pytest.raises(ValueError):
+        DictionaryResult.from_dict({**data, "format": 99})
+    broken = dict(data)
+    del broken["reports"]
+    with pytest.raises(ValueError):
+        DictionaryResult.from_dict(broken)
+
+
+def test_override_digest_changes_with_content() -> None:
+    first = parse_override({"slug": PAD, "columns": {"tahun": {"role": "dimension"}}}, PAD)
+    same = parse_override({"slug": PAD, "columns": {"tahun": {"role": "dimension"}}}, PAD)
+    other = parse_override({"slug": PAD, "columns": {"tahun": {"meaning": "tahun"}}}, PAD)
+    assert first.digest() == same.digest() != other.digest()

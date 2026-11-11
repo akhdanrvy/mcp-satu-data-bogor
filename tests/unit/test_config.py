@@ -30,6 +30,9 @@ def test_defaults_match_contract(settings_env: Path) -> None:
     assert s.description_max_chars == 600
     assert s.inline_rows_fallback is False
     assert s.force_refresh_min_interval_s == 300
+    # KB-32 / KB-33 (Langkah 7)
+    assert (s.cache_stale_max_h, s.cache_max_mb, s.cache_max_rows) == (168, 500, 50_000)
+    assert s.dataref_previous_secret() is None
     assert CONTRACT_VERSION == "0.1"
 
 
