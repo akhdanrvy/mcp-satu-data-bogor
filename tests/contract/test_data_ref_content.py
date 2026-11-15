@@ -59,11 +59,16 @@ def assert_matches_tool(out: dict[str, Any], body: dict[str, Any]) -> None:
     assert len(body["rows"]) == result["data_ref"]["row_count"]
     assert [c["name"] for c in body["columns"]] == [c["name"] for c in result["columns"]]
     for file_col, tool_col in zip(body["columns"], result["columns"], strict=True):
-        assert {k: v for k, v in file_col.items() if k != "meaning"} == {
-            k: v for k, v in tool_col.items() if k != "meaning"
+        skip = {"meaning", "meaning_source"}
+        assert {k: v for k, v in file_col.items() if k not in skip} == {
+            k: v for k, v in tool_col.items() if k not in skip
         }
         expected = mask_free_text(file_col["meaning"]) if file_col["role"] == "measure" else None
         assert tool_col["meaning"] == expected, file_col["name"]
+        # KK-S: dimension berarti → "omitted" di respons; selain itu sumber sama dengan berkas
+        omitted = file_col["role"] != "measure" and file_col["meaning"] is not None
+        expected_source = "omitted" if omitted else file_col["meaning_source"]
+        assert tool_col["meaning_source"] == expected_source, file_col["name"]
     file_prov = dict(body["provenance"])
     file_prov["change_notes"] = mask_free_text(file_prov.get("change_notes"))
     expected_prov = {k: v for k, v in out["provenance"].items() if k != "served_from"}
@@ -145,4 +150,5 @@ def test_file_keeps_full_meaning_and_original_text(catalog_db: Path, tmp_path: P
     assert "Nomor 3 Tahun 2019" in by_name["kode_provinsi"]["meaning"]
     tool = {c["name"]: c for c in out["result"]["columns"]}
     assert tool["kode_provinsi"]["meaning"] is None
-    assert tool["kode_provinsi"]["meaning_source"] == "template"
+    assert tool["kode_provinsi"]["meaning_source"] == "omitted"  # KK-S
+    assert by_name["kode_provinsi"]["meaning_source"] == "template"  # berkas: sumber asli

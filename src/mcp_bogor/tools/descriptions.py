@@ -55,7 +55,8 @@ _DATA = """\
 Siapkan data satu dataset untuk dihitung dan digambar oleh sistem. Respons tool ini TIDAK \
 berisi angka: backend mengambil baris lengkap lewat `data_ref` lalu menghitung dan menggambar \
 sendiri. Jangan menulis, memperkirakan, atau mengarang angka apa pun dari respons ini. \
-`preview` hanya berisi kolom dimensi untuk memastikan filter benar.
+`preview` hanya berisi kolom dimensi untuk memastikan filter benar. Arti kolom dimensi tidak \
+diulang di sini (meaning_source=omitted); lihat {info}.
 
 Isi `periods` dengan tahun yang ditanyakan pengguna; kosongkan untuk semua tahun. `filters` \
 hanya untuk kolom dengan `role=dimension` dari {info} (mis. \

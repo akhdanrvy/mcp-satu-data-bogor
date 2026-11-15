@@ -43,7 +43,7 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [x] **Langkah 6 (KK-I):** `services/dictionary.column_role` dan perluasan `is_numeric_label_column`; cabut penanda xfail di `tests/unit/test_column_roles.py`.
 - [x] **Langkah 5:** sinkron katalog memakai field `catalog_slim` (KK-J: tanpa kontak); uji dengan `catalog_slim.json`.
 - [x] **Langkah 5 (dataset hilang):** portal bisa menghapus dataset (757 pada 5 Nov → 751 pada 10 Nov 2026). Sinkron katalog penuh harus menghapus dari katalog lokal (tabel + indeks FTS5) setiap record yang tidak lagi ada di hasil sinkron; record itu tidak boleh tetap tersaji di `search_datasets`. Penghapusan hanya dilakukan bila sinkron selesai lengkap (semua halaman terbaca, jumlah = `pagination.total_data`); sinkron gagal/terpotong tidak boleh menghapus apa pun. Tes: katalog lama 3 record, sinkron baru 2 record → record ketiga hilang dari tabel dan FTS5; sinkron terpotong → tidak ada yang dihapus.
-- [ ] **Langkah 10:** slug KM-07 = `persentase-kepala-keluarga-miskin-di-kota-bogor`, KM-12 = `persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor`.
+- [x] **Langkah 10:** slug KM-07 = `persentase-kepala-keluarga-miskin-di-kota-bogor`, KM-12 = `persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor`.
 
 ## TODO dari Langkah 4 (10 Nov 2026)
 
@@ -102,9 +102,19 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 ## TODO dari Langkah 9 (11 Nov 2026)
 
 - [x] **Langkah 9:** stdio + streamable-http :8800 (stateless, JSON), file server :8799 terpisah, /healthz, DNS rebinding, token bearer opsional, log JSON ke stderr; tes HTTP sungguhan, stdio subprocess, token, /healthz.
-- [ ] **Akhdan:** uji manual dengan MCP Inspector (stdio dan streamable-http) dan catat hasilnya di README (Langkah 12).
+- [x] **Akhdan:** uji manual dengan MCP Inspector. **Bukti (11 Nov 2026, Akhdan): lulus 5 panggilan** — (1) `search_datasets` "kemiskinan"; (2) `get_dataset_info` kemiskinan; (3) `get_dataset_data` kemiskinan `periods=[2025, 2026]` → `partial` (2026 di `missing_periods`); (4) `get_dataset_data` kemiskinan dengan filter kecamatan → galat `LEVEL_NOT_AVAILABLE`; (5) `get_dataset_data` realisasi PAD → notice `DICTIONARY_NOT_VALIDATED`. Tindak lanjut: `meaning_source="omitted"` untuk kolom dimension di respons data (KK-S, masuk commit Langkah 10).
+- [ ] **Langkah 12 (README):** salin ringkasan uji manual Inspector di atas ke README, termasuk transport yang dipakai.
 - [ ] **Langkah 9 lanjutan (bila perlu):** mode terjadwal `sync_worker` (loop/cron, KB-28); saat ini `--once` dijalankan manual atau oleh penjadwal OS.
 - [ ] **Langkah 12 (RUNBOOK):** cara menjalankan dua proses (server + file server) sebagai layanan, rotasi `MCP_HTTP_AUTH_TOKEN`, dan pemantauan `/healthz`.
+
+## TODO dari Langkah 10a (15 Nov 2026)
+
+- [x] **10a:** skema kartu (KB-49), 12 YAML di `metric_cards/`, pemeriksa `python -m mcp_bogor.metric_cards --check`, `MCP_METRIC_CARDS_DIR`; tes `tests/unit/test_metric_cards.py` (fixture, tanpa jaringan).
+- [ ] **Akhdan:** review 12 kartu (slug, definisi, kolom nilai, satuan, sinonim), lalu isi `reviewed_by`/`reviewed_at`.
+- [ ] **Akhdan (atas izin, ke portal):** agar `--check` lokal lengkap, kamus 10 kartu lain perlu ada di cache laptop: panggil `get_dataset_info` untuk slug KM-02..05 dan KM-07..12 (±10 permintaan probe /bigdata) lewat Inspector. Tanpa itu `--check` keluar 3 (belum dicek); di tes, kesepuluhnya sudah lulus dengan fixture.
+- [ ] **Setelah override `total_pendapatan` masuk:** `--check` akan galat STATUS_OUTDATED untuk KM-01; ubah status menjadi `aktif`.
+- [ ] **10b:** pemasangan sinonim di `search_datasets` (kecocokan token persis, sebelum FTS, slug harus lolos filter, status bukan perlu_konfirmasi), field `metric_card` di item search (KK baru), notice R-10 bertemplat tetap bila kedua slug ada di halaman yang sama, cabut xfail N-03, tes non-regresi urutan untuk kueri non-sinonim.
+- [ ] **Dok 4 bagian 8 (revisi di Google Docs):** KM-04 menjadi "realisasi belanja modal" (bukan per jenis); KM-05 menjadi "persentase SiLPA (sisa lebih perhitungan anggaran) terhadap APBD", satuan PERSEN; KM-08 satuan KUNJUNGAN; periode KM-01 2019-2024 (bukan 2020-2024) dan KM-11 2022-2025 (bukan 2015-2025; catatan "2024 = 0" perlu dicek ulang untuk volume); kolom OPD diisi nama katalog (KM-04/05 = Badan Keuangan dan Aset Daerah).
 
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
 

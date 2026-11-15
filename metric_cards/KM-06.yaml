@@ -1,0 +1,41 @@
+# Kartu metrik KM-06 (Dok 4 bagian 8). Skema: services/metric_cards.MetricCard (KB-49).
+# Diisi dari katalog lokal 11 Nov 2026 dan fixture rekaman 10 Nov 2026 (tanpa portal).
+# Periksa: uv run python -m mcp_bogor.metric_cards --check
+# reviewed_by/reviewed_at diisi Akhdan setelah memeriksa slug, definisi, kolom, satuan, sinonim.
+# catatan_mutu hanya untuk manusia dan pemeriksa; tidak pernah dikirim ke model (KT-03).
+id: KM-06
+nama: "Angka kemiskinan Kota Bogor"
+definisi: "Tingkat kemiskinan (persentase penduduk miskin) Kota Bogor per tahun."
+slug: tingkat-kemiskinan-di-kota-bogor-2
+kolom_nilai: tingkat_kemiskinan
+kolom_dimensi:
+  - tahun
+satuan: PERSEN
+opd: Dinas Sosial
+walidata: Diskominfo Kota Bogor
+walidata_catatan: "berdasarkan asumsi A-01 (diterima sebagai dasar kerja 5 Nov 2026), belum dikonfirmasi formal"
+periode_tersedia:
+  awal: 2025
+  akhir: 2025
+catatan_mutu:
+  - "Hanya tingkat kota; permintaan per kecamatan/kelurahan = LEVEL_NOT_AVAILABLE (O-06)."
+  - "Hanya satu tahun (2025); jangan disambung dengan KM-07 untuk membentuk tren (R-10, F-08)."
+sinonim:
+  - kemiskinan
+  - miskin
+  - angka kemiskinan
+  - tingkat kemiskinan
+  - penduduk miskin
+  - persentase penduduk miskin
+dataset_berbeda_definisi:
+  - persentase-kepala-keluarga-miskin-di-kota-bogor
+status: aktif
+kasus_uji:
+  - N-01
+  - F-03
+  - F-06
+  - F-07
+  - F-08
+  - O-06
+reviewed_by: null
+reviewed_at: null

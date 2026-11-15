@@ -182,12 +182,18 @@ def data_columns(dictionary: DictionaryResult) -> list[ColumnInfo]:
 
 
 def response_columns(columns: Sequence[ColumnInfo]) -> list[ColumnInfo]:
-    """KB-46: kolom di respons get_dataset_data. Arti hanya untuk measure (disamarkan);
-    dimension meaning=null dengan meaning_source tetap. Berkas data_ref memuat arti lengkap."""
-    return [
-        c.model_copy(update={"meaning": mask_free_text(c.meaning) if c.role == "measure" else None})
-        for c in columns
-    ]
+    """KB-46: kolom di respons get_dataset_data. Arti hanya untuk measure (disamarkan).
+    Dimension yang artinya sengaja tidak dikirim: meaning=null, meaning_source="omitted" (KK-S);
+    dimension tanpa arti tetap "none". Berkas data_ref memuat arti lengkap."""
+    out: list[ColumnInfo] = []
+    for c in columns:
+        if c.role == "measure":
+            out.append(c.model_copy(update={"meaning": mask_free_text(c.meaning)}))
+        elif c.meaning is not None:
+            out.append(c.model_copy(update={"meaning": None, "meaning_source": "omitted"}))
+        else:
+            out.append(c)
+    return out
 
 
 @dataclass(frozen=True)

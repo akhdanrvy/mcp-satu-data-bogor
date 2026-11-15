@@ -65,7 +65,7 @@ def test_info_and_data_mask_change_notes_and_meaning(env: ToolEnv) -> None:
     assert data["provenance"]["change_notes"] == masked
     columns = {c["name"]: c for c in data["result"]["columns"]}
     assert columns["kode_provinsi"]["meaning"] is None  # dimension: arti tidak dikirim
-    assert columns["kode_provinsi"]["meaning_source"] == "template"
+    assert columns["kode_provinsi"]["meaning_source"] == "omitted"  # KK-S
     assert columns["tingkat_kemiskinan"]["meaning"]  # measure: arti tetap ada
 
     parts = urlsplit(data["result"]["data_ref"]["url"])

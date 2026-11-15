@@ -1,0 +1,32 @@
+# Kartu metrik KM-07 (Dok 4 bagian 8). Skema: services/metric_cards.MetricCard (KB-49).
+# Diisi dari katalog lokal 11 Nov 2026 dan fixture rekaman 10 Nov 2026 (tanpa portal).
+# Periksa: uv run python -m mcp_bogor.metric_cards --check
+# reviewed_by/reviewed_at diisi Akhdan setelah memeriksa slug, definisi, kolom, satuan, sinonim.
+# catatan_mutu hanya untuk manusia dan pemeriksa; tidak pernah dikirim ke model (KT-03).
+id: KM-07
+nama: "Persentase kepala keluarga miskin"
+definisi: "Persentase kepala keluarga miskin di Kota Bogor per tahun."
+slug: persentase-kepala-keluarga-miskin-di-kota-bogor
+kolom_nilai: persentase
+kolom_dimensi:
+  - tahun
+satuan: PERSEN
+opd: Dinas Sosial
+walidata: Diskominfo Kota Bogor
+walidata_catatan: "berdasarkan asumsi A-01 (diterima sebagai dasar kerja 5 Nov 2026), belum dikonfirmasi formal"
+periode_tersedia:
+  awal: 2019
+  akhir: 2024
+catatan_mutu:
+  - "Definisi kemungkinan berubah (75,32% pada 2019 menjadi 6,53% pada 2024); jangan disambung dengan KM-06 (R-10)."
+sinonim:
+  - kepala keluarga miskin
+  - kk miskin
+  - keluarga miskin
+dataset_berbeda_definisi:
+  - tingkat-kemiskinan-di-kota-bogor-2
+status: aktif
+kasus_uji:
+  - F-08
+reviewed_by: null
+reviewed_at: null

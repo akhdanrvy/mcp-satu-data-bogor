@@ -1,0 +1,33 @@
+# Kartu metrik KM-11 (Dok 4 bagian 8). Skema: services/metric_cards.MetricCard (KB-49).
+# Diisi dari katalog lokal 11 Nov 2026 dan fixture rekaman 10 Nov 2026 (tanpa portal).
+# Periksa: uv run python -m mcp_bogor.metric_cards --check
+# reviewed_by/reviewed_at diisi Akhdan setelah memeriksa slug, definisi, kolom, satuan, sinonim.
+# catatan_mutu hanya untuk manusia dan pemeriksa; tidak pernah dikirim ke model (KT-03).
+id: KM-11
+nama: "Volume lalu lintas Jl. Pajajaran"
+definisi: "Volume lalu lintas segmen 1 dan 2 Jalan Pajajaran per hari operasional (hari kerja/libur) per tahun."
+slug: volume-lalu-lintas-segmen-1-dan-2-berdasarkan-hari-operasional-di-jalan-pajajaran--kota-bogor
+kolom_nilai: volume
+kolom_dimensi:
+  - tahun
+  - segmen
+  - hari_operasional
+satuan: SMP/JAM
+opd: Dinas Perhubungan
+walidata: Diskominfo Kota Bogor
+walidata_catatan: "berdasarkan asumsi A-01 (diterima sebagai dasar kerja 5 Nov 2026), belum dikonfirmasi formal"
+periode_tersedia:
+  awal: 2022
+  akhir: 2025
+catatan_mutu:
+  - "Volume 2022 dan 2023 identik di beberapa segmen (dicatat saja)."
+  - "Dok 4 menulis periode 2015-2025 dan 2024 = 0 (QC-01); data portal 2022-2025. Revisi Dok 4 bagian 8."
+sinonim:
+  - volume lalu lintas pajajaran
+  - volume kendaraan pajajaran
+dataset_berbeda_definisi: []
+status: aktif
+kasus_uji:
+  - N-08
+reviewed_by: null
+reviewed_at: null

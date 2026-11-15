@@ -85,14 +85,16 @@ class ColumnInfo(ContractModel):
     meaning: str | None = None
     unit: str | None = None
     # KK-M: "override" menggantikan "inferred"; arti tidak pernah ditebak (Dok 2 bagian 4).
-    meaning_source: Literal["template", "override", "none"] = "none"
+    # KK-S: "omitted" = arti ada di kamus tetapi sengaja tidak dikirim (dimension di
+    # get_dataset_data, KB-46); arti lengkap di get_dataset_info dan berkas data_ref.
+    meaning_source: Literal["template", "override", "omitted", "none"] = "none"
     top_values: list[DimensionValue] | None = None
 
     @model_validator(mode="after")
     def _check(self) -> ColumnInfo:
         # KK: arti tanpa sumber tidak boleh (tanpa tebakan). Arti boleh ditahan (null) walau
         # sumbernya ada: get_dataset_data hanya mengisi arti kolom measure (KB-46).
-        if self.meaning is not None and self.meaning_source == "none":
+        if self.meaning is not None and self.meaning_source in ("none", "omitted"):
             raise ValueError("meaning terisi wajib punya meaning_source (KK, tanpa tebakan)")
         if self.top_values is not None and self.role != "dimension":
             raise ValueError("top_values hanya untuk kolom dimension (KT-03)")

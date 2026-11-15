@@ -1,0 +1,31 @@
+# Kartu metrik KM-02 (Dok 4 bagian 8). Skema: services/metric_cards.MetricCard (KB-49).
+# Diisi dari katalog lokal 11 Nov 2026 dan fixture rekaman 10 Nov 2026 (tanpa portal).
+# Periksa: uv run python -m mcp_bogor.metric_cards --check
+# reviewed_by/reviewed_at diisi Akhdan setelah memeriksa slug, definisi, kolom, satuan, sinonim.
+# catatan_mutu hanya untuk manusia dan pemeriksa; tidak pernah dikirim ke model (KT-03).
+id: KM-02
+nama: "Persentase realisasi PAD"
+definisi: "Persentase realisasi pendapatan asli daerah (PAD) Kota Bogor per tahun."
+slug: persentase-realisasi-pendapatan-asli-daerah-pad-kota-bogor
+kolom_nilai: persentase_pendapatan
+kolom_dimensi:
+  - tahun
+satuan: PERSEN
+opd: Badan Pendapatan Daerah
+walidata: Diskominfo Kota Bogor
+walidata_catatan: "berdasarkan asumsi A-01 (diterima sebagai dasar kerja 5 Nov 2026), belum dikonfirmasi formal"
+periode_tersedia:
+  awal: 2015
+  akhir: 2024
+catatan_mutu:
+  - "2021-2023 bernilai 0,04-0,45, sekitar 100 kali lebih kecil dari tahun lain; kemungkinan salah skala di sumber (QC-02 skala). Data tidak diubah."
+sinonim:
+  - persentase realisasi pad
+  - persentase pad
+  - capaian pad
+dataset_berbeda_definisi: []
+status: aktif
+kasus_uji:
+  - Q-02
+reviewed_by: null
+reviewed_at: null

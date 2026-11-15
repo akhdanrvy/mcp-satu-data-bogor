@@ -63,6 +63,8 @@ class Settings(BaseSettings):
     cache_dir: Path = Path("./var/cache")
     # KK-07: kurasi kamus kolom per slug (overrides/<slug>.yaml); tidak dibuat otomatis.
     overrides_dir: Path = Path("./overrides")
+    # KB-49: kartu metrik (Dok 4 bagian 8), metric_cards/KM-xx.yaml; dibaca, tidak ditulis.
+    metric_cards_dir: Path = Path("./metric_cards")
     cache_ttl_h: float = Field(default=24, gt=0)
     # KB-32: batas umur cache usang yang masih boleh disajikan saat portal gagal (KS-05).
     cache_stale_max_h: float = Field(default=168, gt=0)
@@ -123,7 +125,7 @@ class Settings(BaseSettings):
     def _strip_trailing_slash(cls, value: str) -> str:
         return value.rstrip("/")
 
-    @field_validator("db_path", "cache_dir", "overrides_dir")
+    @field_validator("db_path", "cache_dir", "overrides_dir", "metric_cards_dir")
     @classmethod
     def _resolve_path(cls, value: Path) -> Path:
         return value.expanduser().resolve()

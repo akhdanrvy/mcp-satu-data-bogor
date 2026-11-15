@@ -1,0 +1,32 @@
+# Kartu metrik KM-04 (Dok 4 bagian 8). Skema: services/metric_cards.MetricCard (KB-49).
+# Diisi dari katalog lokal 11 Nov 2026 dan fixture rekaman 10 Nov 2026 (tanpa portal).
+# Periksa: uv run python -m mcp_bogor.metric_cards --check
+# reviewed_by/reviewed_at diisi Akhdan setelah memeriksa slug, definisi, kolom, satuan, sinonim.
+# catatan_mutu hanya untuk manusia dan pemeriksa; tidak pernah dikirim ke model (KT-03).
+id: KM-04
+nama: "Realisasi belanja modal"
+definisi: "Realisasi belanja modal daerah Kota Bogor per tahun, dalam rupiah."
+slug: realisasi-belanja-modal-daerah-di-kota-bogor
+kolom_nilai: realisasi_belanja
+kolom_dimensi:
+  - tahun
+satuan: RUPIAH
+opd: Badan Keuangan dan Aset Daerah
+walidata: Diskominfo Kota Bogor
+walidata_catatan: "berdasarkan asumsi A-01 (diterima sebagai dasar kerja 5 Nov 2026), belum dikonfirmasi formal"
+periode_tersedia:
+  awal: 2019
+  akhir: 2025
+catatan_mutu:
+  - "Pagu anggaran tidak tersedia di portal; hanya realisasi."
+  - "Kartu ini hanya belanja modal (keputusan Akhdan 15 Nov 2026); jenis belanja lain punya dataset sendiri dan belum berkartu. Revisi Dok 4 bagian 8 (belanja per jenis)."
+sinonim:
+  - belanja modal
+  - realisasi belanja modal
+dataset_berbeda_definisi: []
+status: aktif
+kasus_uji:
+  - N-04
+  - F-02
+reviewed_by: null
+reviewed_at: null

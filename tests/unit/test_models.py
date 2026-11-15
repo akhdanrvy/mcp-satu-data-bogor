@@ -320,6 +320,10 @@ def test_column_info_rules() -> None:
     # KB-46: arti boleh ditahan walau sumbernya ada (kolom dimension di get_dataset_data)
     assert ColumnInfo(name="x", role="id", meaning_source="template").meaning is None
     assert ColumnInfo(name="x", role="dimension").meaning_source == "none"
+    # KK-S: "omitted" = arti sengaja tidak dikirim; tidak boleh berisi arti
+    assert ColumnInfo(name="x", role="dimension", meaning_source="omitted").meaning is None
+    with pytest.raises(ValidationError, match="meaning"):
+        ColumnInfo(name="x", role="dimension", meaning="Arti", meaning_source="omitted")
 
 
 # Pengaman KT-03: angka berformat Indonesia di dimensi = measure salah peran (KM-08).
