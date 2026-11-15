@@ -8,11 +8,13 @@ from pathlib import Path
 from typing import Any
 
 from mcp_bogor.config import WIB, Settings
+from mcp_bogor.runtime import load_card_index
 from mcp_bogor.sync_worker import sync_once
 from mcp_bogor.tools.common import ToolDeps
 from tests.fakes import FakeSourceAdapter, make_settings
 
 SYNC_AT = datetime(2026, 11, 10, 2, 0, tzinfo=WIB)
+CARDS = Path(__file__).parents[1] / "metric_cards"
 
 
 def synced_settings(tmp_path: Path, **overrides: Any) -> Settings:
@@ -49,12 +51,19 @@ class ToolEnv:
             "cache_dir": tmp_path / "cache",
             "overrides_dir": tmp_path / "overrides",
             "dataref_secret": SECRET,
+            "metric_cards_dir": CARDS,
         }
         values.update(overrides)
         self.settings = make_settings(tmp_path, **values)
         self.adapter = FakeSourceAdapter()
         self.clock = FixedClock(SYNC_AT + timedelta(hours=1))
-        self.deps = ToolDeps(self.settings, now=self.clock, adapter=self.adapter)
+        # KB-50: seperti server (runtime.build_deps), kartu metrik dimuat; bawaan kartu repo.
+        self.deps = ToolDeps(
+            self.settings,
+            now=self.clock,
+            adapter=self.adapter,
+            metric_cards=load_card_index(self.settings),
+        )
 
     def _run(self, runner: Any, args: dict[str, Any]) -> dict[str, Any]:
         return asyncio.run(runner(self.deps, args))

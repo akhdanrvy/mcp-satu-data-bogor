@@ -17,6 +17,7 @@ import pytest
 from mcp_bogor.config import WIB
 from mcp_bogor.models import SearchParams, SearchResult
 from mcp_bogor.services import catalog
+from mcp_bogor.services.metric_cards import card_index, load_cards, synonym_key
 from mcp_bogor.services.stemming import stem_for_index
 from mcp_bogor.storage import db
 from mcp_bogor.sync_worker import reindex, sync_once
@@ -37,8 +38,13 @@ def conn(tmp_path_factory: pytest.TempPathFactory) -> Iterator[sqlite3.Connectio
     reader.close()
 
 
-def _search(conn: sqlite3.Connection, query: str, **kwargs: object) -> catalog.CatalogSearch:
-    return catalog.search(conn, SearchParams(query=query, **kwargs))
+def _search(
+    conn: sqlite3.Connection,
+    query: str,
+    cards: catalog.CardIndex = catalog.EMPTY_CARDS,
+    **kwargs: object,
+) -> catalog.CatalogSearch:
+    return catalog.search(conn, SearchParams(query=query, **kwargs), cards)
 
 
 def _slugs(result: SearchResult) -> list[str]:
@@ -215,10 +221,8 @@ def test_search_logs_without_query_text(
 
 N01 = "tingkat-kemiskinan-di-kota-bogor-2"
 N03 = "realisasi-pendapatan-asli-daerah-pad-kota-bogor"
-AMBIGUOUS = (
-    "ambigu; diselesaikan sinonim KM-01 di Langkah 10 (peringkat 5: sebelas dataset memuat "
-    "frasa 'pendapatan asli daerah'; bobot cakupan tidak dinaikkan untuk satu kasus)"
-)
+# KB-50: relevansi diukur dengan kartu metrik repo (sinonim dipasang sebelum FTS).
+CARDS = card_index(load_cards(Path(__file__).parents[2] / "metric_cards"))
 
 # (kasus golden set / kartu metrik, kueri, slug target atau None = dari golden set, alasan xfail)
 RELEVANCE: list[tuple[str, str, str | None, str | None]] = [
@@ -227,7 +231,7 @@ RELEVANCE: list[tuple[str, str, str | None, str | None]] = [
     ("N-01", "penduduk miskin", N01, None),
     ("N-02", "kecepatan lalu lintas pajajaran", None, None),
     ("N-03", "PAD", N03, None),
-    ("N-03", "pendapatan asli daerah", N03, AMBIGUOUS),
+    ("N-03", "pendapatan asli daerah", N03, None),  # xfail dicabut: sinonim KM-01 (10b)
     ("N-04", "belanja modal", None, None),
     ("N-05", "SiLPA", None, None),
     ("N-05", "silpa", None, None),
@@ -281,20 +285,112 @@ def test_golden_relevance_top3(
     conn: sqlite3.Connection, case_id: str, query: str, expected: str | None
 ) -> None:
     slug = _target(case_id, expected)
-    top3 = _slugs(_search(conn, query, page_size=3).result)
+    top3 = _slugs(_search(conn, query, CARDS, page_size=3).result)
     assert slug in top3, (query, top3)
 
 
 def test_relevance_table_is_reported(conn: sqlite3.Connection) -> None:
     """Bukan asersi relevansi; mencetak tabel untuk laporan (pytest -s)."""
-    print("\n| Kasus | Kueri | Mode | Total | Peringkat |")
+    print("\n| Kasus | Kueri | Mode | Kartu | Total | Peringkat | Tanpa kartu |")
     for case_id, query, expected, _ in RELEVANCE:
         slug = _target(case_id, expected)
-        outcome = _search(conn, query, page_size=20)
+        outcome = _search(conn, query, CARDS, page_size=20)
+        before = _slugs(_search(conn, query, page_size=20).result)
         slugs = _slugs(outcome.result)
         rank = slugs.index(slug) + 1 if slug in slugs else "-"
-        print(f"| {case_id} | {query} | {outcome.match_mode} | {outcome.result.total} | {rank} |")
+        old = before.index(slug) + 1 if slug in before else "-"
+        card = CARDS.card_of.get(outcome.pinned, "-") if outcome.pinned else "-"
+        print(
+            f"| {case_id} | {query} | {outcome.match_mode} | {card} | {outcome.result.total} "
+            f"| {rank} | {old} |"
+        )
     assert len(RELEVANCE) == 18
+
+
+# ---------------------------------------------------------------- kartu metrik (KB-50, KK-T)
+
+ALL_SYNONYMS = sorted(
+    (" ".join(key), slug) for key, slug in CARDS.pins.items()
+)  # bentuk token, cukup untuk dijadikan kueri
+
+
+@pytest.mark.parametrize(("query", "slug"), ALL_SYNONYMS, ids=[q for q, _ in ALL_SYNONYMS])
+def test_every_synonym_pins_its_card_first(conn: sqlite3.Connection, query: str, slug: str) -> None:
+    outcome = _search(conn, query, CARDS, page_size=5)
+    assert outcome.pinned == slug
+    first = outcome.result.items[0]
+    assert first.slug == slug and first.metric_card == CARDS.card_of[slug]
+    assert len(set(_slugs(outcome.result))) == len(outcome.result.items)  # tanpa duplikat
+
+
+NON_SYNONYM_QUERIES = [q for _, q, _, _ in RELEVANCE if synonym_key(q) not in CARDS.pins] + [
+    "aduan warga",
+    "pengaduan",
+    "puskesmas",
+    "pendapatan daerah",
+    "kemiskinan per kecamatan",
+    "PAD 2024 kecamatan",
+    "PAD; DROP TABLE datasets;--",
+    "sekolah dasar",
+]
+
+
+@pytest.mark.parametrize("query", NON_SYNONYM_QUERIES)
+def test_non_synonym_order_is_unchanged(conn: sqlite3.Connection, query: str) -> None:
+    """Non-regresi: kueri yang tidak persis sama dengan sinonim mana pun diurutkan persis
+    seperti tanpa kartu (hanya metric_card yang bertambah)."""
+    with_cards = _search(conn, query, CARDS, page_size=20)
+    without = _search(conn, query, page_size=20)
+    assert with_cards.pinned is None
+    assert _slugs(with_cards.result) == _slugs(without.result)
+    assert with_cards.result.total == without.result.total
+    assert with_cards.match_mode == without.match_mode
+    for item in with_cards.result.items:
+        assert item.metric_card == CARDS.card_of.get(item.slug)
+
+
+def test_pin_adds_dataset_fts_did_not_find(conn: sqlite3.Connection) -> None:
+    """'kk miskin': FTS tidak menemukan apa pun; kartu KM-07 tetap tampil."""
+    without = _search(conn, "kk miskin", page_size=20)
+    outcome = _search(conn, "kk miskin", CARDS, page_size=20)
+    assert outcome.result.total == without.result.total + (
+        0 if "persentase-kepala-keluarga-miskin-di-kota-bogor" in _slugs(without.result) else 1
+    )
+    assert outcome.result.items[0].metric_card == "KM-07"
+
+
+def test_pin_respects_filters_and_pagination(conn: sqlite3.Connection) -> None:
+    kemiskinan = CARDS.pins[("kemiskinan",)]
+    other_opd = _search(conn, "kemiskinan", CARDS, opd="Dinas Kesehatan", page_size=20)
+    assert other_opd.pinned is None and kemiskinan not in _slugs(other_opd.result)
+    wrong_year = _search(conn, "kemiskinan", CARDS, tahun=2019, page_size=20)
+    assert wrong_year.pinned is None  # data kemiskinan kota hanya 2025
+    page1 = _search(conn, "kemiskinan", CARDS, page_size=3)
+    page2 = _search(conn, "kemiskinan", CARDS, page=2, page_size=3)
+    assert page1.result.items[0].slug == kemiskinan
+    assert kemiskinan not in _slugs(page2.result)
+    assert page1.result.total == page2.result.total
+
+
+def test_pin_skipped_when_slug_not_in_catalog(
+    conn: sqlite3.Connection, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level("INFO", logger="mcp_bogor.services.catalog")
+    ghost = catalog.CardIndex(
+        pins={("kemiskinan",): "slug-hilang"}, card_of={"slug-hilang": "KM-99"}
+    )
+    outcome = _search(conn, "kemiskinan", ghost, page_size=20)
+    assert outcome.pinned is None
+    assert _slugs(outcome.result) == _slugs(_search(conn, "kemiskinan", page_size=20).result)
+    assert "metric_card_pin_skipped" in caplog.text
+
+
+def test_different_definition_pairs() -> None:
+    km06, km07 = CARDS.pins[("kemiskinan",)], CARDS.pins[("kepala", "keluarga", "miskin")]
+    assert catalog.different_definition_pairs([km06, "x", km07], CARDS) == [(km06, km07)]
+    assert catalog.different_definition_pairs([km07, km06], CARDS) == [(km07, km06)]
+    assert catalog.different_definition_pairs([km06, "x"], CARDS) == []
+    assert catalog.different_definition_pairs([km06, km07], catalog.EMPTY_CARDS) == []
 
 
 # ---------------------------------------------------------------- KB-29: prefix, cakupan, stem

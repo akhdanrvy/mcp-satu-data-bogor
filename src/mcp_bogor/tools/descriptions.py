@@ -25,6 +25,11 @@ mempersempit.
 Hasilnya daftar dataset (slug, nama, OPD, satuan, rentang tahun, waktu pembaruan, status \
 resmi/draf), tanpa angka data. Pilih satu slug lalu panggil {info}.
 
+Item dengan `metric_card` terisi adalah indikator utama yang sudah dikurasi; utamakan itu bila \
+sesuai pertanyaan. Notice DIFFERENT_DEFINITION berarti dua dataset dalam hasil mengukur hal \
+berbeda walau namanya mirip: pakai satu yang sesuai pertanyaan dan jangan menyambung atau \
+membandingkan keduanya sebagai satu seri.
+
 Galat NO_MATCH berarti kata kunci itu tidak cocok dengan dataset mana pun; coba sekali lagi \
 dengan kata yang lebih umum atau sinonim; bila tetap kosong, katakan data tidak tersedia di \
 portal dan jangan memakai dataset lain yang mengukur hal berbeda. Dataset dengan nama mirip \

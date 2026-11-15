@@ -38,7 +38,7 @@ from pydantic import (
 )
 
 from mcp_bogor.models.params import SLUG_MAX_CHARS, SLUG_PATTERN
-from mcp_bogor.services.catalog import CatalogDataset, get_dataset, query_tokens
+from mcp_bogor.services.catalog import CardIndex, CatalogDataset, get_dataset, query_tokens
 from mcp_bogor.services.dictionary import DictionaryResult, OverrideError, parse_override
 from mcp_bogor.services.info import InfoBundle
 from mcp_bogor.storage import db
@@ -190,6 +190,24 @@ def load_cards(directory: Path) -> list[MetricCard]:
 def synonym_index(cards: Sequence[MetricCard]) -> dict[tuple[str, ...], MetricCard]:
     """Sinonim (bentuk token) → kartu. Keunikan sudah dijamin parse_cards."""
     return {key: card for card in cards for key in card.synonym_keys()}
+
+
+def card_index(cards: Sequence[MetricCard]) -> CardIndex:
+    """Indeks untuk search_datasets (KB-50, KK-T). Kartu perlu_konfirmasi tidak dipakai sama
+    sekali (tanpa pemasangan, tanpa metric_card). kamus_belum_tervalidasi tetap dipakai: tool
+    info/data sudah memberi notice DICTIONARY_NOT_VALIDATED (keputusan Akhdan 15 Nov 2026).
+    Pasangan R-10 dibuat dua arah walau hanya ditulis di satu kartu."""
+    usable = [c for c in cards if c.status != "perlu_konfirmasi"]
+    different: dict[str, set[str]] = {}
+    for card in usable:
+        for other in card.dataset_berbeda_definisi:
+            different.setdefault(card.slug, set()).add(other)
+            different.setdefault(other, set()).add(card.slug)
+    return CardIndex(
+        pins={key: card.slug for card in usable for key in card.synonym_keys()},
+        card_of={card.slug: card.id for card in usable},
+        different={slug: frozenset(others) for slug, others in different.items()},
+    )
 
 
 # ---------------------------------------------------------------- pemeriksaan

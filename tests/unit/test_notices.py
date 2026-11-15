@@ -12,12 +12,34 @@ from tests import model_samples as s
 
 @pytest.mark.parametrize("code", list(NoticeCode))
 def test_every_notice_renders_without_numbers(code: NoticeCode) -> None:
+    """Templat sendiri tanpa angka; placeholder diisi nilai tanpa digit."""
     column = "total_pendapatan" if "{column}" in NOTICE_TEMPLATES[code] else None
-    notice = Notice.from_template(code, column=column)
+    datasets = ("dataset-a", "dataset-b") if "{dataset}" in NOTICE_TEMPLATES[code] else None
+    notice = Notice.from_template(code, column=column, datasets=datasets)
     assert notice.code is code and notice.column == column
     assert not any(ch.isdigit() for ch in notice.message)
     if column:
         assert f"'{column}'" in notice.message
+    if datasets:
+        assert notice.datasets == list(datasets)
+        assert all(f"'{slug}'" in notice.message for slug in datasets)
+
+
+def test_different_definition_notice_rules() -> None:
+    """KK-T: tepat dua slug berbeda; slug boleh berdigit polos, bukan angka berformat."""
+    pair = ("tingkat-kemiskinan-di-kota-bogor-2", "persentase-kepala-keluarga-miskin-di-kota-bogor")
+    notice = Notice.from_template(NoticeCode.DIFFERENT_DEFINITION, datasets=pair)
+    assert notice.datasets == list(pair) and notice.column is None
+    with pytest.raises(ValueError):
+        Notice.from_template(NoticeCode.DIFFERENT_DEFINITION)
+    with pytest.raises(ValueError):
+        Notice.from_template(NoticeCode.CATALOG_STALE, datasets=pair)
+    with pytest.raises(ValidationError):
+        Notice.from_template(NoticeCode.DIFFERENT_DEFINITION, datasets=(pair[0], pair[0]))
+    with pytest.raises(ValidationError):
+        Notice.from_template(NoticeCode.DIFFERENT_DEFINITION, datasets=("a", "1.234"))
+    with pytest.raises(ValidationError):
+        Notice(code=NoticeCode.CATALOG_STALE, message="x", datasets=list(pair))
 
 
 def test_notice_column_rules() -> None:

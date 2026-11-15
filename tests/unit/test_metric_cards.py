@@ -6,7 +6,6 @@ Katalog dari 751 record rekaman; kamus dibangun lewat get_dataset_info dengan Fa
 
 from __future__ import annotations
 
-import logging
 import sqlite3
 from collections.abc import Iterator
 from pathlib import Path
@@ -304,26 +303,12 @@ def test_run_check_reports_invalid_cards(tmp_path: Path, catalog_db: Path) -> No
     assert run_check(tmp_path / "hilang", catalog_db, tmp_path, OVERRIDES_DIR).exit_code == 1
 
 
-@pytest.fixture
-def root_logging() -> Iterator[None]:
-    """main() memasang handler JSON di root logger pada stderr milik capsys; lepas setelah
-    tes agar tes lain tidak menulis ke stream yang sudah ditutup."""
-    root = logging.getLogger()
-    handlers, level = list(root.handlers), root.level
-    yield
-    for handler in list(root.handlers):
-        if handler not in handlers:
-            root.removeHandler(handler)
-    root.setLevel(level)
-
-
 def _cli_env(monkeypatch: pytest.MonkeyPatch, **values: Path) -> None:
     """Dipakai bersama settings_env: cwd tmp dan env MCP_ bersih (tanpa .env laptop)."""
     for key, value in values.items():
         monkeypatch.setenv(f"MCP_{key.upper()}", str(value))
 
 
-@pytest.mark.usefixtures("root_logging")
 def test_cli_check(
     settings_env: Path,
     cached_env: ToolEnv,
@@ -344,7 +329,6 @@ def test_cli_check(
     assert cli.main([]) == 2
 
 
-@pytest.mark.usefixtures("root_logging")
 def test_cli_catalog_missing(
     settings_env: Path,
     tmp_path: Path,
@@ -359,3 +343,53 @@ def test_cli_catalog_missing(
     )
     assert cli.main(["--check"]) == 2
     assert "DITOLAK" in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------- indeks untuk search (KB-50)
+
+
+def test_card_index_uses_usable_cards(cards: list[MetricCard]) -> None:
+    from mcp_bogor.services.metric_cards import card_index
+
+    index = card_index(cards)
+    assert len(index.card_of) == 12
+    assert index.pins[synonym_key("pendapatan asli daerah")] == PAD  # KM-01 tetap dipasang
+    km06 = next(c for c in cards if c.id == "KM-06")
+    km07 = next(c for c in cards if c.id == "KM-07")
+    assert index.different[km06.slug] == frozenset({km07.slug})
+    assert index.different[km07.slug] == frozenset({km06.slug})
+
+    pending = [c.model_copy(update={"status": "perlu_konfirmasi"}) if c.id == "KM-06" else c
+               for c in cards]  # fmt: skip
+    index = card_index(pending)
+    assert km06.slug not in index.card_of
+    assert synonym_key("kemiskinan") not in index.pins
+    # R-10 tetap dari kartu KM-07 (dua arah) walau KM-06 belum terkonfirmasi
+    assert index.different[km06.slug] == frozenset({km07.slug})
+
+
+def test_card_index_one_sided_pair_is_mutual(cards: list[MetricCard]) -> None:
+    from mcp_bogor.services.metric_cards import card_index
+
+    km06 = next(c for c in cards if c.id == "KM-06")
+    index = card_index([km06.model_copy(update={"dataset_berbeda_definisi": ["lain"]})])
+    assert index.different == {km06.slug: frozenset({"lain"}), "lain": frozenset({km06.slug})}
+
+
+def test_load_card_index_degrades_without_failing(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    from mcp_bogor.runtime import load_card_index
+    from mcp_bogor.services.catalog import EMPTY_CARDS
+    from tests.fakes import make_settings
+
+    caplog.set_level("INFO", logger="mcp_bogor.runtime")
+    assert load_card_index(make_settings(tmp_path, metric_cards_dir=CARDS_DIR)).card_of
+    assert "metric_cards_loaded" in caplog.text
+    broken = tmp_path / "kartu"
+    broken.mkdir()
+    (broken / "KM-01.yaml").write_text("id: KM-02\n", encoding="utf-8")
+    for directory in (broken, tmp_path / "hilang"):
+        caplog.clear()
+        assert load_card_index(make_settings(tmp_path, metric_cards_dir=directory)) is EMPTY_CARDS
+        assert "metric_cards_invalid" in caplog.text

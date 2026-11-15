@@ -62,8 +62,8 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [x] **Akhdan:** putuskan KB-28 (ulang sinkron lebih cepat setelah gagal) dan KB-29 (perbaikan relevansi; dua kasus golden set xfail).
 - [x] **Akhdan:** setujui atau tolak dependensi PySastrawi (KB-29.2): disetujui; `pysastrawi==1.2.1` ditambahkan, stem hanya di nama, skema v3.
 - [ ] **Akhdan:** tinjau aturan indeks stem KB-29 (a) tanpa hitung ganda dan (b) awalan pe-/per- tidak di-stem.
-- [ ] **Langkah 10 (KB-29.4):** sinonim kartu metrik (mis. "miskin" → KM-06, "PAD" → KM-01) dicek sebelum FTS.
-- [ ] **Langkah 10 (KB-29):** sinonim KM-01 untuk "pendapatan asli daerah" (kasus relevansi N-03 yang masih xfail); setelah lulus, cabut xfail di `tests/unit/test_catalog_search.py`.
+- [x] **Langkah 10 (KB-29.4):** sinonim kartu metrik (mis. "miskin" → KM-06, "PAD" → KM-01) dicek sebelum FTS.
+- [x] **Langkah 10 (KB-29):** sinonim KM-01 untuk "pendapatan asli daerah" (kasus relevansi N-03 yang masih xfail); setelah lulus, cabut xfail di `tests/unit/test_catalog_search.py`.
 - [ ] **Catatan migrasi:** katalog lokal skema v1 (bila sinkron sudah dijalankan) otomatis dimigrasikan ke v2 dan FTS-nya dibangun ulang saat `sync_worker` berikutnya membuka DB.
 - [ ] **Langkah 8:** `search_datasets` memakai `storage.db.connect_read` + `services.catalog.search`; catat `match_mode` di log tool; `CatalogNotReady` → galat INTERNAL dengan pesan templat (katalog belum disinkron).
 - [ ] **Langkah 8:** peringatan katalog usang bila `catalog_synced_at` lebih tua dari `MCP_CATALOG_SYNC_MIN_INTERVAL_H` × 2.
@@ -111,10 +111,19 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 
 - [x] **10a:** skema kartu (KB-49), 12 YAML di `metric_cards/`, pemeriksa `python -m mcp_bogor.metric_cards --check`, `MCP_METRIC_CARDS_DIR`; tes `tests/unit/test_metric_cards.py` (fixture, tanpa jaringan).
 - [ ] **Akhdan:** review 12 kartu (slug, definisi, kolom nilai, satuan, sinonim), lalu isi `reviewed_by`/`reviewed_at`.
-- [ ] **Akhdan (atas izin, ke portal):** agar `--check` lokal lengkap, kamus 10 kartu lain perlu ada di cache laptop: panggil `get_dataset_info` untuk slug KM-02..05 dan KM-07..12 (±10 permintaan probe /bigdata) lewat Inspector. Tanpa itu `--check` keluar 3 (belum dicek); di tes, kesepuluhnya sudah lulus dengan fixture.
+- [x] ~~**Akhdan (atas izin, ke portal):**~~ dipindah ke Langkah 11 (keputusan 15 Nov 2026): agar `--check` lokal lengkap, kamus 10 kartu lain perlu ada di cache laptop: panggil `get_dataset_info` untuk slug KM-02..05 dan KM-07..12 (±10 permintaan probe /bigdata) lewat Inspector. Tanpa itu `--check` keluar 3 (belum dicek); di tes, kesepuluhnya sudah lulus dengan fixture.
 - [ ] **Setelah override `total_pendapatan` masuk:** `--check` akan galat STATUS_OUTDATED untuk KM-01; ubah status menjadi `aktif`.
-- [ ] **10b:** pemasangan sinonim di `search_datasets` (kecocokan token persis, sebelum FTS, slug harus lolos filter, status bukan perlu_konfirmasi), field `metric_card` di item search (KK baru), notice R-10 bertemplat tetap bila kedua slug ada di halaman yang sama, cabut xfail N-03, tes non-regresi urutan untuk kueri non-sinonim.
+- [x] **10b:** pemasangan sinonim di `search_datasets` (kecocokan token persis, sebelum FTS, slug harus lolos filter, status bukan perlu_konfirmasi), field `metric_card` di item search (KK baru), notice R-10 bertemplat tetap bila kedua slug ada di halaman yang sama, cabut xfail N-03, tes non-regresi urutan untuk kueri non-sinonim.
 - [ ] **Dok 4 bagian 8 (revisi di Google Docs):** KM-04 menjadi "realisasi belanja modal" (bukan per jenis); KM-05 menjadi "persentase SiLPA (sisa lebih perhitungan anggaran) terhadap APBD", satuan PERSEN; KM-08 satuan KUNJUNGAN; periode KM-01 2019-2024 (bukan 2020-2024) dan KM-11 2022-2025 (bukan 2015-2025; catatan "2024 = 0" perlu dicek ulang untuk volume); kolom OPD diisi nama katalog (KM-04/05 = Badan Keuangan dan Aset Daerah).
+
+## TODO dari Langkah 10b (15 Nov 2026)
+
+- [x] **Akhdan (review 10a):** sinonim "capaian pad" (KM-02) dan "retribusi" (KM-03) dipertahankan; periode KM-01 dan KM-11 mengikuti portal; catatan 2024 = 0 untuk volume KM-11 terkonfirmasi oleh QC Langkah 6 (N-08).
+- [x] **10b:** pemasangan sinonim kartu di `search_datasets` (KB-50), `metric_card` di item search dan notice `DIFFERENT_DEFINITION` (KK-T), xfail N-03 dicabut (18/18 top-3), tes non-regresi urutan, fixture autouse pemulih root logger untuk semua tes CLI (`sync_worker`, `metric_cards`, `runtime`, file server).
+- [ ] **Akhdan:** review snapshot `tool_schemas.json` (field `metric_card`, notice `datasets`, kode `DIFFERENT_DEFINITION`).
+- [ ] **Usulan (perlu persetujuan):** satu kalimat di deskripsi `search_datasets` tentang `metric_card` dan notice `DIFFERENT_DEFINITION`; deskripsi belum diubah di 10b.
+- [ ] **Langkah 11 (smoke):** smoke test akan mengisi cache kamus 10 kartu yang belum ada di laptop (KM-02..05, KM-07..12); setelah itu jalankan ulang `uv run python -m mcp_bogor.metric_cards --check` dan pastikan kode keluar 0 (hanya peringatan "belum diperiksa" sampai `reviewed_by` diisi).
+- [ ] **Dok 4 bagian 3 dan bagian 2 (revisi di Google Docs):** `metric_card` di item search; notice `DIFFERENT_DEFINITION` + field `datasets` (KK-T), bersama revisi `notices` KK-R.
 
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
 

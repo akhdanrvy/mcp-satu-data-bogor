@@ -57,6 +57,8 @@ class SearchItem(ContractModel):
     tahun_akhir: int | None = None
     data_updated_at: WibDatetime | None = None
     officialness: Officialness
+    # KK-T: id kartu metrik (Dok 4 bagian 8) bila dataset ini dikurasi sebagai kartu.
+    metric_card: str | None = Field(default=None, pattern=r"^KM-\d{2}$")
 
 
 class SearchResult(ContractModel):

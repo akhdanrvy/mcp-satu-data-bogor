@@ -226,7 +226,14 @@ def test_build_deps_stdio_degrades_with_warnings(
     assert deps.adapter is None and deps.data_cache is None and deps.signer is None
     events = [json.loads(r.getMessage())["event"] for r in caplog.records]
     assert events.count("startup_degraded") == 2 and "catalog_not_ready" in events
-    assert all(r.levelname == "WARNING" for r in caplog.records)
+    # KB-50: kartu metrik repo termuat (INFO); semua catatan start lain adalah peringatan
+    assert "metric_cards_loaded" in events
+    assert all(
+        r.levelname == "WARNING"
+        for r, event in zip(caplog.records, events, strict=True)
+        if event != "metric_cards_loaded"
+    )
+    assert deps.metric_cards.card_of  # tetap ada walau start terdegradasi
 
 
 def test_main_http_refuses_start_without_secret(

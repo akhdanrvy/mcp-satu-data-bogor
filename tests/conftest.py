@@ -8,7 +8,9 @@ ditandai).
 
 from __future__ import annotations
 
+import logging
 import socket
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -71,6 +73,21 @@ def _block_network(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPat
     monkeypatch.setattr(socket.socket, "connect", guarded_connect)
     monkeypatch.setattr(socket.socket, "connect_ex", guarded_connect_ex)
     monkeypatch.setattr(socket, "getaddrinfo", guarded_getaddrinfo)
+
+
+@pytest.fixture(autouse=True)
+def _restore_root_logging() -> Iterator[None]:
+    """CLI main() (sync_worker, metric_cards, runtime, fileserver) memanggil configure_logging,
+    yang memasang handler JSON di root logger pada sys.stderr saat itu (milik capsys) dan
+    mengubah level root. Tanpa pemulihan, tes berikutnya menulis ke stream yang sudah ditutup
+    atau kehilangan log INFO, sehingga hasil tes bergantung pada urutan."""
+    root = logging.getLogger()
+    handlers, level = list(root.handlers), root.level
+    yield
+    for handler in list(root.handlers):
+        if handler not in handlers:
+            root.removeHandler(handler)
+    root.setLevel(level)
 
 
 @pytest.fixture

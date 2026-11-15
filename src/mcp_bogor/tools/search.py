@@ -1,8 +1,10 @@
 """Tool search_datasets (Dok 4 bagian 3). Katalog lokal saja; tidak pernah ke portal.
 
-Alur (RENCANA_LANGKAH8 bagian 1.1): validasi → FTS katalog baca-saja → NO_MATCH bila
-total 0 → notice CATALOG_STALE bila katalog lama tidak disinkron → anggaran token
-(item dipangkas dari belakang, page_size diturunkan ke jumlah item, status partial).
+Alur (RENCANA_LANGKAH8 bagian 1.1): validasi → FTS katalog baca-saja (+ pemasangan sinonim
+kartu metrik, KB-50) → NO_MATCH bila total 0 → notice CATALOG_STALE bila katalog lama tidak
+disinkron → anggaran token (item dipangkas dari belakang, page_size diturunkan ke jumlah item,
+status partial). Notice DIFFERENT_DEFINITION (R-10, KK-T) dihitung per kandidat, sehingga
+hanya muncul bila kedua slug memang ada di halaman yang dikirim.
 """
 
 from __future__ import annotations
@@ -14,7 +16,7 @@ from mcp_bogor.models.envelope import ToolEnvelope, ok, partial
 from mcp_bogor.models.errors import ErrorCode
 from mcp_bogor.models.notices import Notice, NoticeCode
 from mcp_bogor.models.params import SEARCH_MAX_PAGE_SIZE_KEY, SearchParams
-from mcp_bogor.models.results import SearchResult
+from mcp_bogor.models.results import SearchItem, SearchResult
 from mcp_bogor.services import catalog
 from mcp_bogor.services.budget import TruncatedReason, fit_to_budget
 from mcp_bogor.tools.common import ToolDeps, ToolFailure, run_tool
@@ -22,6 +24,11 @@ from mcp_bogor.tools.common import ToolDeps, ToolFailure, run_tool
 TOOL = "search_datasets"
 # Katalog dianggap usang bila sinkron terakhir lebih tua dari kelipatan interval ini.
 CATALOG_STALE_FACTOR = 2
+
+
+def different_definition_notices(items: list[SearchItem], deps: ToolDeps) -> list[Notice]:
+    pairs = catalog.different_definition_pairs([i.slug for i in items], deps.metric_cards)
+    return [Notice.from_template(NoticeCode.DIFFERENT_DEFINITION, datasets=pair) for pair in pairs]
 
 
 def catalog_is_stale(synced_at: datetime | None, now: datetime, interval_h: float) -> bool:
@@ -33,7 +40,7 @@ def catalog_is_stale(synced_at: datetime | None, now: datetime, interval_h: floa
 async def handle_search(params: SearchParams, deps: ToolDeps) -> ToolEnvelope[SearchResult]:
     conn = deps.open_catalog()
     try:
-        found = catalog.search(conn, params)
+        found = catalog.search(conn, params, deps.metric_cards)
     finally:
         conn.close()
     result = found.result
@@ -46,17 +53,21 @@ async def handle_search(params: SearchParams, deps: ToolDeps) -> ToolEnvelope[Se
         notices.append(Notice.from_template(NoticeCode.CATALOG_STALE))
     request_id = params.request_id
 
+    def page_notices(items: list[SearchItem]) -> list[Notice]:
+        return [*notices, *different_definition_notices(items, deps)]
+
     def candidates() -> Iterator[tuple[TruncatedReason | None, ToolEnvelope[SearchResult]]]:
-        yield None, ok(result, request_id=request_id, notices=notices)
+        yield None, ok(result, request_id=request_id, notices=page_notices(result.items))
         for count in range(len(result.items) - 1, 0, -1):
-            trimmed = result.model_copy(update={"items": result.items[:count], "page_size": count})
+            items = result.items[:count]
+            trimmed = result.model_copy(update={"items": items, "page_size": count})
             yield (
                 TruncatedReason.ITEMS,
                 partial(
                     trimmed,
                     request_id=request_id,
                     truncated_reason=TruncatedReason.ITEMS.value,
-                    notices=notices,
+                    notices=page_notices(items),
                 ),
             )
 

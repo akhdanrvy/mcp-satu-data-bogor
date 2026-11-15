@@ -17,13 +17,18 @@ Pencarian (server tool, koneksi baca saja):
 - Urutan: bm25 dikurangi NAME_COVERAGE_WEIGHT dikali cakupan nama (proporsi token nama tanpa
   stopword yang cocok dengan kueri), lalu tahun_akhir terbaru. Bobot cakupan kecil sehingga
   berperan sebagai pemecah seri saat skor bm25 berdekatan.
+- Kartu metrik (KB-29.4, KB-50): bila deret token kueri PERSIS sama dengan sinonim kartu
+  (`CardIndex.pins`), slug kartu dipasang di peringkat 1 (hanya bila ada di katalog dan lolos
+  filter opd/topik/tahun); hasil FTS lain menyusul tanpa duplikat. Ini aturan dari data kurasi,
+  bukan bobot: kueri yang tidak sama persis dengan sinonim mana pun diurutkan persis seperti
+  tanpa kartu. Item yang slug-nya kartu diberi `metric_card` (KK-T).
 """
 
 from __future__ import annotations
 
 import sqlite3
 from collections.abc import Callable, Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Literal
 
@@ -265,10 +270,46 @@ def name_coverage(name: str, tokens: Sequence[str], *, substring: bool = False) 
 
 
 @dataclass(frozen=True)
+class CardIndex:
+    """Bagian kartu metrik yang dipakai pencarian (dibuat services.metric_cards.card_index).
+
+    Didefinisikan di sini, bukan di services.metric_cards, karena metric_cards mengimpor
+    catalog (query_tokens); arah impor tetap satu.
+    """
+
+    pins: Mapping[tuple[str, ...], str] = field(default_factory=dict)  # sinonim → slug
+    card_of: Mapping[str, str] = field(default_factory=dict)  # slug → id kartu
+    # R-10: slug → slug dataset yang definisinya berbeda (dua arah).
+    different: Mapping[str, frozenset[str]] = field(default_factory=dict)
+
+    def pinned_slug(self, tokens: Sequence[str]) -> str | None:
+        return self.pins.get(tuple(tokens)) if tokens else None
+
+
+EMPTY_CARDS = CardIndex()
+
+
+def different_definition_pairs(slugs: Sequence[str], cards: CardIndex) -> list[tuple[str, str]]:
+    """R-10 (KK-T): pasangan slug berbeda definisi yang KEDUANYA ada di `slugs` (satu halaman
+    hasil), urut kemunculan, tiap pasangan sekali."""
+    present = set(slugs)
+    pairs: list[tuple[str, str]] = []
+    seen: set[frozenset[str]] = set()
+    for slug in slugs:
+        for other in sorted(cards.different.get(slug, frozenset()) & present):
+            key = frozenset((slug, other))
+            if other != slug and key not in seen:
+                seen.add(key)
+                pairs.append((slug, other))
+    return pairs
+
+
+@dataclass(frozen=True)
 class CatalogSearch:
     result: SearchResult
     match_mode: MatchMode
     tokens: tuple[str, ...]
+    pinned: str | None = None  # slug yang dipasang dari kartu metrik
 
 
 def _filters(params: SearchParams) -> tuple[list[str], list[Any]]:
@@ -318,7 +359,14 @@ def _run(
     return sorted(rows, key=key)
 
 
-def _item(row: sqlite3.Row) -> SearchItem:
+def _pinned_row(conn: sqlite3.Connection, slug: str, params: SearchParams) -> sqlite3.Row | None:
+    """Baris slug kartu bila ada di katalog dan lolos filter yang sama dengan FTS."""
+    clauses, args = _filters(params)
+    where = " AND ".join(["d.slug = ?", *clauses])
+    return conn.execute(f"SELECT d.* FROM datasets AS d WHERE {where}", [slug, *args]).fetchone()
+
+
+def _item(row: sqlite3.Row, cards: CardIndex = EMPTY_CARDS) -> SearchItem:
     updated = row["data_updated_at"]
     return SearchItem(
         slug=row["slug"],
@@ -332,6 +380,7 @@ def _item(row: sqlite3.Row) -> SearchItem:
         tahun_akhir=row["tahun_akhir"],
         data_updated_at=datetime.fromisoformat(updated) if updated else None,
         officialness=Officialness(status=row["official_status"]),
+        metric_card=cards.card_of.get(row["slug"]),
     )
 
 
@@ -406,7 +455,9 @@ def catalog_synced_at(conn: sqlite3.Connection) -> datetime | None:
     return datetime.fromisoformat(value) if value else None
 
 
-def search(conn: sqlite3.Connection, params: SearchParams) -> CatalogSearch:
+def search(
+    conn: sqlite3.Connection, params: SearchParams, cards: CardIndex = EMPTY_CARDS
+) -> CatalogSearch:
     """Cari katalog lokal (Dok 4 bagian 3). Tidak pernah melempar galat sintaks FTS."""
     tokens = query_tokens(params.query)
     rows: list[sqlite3.Row] = []
@@ -420,12 +471,21 @@ def search(conn: sqlite3.Connection, params: SearchParams) -> CatalogSearch:
             mode = "trigram"
         if not rows:
             mode = "none"
+    pinned: str | None = None
+    slug = cards.pinned_slug(tokens)
+    if slug is not None:
+        row = _pinned_row(conn, slug, params)
+        if row is not None:
+            pinned = slug
+            rows = [row, *(r for r in rows if r["slug"] != slug)]
+        else:
+            log_event(LOGGER, "metric_card_pin_skipped", slug=slug, card=cards.card_of.get(slug))
     offset = (params.page - 1) * params.page_size
     result = SearchResult(
         total=len(rows),
         page=params.page,
         page_size=params.page_size,
-        items=[_item(row) for row in rows[offset : offset + params.page_size]],
+        items=[_item(row, cards) for row in rows[offset : offset + params.page_size]],
         catalog_synced_at=catalog_synced_at(conn),
     )
     log_event(
@@ -435,5 +495,6 @@ def search(conn: sqlite3.Connection, params: SearchParams) -> CatalogSearch:
         tokens=len(tokens),
         total=len(rows),
         filters=sorted(k for k in ("opd", "topik", "tahun") if getattr(params, k) is not None),
+        **({"metric_card": cards.card_of.get(pinned)} if pinned else {}),
     )
-    return CatalogSearch(result=result, match_mode=mode, tokens=tuple(tokens))
+    return CatalogSearch(result=result, match_mode=mode, tokens=tuple(tokens), pinned=pinned)

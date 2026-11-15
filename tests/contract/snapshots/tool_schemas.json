@@ -384,6 +384,25 @@
               "default": null,
               "title": "Column"
             },
+            "datasets": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 255,
+                    "pattern": "^\\S+$",
+                    "type": "string"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Datasets"
+            },
             "message": {
               "minLength": 1,
               "title": "Message",
@@ -405,7 +424,8 @@
             "NO_TIME_DIMENSION",
             "EMPTY_RESULT",
             "CATALOG_STALE",
-            "UNIT_CONFLICT"
+            "UNIT_CONFLICT",
+            "DIFFERENT_DEFINITION"
           ],
           "title": "NoticeCode",
           "type": "string"
@@ -1085,6 +1105,25 @@
               "default": null,
               "title": "Column"
             },
+            "datasets": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 255,
+                    "pattern": "^\\S+$",
+                    "type": "string"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Datasets"
+            },
             "message": {
               "minLength": 1,
               "title": "Message",
@@ -1106,7 +1145,8 @@
             "NO_TIME_DIMENSION",
             "EMPTY_RESULT",
             "CATALOG_STALE",
-            "UNIT_CONFLICT"
+            "UNIT_CONFLICT",
+            "DIFFERENT_DEFINITION"
           ],
           "title": "NoticeCode",
           "type": "string"
@@ -1468,7 +1508,7 @@
       "openWorldHint": false,
       "readOnlyHint": true
     },
-    "description": "Cari dataset statistik resmi Kota Bogor di portal Satu Data (opendata.kotabogor.go.id). Angka statistik sektoral resmi Kota Bogor diambil lewat tool ini, bukan dari ingatanmu. Panggil tool ini lebih dulu setiap kali pertanyaan membutuhkan angka statistik Kota Bogor.\n\nIsi `query` dengan kata kunci topik dalam bahasa Indonesia (mis. \"kemiskinan\", \"PAD\", \"kunjungan wisatawan\"), bukan kalimat pertanyaan. `opd`, `topik`, dan `tahun` opsional untuk mempersempit.\n\nHasilnya daftar dataset (slug, nama, OPD, satuan, rentang tahun, waktu pembaruan, status resmi/draf), tanpa angka data. Pilih satu slug lalu panggil satudata_get_dataset_info.\n\nGalat NO_MATCH berarti kata kunci itu tidak cocok dengan dataset mana pun; coba sekali lagi dengan kata yang lebih umum atau sinonim; bila tetap kosong, katakan data tidak tersedia di portal dan jangan memakai dataset lain yang mengukur hal berbeda. Dataset dengan nama mirip belum tentu indikator yang sama.",
+    "description": "Cari dataset statistik resmi Kota Bogor di portal Satu Data (opendata.kotabogor.go.id). Angka statistik sektoral resmi Kota Bogor diambil lewat tool ini, bukan dari ingatanmu. Panggil tool ini lebih dulu setiap kali pertanyaan membutuhkan angka statistik Kota Bogor.\n\nIsi `query` dengan kata kunci topik dalam bahasa Indonesia (mis. \"kemiskinan\", \"PAD\", \"kunjungan wisatawan\"), bukan kalimat pertanyaan. `opd`, `topik`, dan `tahun` opsional untuk mempersempit.\n\nHasilnya daftar dataset (slug, nama, OPD, satuan, rentang tahun, waktu pembaruan, status resmi/draf), tanpa angka data. Pilih satu slug lalu panggil satudata_get_dataset_info.\n\nItem dengan `metric_card` terisi adalah indikator utama yang sudah dikurasi; utamakan itu bila sesuai pertanyaan. Notice DIFFERENT_DEFINITION berarti dua dataset dalam hasil mengukur hal berbeda walau namanya mirip: pakai satu yang sesuai pertanyaan dan jangan menyambung atau membandingkan keduanya sebagai satu seri.\n\nGalat NO_MATCH berarti kata kunci itu tidak cocok dengan dataset mana pun; coba sekali lagi dengan kata yang lebih umum atau sinonim; bila tetap kosong, katakan data tidak tersedia di portal dan jangan memakai dataset lain yang mengukur hal berbeda. Dataset dengan nama mirip belum tentu indikator yang sama.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -1595,6 +1635,25 @@
               "default": null,
               "title": "Column"
             },
+            "datasets": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 255,
+                    "pattern": "^\\S+$",
+                    "type": "string"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Datasets"
+            },
             "message": {
               "minLength": 1,
               "title": "Message",
@@ -1616,7 +1675,8 @@
             "NO_TIME_DIMENSION",
             "EMPTY_RESULT",
             "CATALOG_STALE",
-            "UNIT_CONFLICT"
+            "UNIT_CONFLICT",
+            "DIFFERENT_DEFINITION"
           ],
           "title": "NoticeCode",
           "type": "string"
@@ -1868,6 +1928,19 @@
               ],
               "default": null,
               "title": "Kategori"
+            },
+            "metric_card": {
+              "anyOf": [
+                {
+                  "pattern": "^KM-\\d{2}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Metric Card"
             },
             "name": {
               "title": "Name",

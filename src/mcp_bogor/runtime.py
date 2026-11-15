@@ -38,7 +38,10 @@ from mcp_bogor.fileserver.signing import DataRefSigner
 from mcp_bogor.health import catalog_status, server_health, server_version
 from mcp_bogor.logging import configure_logging, get_logger, log_event, log_warning
 from mcp_bogor.server import build_server
+from mcp_bogor.services.catalog import EMPTY_CARDS, CardIndex
+from mcp_bogor.services.metric_cards import MetricCardError, card_index, load_cards
 from mcp_bogor.storage.cache import DataCache
+from mcp_bogor.storage.metric_cards import MetricCardFileError
 from mcp_bogor.tools.common import ToolDeps
 
 LOGGER = get_logger(__name__)
@@ -80,8 +83,27 @@ def build_deps(
             "catalog_not_ready",
             reason="katalog belum disinkron; jalankan python -m mcp_bogor.sync_worker --once",
         )
-    deps = ToolDeps(settings, adapter=adapter, data_cache=data_cache, signer=signer)
+    deps = ToolDeps(
+        settings,
+        adapter=adapter,
+        data_cache=data_cache,
+        signer=signer,
+        metric_cards=load_card_index(settings),
+    )
     return deps, report
+
+
+def load_card_index(settings: Settings) -> CardIndex:
+    """KB-50: kartu rusak atau direktori hilang → server tetap jalan tanpa kartu (peringatan
+    `metric_cards_invalid`); `python -m mcp_bogor.metric_cards --check` dan tes menangkapnya."""
+    try:
+        cards = load_cards(settings.metric_cards_dir)
+    except (MetricCardError, MetricCardFileError) as exc:
+        log_warning(LOGGER, "metric_cards_invalid", reason=str(exc))
+        return EMPTY_CARDS
+    index = card_index(cards)
+    log_event(LOGGER, "metric_cards_loaded", cards=len(cards), used=len(index.card_of))
+    return index
 
 
 async def close_deps(deps: ToolDeps) -> None:

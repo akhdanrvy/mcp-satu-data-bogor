@@ -146,7 +146,7 @@ def test_too_large_even_after_trimming(root: Path) -> None:
 def test_unexpected_error_is_internal_without_detail(
     root: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
-    def boom(conn: Any, params: Any) -> Any:
+    def boom(conn: Any, params: Any, cards: Any = None) -> Any:
         raise RuntimeError("rahasia 9.160.885")
 
     monkeypatch.setattr(search_mod.catalog, "search", boom)
@@ -165,3 +165,60 @@ def test_log_has_no_query_text(root: Path, caplog: pytest.LogCaptureFixture) -> 
     assert event["tool"] == "search_datasets" and event["request_id"] == "rq-9"
     assert event["status"] == "ok" and event["size_bytes"] > 0
     assert "wisatawan" not in message and "kunjungan" not in message
+
+
+# ---------------------------------------------------------------- kartu metrik (KB-50, KK-T)
+
+REPO_CARDS = Path(__file__).parents[2] / "metric_cards"
+KK_MISKIN = "persentase-kepala-keluarga-miskin-di-kota-bogor"
+
+
+def _card_deps(root: Path, **overrides: Any) -> ToolDeps:
+    from mcp_bogor.runtime import load_card_index
+
+    deps = _deps(root, metric_cards_dir=REPO_CARDS, **overrides)
+    deps.metric_cards = load_card_index(deps.settings)
+    return deps
+
+
+def _r10(out: dict[str, Any]) -> list[dict[str, Any]]:
+    return [n for n in out["notices"] if n["code"] == "DIFFERENT_DEFINITION"]
+
+
+def test_kemiskinan_pins_card_and_warns_r10(root: Path) -> None:
+    out = _call(_card_deps(root), query="kemiskinan")
+    items = out["result"]["items"]
+    assert items[0]["slug"] == KEMISKINAN and items[0]["metric_card"] == "KM-06"
+    km07 = next(i for i in items if i["slug"] == KK_MISKIN)
+    assert km07["metric_card"] == "KM-07"
+    assert all(i["metric_card"] is None for i in items if i["slug"] not in (KEMISKINAN, KK_MISKIN))
+    (notice,) = _r10(out)
+    assert notice["datasets"] == [KEMISKINAN, KK_MISKIN] and notice["column"] is None
+    assert KEMISKINAN in notice["message"] and KK_MISKIN in notice["message"]
+    assert out["status"] == "ok"
+
+
+def test_r10_only_when_both_on_the_same_page(root: Path) -> None:
+    deps = _card_deps(root)
+    first = _call(deps, query="kemiskinan", page_size=1)
+    assert [i["slug"] for i in first["result"]["items"]] == [KEMISKINAN] and _r10(first) == []
+    # tanpa kartu: tidak ada notice R-10 dan tidak ada metric_card
+    plain = _call(_deps(root), query="kemiskinan")
+    assert _r10(plain) == [] and all(i["metric_card"] is None for i in plain["result"]["items"])
+
+
+def test_r10_recomputed_after_token_trimming(root: Path) -> None:
+    """Item dipangkas anggaran token → notice dihitung ulang dari halaman yang dikirim."""
+    deps = _card_deps(root, max_response_tokens=10_000)
+    full = _call(deps, query="kemiskinan")
+    assert _r10(full)
+    slugs = [i["slug"] for i in full["result"]["items"]]
+    keep = slugs.index(KK_MISKIN)  # KM-07 tidak di posisi pertama
+    assert keep > 0
+    one = estimate_tokens(
+        {**full, "result": {**full["result"], "items": full["result"]["items"][:1]}}
+    )
+    tight = _call(_card_deps(root, max_response_tokens=one + 20), query="kemiskinan")
+    assert [i["slug"] for i in tight["result"]["items"]] == [KEMISKINAN]
+    assert tight["truncated"] is True and tight["status"] == "partial"
+    assert _r10(tight) == []

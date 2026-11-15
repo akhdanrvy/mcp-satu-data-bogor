@@ -35,6 +35,7 @@ from mcp_bogor.models.errors import (
     ToolName,
 )
 from mcp_bogor.services.budget import compact_json_bytes
+from mcp_bogor.services.catalog import EMPTY_CARDS, CardIndex
 from mcp_bogor.storage import db
 from mcp_bogor.storage.cache import DataCache, DictionaryCache
 
@@ -97,6 +98,8 @@ class ToolDeps:
     # jalan tanpa secret. Secret tidak sah → ConfigError → INTERNAL.
     data_cache: DataCache | None = None
     signer: DataRefSigner | None = None
+    # KB-50: indeks kartu metrik untuk search (dimuat runtime.build_deps; kosong = tanpa kartu).
+    metric_cards: CardIndex = EMPTY_CARDS
 
     def __post_init__(self) -> None:
         if self.dictionary_cache is None:
