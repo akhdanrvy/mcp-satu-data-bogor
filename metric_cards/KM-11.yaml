@@ -22,6 +22,7 @@ periode_tersedia:
 catatan_mutu:
   - "Volume 2022 dan 2023 identik di beberapa segmen (dicatat saja)."
   - "Dok 4 menulis periode 2015-2025 dan 2024 = 0 (QC-01); data portal 2022-2025. Revisi Dok 4 bagian 8."
+  - "2024 = 0 di semua segmen (QC-01), terkonfirmasi smoke 17 Nov 2026."
 sinonim:
   - volume lalu lintas pajajaran
   - volume kendaraan pajajaran
@@ -29,5 +30,5 @@ dataset_berbeda_definisi: []
 status: aktif
 kasus_uji:
   - N-08
-reviewed_by: null
-reviewed_at: null
+reviewed_by: Akhdan
+reviewed_at: 2026-11-17

@@ -222,7 +222,7 @@ Status kartu:
 | Status | Arti |
 |---|---|
 | `aktif` | Dipakai search; kamus harus tervalidasi |
-| `kamus_belum_tervalidasi` | Dipakai search; tool memberi notice `DICTIONARY_NOT_VALIDATED` (mis. KM-01 sampai override `total_pendapatan` masuk) |
+| `kamus_belum_tervalidasi` | Dipakai search; tool memberi notice `DICTIONARY_NOT_VALIDATED` (KM-01 berstatus ini sampai override `total_pendapatan` masuk 17 Nov 2026; kini `aktif`) |
 | `perlu_konfirmasi` | Tidak dipakai sama sekali (tanpa pemasangan, tanpa `metric_card`) |
 
 Prosedur mengubah atau menambah kartu:
@@ -230,7 +230,7 @@ Prosedur mengubah atau menambah kartu:
 2. Setelah memeriksa slug, definisi, kolom, satuan, dan sinonim, isi `reviewed_by` (nama pemeriksa, **bukan** email) dan `reviewed_at: YYYY-MM-DD`.
 3. Jalankan `uv run python -m mcp_bogor.metric_cards --check` dan perbaiki sampai kode keluar 0. Galat yang umum: `NOT_IN_CATALOG`, `UNIT_MISMATCH`, `MEASURE_ROLE`, `STATUS_OUTDATED`. Kode 3 (`DICTIONARY_NOT_CACHED`) berarti kamusnya belum ada di cache; panggil `get_dataset_info` slug itu sekali lewat Inspector.
 4. Jalankan `uv run pytest tests/unit/test_metric_cards.py tests/contract` (tanpa jaringan).
-5. **Restart server MCP**, karena kartu hanya dimuat saat start. Kartu yang rusak membuat server tetap jalan tanpa kartu (log `metric_cards_invalid`).
+5. **Restart server MCP**: setiap perubahan kartu baru berlaku setelah restart, karena kartu hanya dimuat saat start. Kartu yang rusak membuat server tetap jalan tanpa kartu (log `metric_cards_invalid`).
 
 ### Override kamus (`overrides/<slug>.yaml`, KK-07)
 
@@ -249,7 +249,8 @@ columns:
 ```
 
 - Kolom measure yang tidak terdokumentasi baru dianggap tervalidasi (`dictionary_validated=true`) bila keempat field `meaning`, `unit`, `reviewed_by`, dan `reviewed_at` terisi (KB-30).
-- Override dibaca setiap kali kamus diminta, jadi **tidak perlu restart**. Perubahan isi mengubah sidiknya, sehingga kamus di cache dibuat ulang otomatis; itu memicu satu probe `/bigdata` ke portal.
+- Override dibaca setiap kali kamus diminta, jadi **tidak perlu restart**. Perubahan isi mengubah sidiknya, sehingga kamus di cache dibangun ulang otomatis pada panggilan `get_dataset_info` (atau `get_dataset_data`) berikutnya untuk slug itu; pembangunan ulang memicu **1 permintaan ke portal** (probe `/bigdata`).
+- Sampai kamus dibangun ulang, `metric_cards --check` memberi `DICTIONARY_OVERRIDE_CHANGED` (belum dicek, kode keluar 3) untuk kartu slug itu.
 - Berkas yang tidak sah membuat tool untuk slug itu mengembalikan `INTERNAL`. Rinciannya hanya ada di log.
 - Setelah override sebuah kartu `kamus_belum_tervalidasi` masuk, `--check` memberi `STATUS_OUTDATED`. Ubah status kartu menjadi `aktif`, lalu restart.
 

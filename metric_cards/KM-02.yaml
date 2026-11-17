@@ -19,6 +19,7 @@ periode_tersedia:
   akhir: 2024
 catatan_mutu:
   - "2021-2023 bernilai 0,04-0,45, sekitar 100 kali lebih kecil dari tahun lain; kemungkinan salah skala di sumber (QC-02 skala). Data tidak diubah."
+  - "Pembagi persentase tidak dijelaskan di portal."
 sinonim:
   - persentase realisasi pad
   - persentase pad
@@ -27,5 +28,5 @@ dataset_berbeda_definisi: []
 status: aktif
 kasus_uji:
   - Q-02
-reviewed_by: null
-reviewed_at: null
+reviewed_by: Akhdan
+reviewed_at: 2026-11-17

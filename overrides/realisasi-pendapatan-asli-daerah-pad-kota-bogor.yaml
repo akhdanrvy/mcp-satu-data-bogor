@@ -1,0 +1,11 @@
+# Kurasi kamus kolom (KK-07). Skema: services/dictionary.DictionaryOverride.
+# TM-01 (docs/TEMUAN_MUTU_DATA.md): deskripsi portal menjelaskan arti kolom nilai di bawah
+# nama kolom cakupan_pelayanan (tidak ada di data); kolom nilai di data adalah total_pendapatan.
+slug: realisasi-pendapatan-asli-daerah-pad-kota-bogor
+note: "Deskripsi portal memuat arti ini di bawah nama kolom cakupan_pelayanan (salah label); diverifikasi dari halaman dataset portal 17 Nov 2026; konfirmasi Bapenda belum ada."
+columns:
+  total_pendapatan:
+    meaning: realisasi pendapatan asli daerah (PAD) Kota Bogor per tahun
+    unit: RUPIAH
+    reviewed_by: Akhdan
+    reviewed_at: 2026-11-17

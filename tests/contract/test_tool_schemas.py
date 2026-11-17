@@ -283,11 +283,14 @@ def test_info_schema_and_annotations(tmp_path: Path) -> None:
     assert info.annotations.readOnlyHint is True and info.annotations.openWorldHint is True
 
 
-def test_e2e_info_through_mcp(catalog_root: Path) -> None:
+def test_e2e_info_through_mcp(catalog_root: Path, tmp_path: Path) -> None:
     from mcp_bogor.models import InfoResult
     from tests.fakes import FakeSourceAdapter
 
-    deps = deps_for(make_settings(catalog_root))
+    # override kosong: KM-01 tanpa override total_pendapatan → notice DICTIONARY_NOT_VALIDATED
+    empty_overrides = tmp_path / "overrides"
+    empty_overrides.mkdir()
+    deps = deps_for(make_settings(catalog_root, overrides_dir=empty_overrides))
     deps.adapter = FakeSourceAdapter()
 
     async def action(client: Any) -> Any:

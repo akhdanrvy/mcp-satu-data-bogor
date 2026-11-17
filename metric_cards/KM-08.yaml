@@ -5,7 +5,7 @@
 # catatan_mutu hanya untuk manusia dan pemeriksa; tidak pernah dikirim ke model (KT-03).
 id: KM-08
 nama: "Kunjungan wisatawan"
-definisi: "Perkembangan jumlah kunjungan wisatawan ke Kota Bogor per tahun."
+definisi: "Jumlah kunjungan wisatawan ke Kota Bogor per tahun (portal menamainya 'perkembangan')."
 slug: perkembangan-jumlah-kunjungan-wisatawan-di-kota-bogor
 kolom_nilai: perkembangan_kunjungan
 kolom_dimensi:
@@ -30,5 +30,5 @@ status: aktif
 kasus_uji:
   - N-06
   - F-01
-reviewed_by: null
-reviewed_at: null
+reviewed_by: Akhdan
+reviewed_at: 2026-11-17

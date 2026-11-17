@@ -18,7 +18,7 @@ periode_tersedia:
   awal: 2019
   akhir: 2024
 catatan_mutu:
-  - "Arti kolom total_pendapatan belum terdokumentasi di deskripsi portal; menunggu override terverifikasi Akhdan (TM-01). Sampai itu kamus dictionary_validated=false."
+  - "Arti kolom total_pendapatan dari override terverifikasi (TM-01): deskripsi portal memuat arti ini di bawah nama kolom cakupan_pelayanan (salah label); diverifikasi dari halaman dataset portal 17 Nov 2026; konfirmasi Bapenda belum ada."
   - "Dok 4 menulis periode 2020-2024; data portal 2019-2024 (N-03 memakai lima tahun terakhir)."
 sinonim:
   - pad
@@ -26,8 +26,8 @@ sinonim:
   - realisasi pad
   - realisasi pendapatan asli daerah
 dataset_berbeda_definisi: []
-status: kamus_belum_tervalidasi
+status: aktif
 kasus_uji:
   - N-03
-reviewed_by: null
-reviewed_at: null
+reviewed_by: Akhdan
+reviewed_at: 2026-11-17

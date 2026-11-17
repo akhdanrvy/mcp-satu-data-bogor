@@ -109,3 +109,7 @@ OK* KM-10 Kecepatan lalu lintas Jl. Pajajaran [aktif] - warning: belum diperiksa
 OK* KM-11 Volume lalu lintas Jl. Pajajaran [aktif] - warning: belum diperiksa (reviewed_by kosong) (NOT_REVIEWED)
 OK* KM-12 Persentase penanganan pengaduan [aktif] - warning: belum diperiksa (reviewed_by kosong) (NOT_REVIEWED)
 Ringkasan: 12 kartu; ok 0, ok+peringatan 12, belum dicek 0, galat 0
+
+## Addendum
+
+Pembaruan 17 Nov 2026: setelah review 12 kartu dan override KM-01 (TM-01), metric_cards --check atas cache smoke = 12 OK tanpa peringatan (kode keluar 0).

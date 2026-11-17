@@ -59,9 +59,10 @@ def test_repo_has_twelve_valid_cards(cards: list[MetricCard]) -> None:
     assert [c.id for c in cards] == [f"KM-{i:02d}" for i in range(1, 13)]
     assert len({c.slug for c in cards}) == 12
     assert all(c.walidata == "Diskominfo Kota Bogor" and c.walidata_catatan for c in cards)
-    assert all(c.reviewed_by is None for c in cards)  # diisi Akhdan setelah review
+    # review kartu terhadap halaman portal 17 Nov 2026
+    assert all(c.reviewed_by == "Akhdan" and str(c.reviewed_at) == "2026-11-17" for c in cards)
     by_id = {c.id: c for c in cards}
-    assert by_id["KM-01"].status == "kamus_belum_tervalidasi"
+    assert by_id["KM-01"].status == "aktif"  # override total_pendapatan (TM-01)
     assert by_id["KM-07"].slug == "persentase-kepala-keluarga-miskin-di-kota-bogor"
     assert by_id["KM-12"].slug == (
         "persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor"
@@ -95,7 +96,8 @@ def test_synonym_key_uses_search_sanitizing() -> None:
         ({"sinonim": []}, "sinonim"),
         ({"sinonim": ["kota bogor"]}, "kosong setelah sanitasi"),
         ({"sinonim": ["Miskin", "miskin?"]}, "sinonim sama"),
-        ({"reviewed_by": "Akhdan"}, "berpasangan"),
+        ({"reviewed_by": "Akhdan", "reviewed_at": None}, "berpasangan"),
+        ({"reviewed_by": None, "reviewed_at": "2026-11-17"}, "berpasangan"),
         ({"kolom_dimensi": ["tahun", "tingkat_kemiskinan"]}, "kolom_nilai"),
         ({"kolom_dimensi": ["tahun", "tahun"]}, "duplikat"),
         ({"dataset_berbeda_definisi": ["tingkat-kemiskinan-di-kota-bogor-2"]}, "sendiri"),
@@ -177,13 +179,13 @@ def _codes(report: CheckReport, card_id: str) -> set[str]:
 def test_repo_cards_pass_against_fixture(
     cached_env: ToolEnv, conn: sqlite3.Connection, cards: list[MetricCard]
 ) -> None:
-    """Satu-satunya temuan: belum diperiksa Akhdan. KM-01 konsisten (kamus belum tervalidasi)."""
+    """Semua kartu sudah direview dan konsisten tanpa temuan; KM-01 aktif lewat override repo."""
     report = _check(cached_env, conn, cards)
     assert report.exit_code == 0, report.render()
     for check in report.cards:
-        assert {f.code for f in check.findings} == {"NOT_REVIEWED"}, report.render()
-        assert check.outcome == "warning"
-    assert "belum diperiksa" in report.render()
+        assert check.findings == [], report.render()
+        assert check.outcome == "ok"
+    assert "belum diperiksa" not in report.render()
 
 
 def test_without_cache_everything_is_unchecked(
@@ -204,7 +206,8 @@ def _card(cards: list[MetricCard], card_id: str, **update: Any) -> MetricCard:
 @pytest.mark.parametrize(
     ("card_id", "update", "code", "level"),
     [
-        ("KM-01", {"status": "aktif"}, "STATUS_NOT_VALIDATED", "error"),
+        ("KM-01", {"status": "kamus_belum_tervalidasi"}, "STATUS_OUTDATED", "error"),
+        ("KM-06", {"reviewed_by": None, "reviewed_at": None}, "NOT_REVIEWED", "warning"),
         ("KM-06", {"status": "kamus_belum_tervalidasi"}, "STATUS_OUTDATED", "error"),
         ("KM-06", {"kolom_nilai": "jumlah"}, "MEASURE_MISSING", "error"),
         ("KM-06", {"kolom_nilai": "satuan"}, "MEASURE_ROLE", "error"),
@@ -252,15 +255,19 @@ def test_related_cards_should_be_mutual(
 def test_km01_status_follows_override(
     catalog_db: Path, tmp_path: Path, conn: sqlite3.Connection, cards: list[MetricCard]
 ) -> None:
-    """Begitu override total_pendapatan lengkap masuk, kartu KM-01 wajib dinaikkan statusnya;
-    override berubah setelah kamus di-cache → belum dicek (bukan hasil basi)."""
+    """Tanpa override total_pendapatan, KM-01 tidak boleh aktif; begitu override lengkap masuk,
+    kartu wajib dinaikkan statusnya. Override berubah setelah kamus di-cache → belum dicek
+    (bukan hasil basi)."""
     overrides = tmp_path / "overrides"
     overrides.mkdir()
     env = ToolEnv(catalog_db, tmp_path, overrides_dir=overrides)
     km01 = [_card(cards, "KM-01")]
+    pending = [_card(cards, "KM-01", status="kamus_belum_tervalidasi")]
     env.info(slug=PAD)
-    assert "NOT_REVIEWED" in _codes(_check(env, conn, km01), "KM-01")
-    assert _check(env, conn, km01).exit_code == 0
+    without = _check(env, conn, km01)
+    assert "STATUS_NOT_VALIDATED" in _codes(without, "KM-01")
+    assert without.exit_code == 1
+    assert _check(env, conn, pending).exit_code == 0
 
     (overrides / f"{PAD}.yaml").write_text(
         yaml.safe_dump(
@@ -284,10 +291,11 @@ def test_km01_status_follows_override(
     assert stale.exit_code == 3
 
     env.info(slug=PAD)  # kamus dibangun ulang dengan override
-    report = _check(env, conn, km01)
+    report = _check(env, conn, pending)
     assert "STATUS_OUTDATED" in _codes(report, "KM-01")
     assert report.exit_code == 1
-    assert _check(env, conn, [_card(cards, "KM-01", status="aktif")]).exit_code == 0
+    active = _check(env, conn, km01)
+    assert _codes(active, "KM-01") == set() and active.exit_code == 0
 
     (overrides / f"{PAD}.yaml").write_text("slug: [rusak", encoding="utf-8")
     assert "OVERRIDE_INVALID" in _codes(_check(env, conn, km01), "KM-01")
