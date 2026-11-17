@@ -111,6 +111,7 @@ class Settings(BaseSettings):
     top_values: int = Field(default=10, ge=0)
     preview_rows: int = Field(default=5, ge=0, le=5)  # FR-14: maks 5 baris
     description_max_chars: int = Field(default=600, gt=0)
+    # Dicadangkan: v0.1 tidak punya jalur yang mengirim baris data ke respons tool (KT-03).
     inline_rows_fallback: bool = False
     force_refresh_min_interval_s: int = Field(default=300, ge=0)  # per slug+parameter
 
@@ -124,6 +125,17 @@ class Settings(BaseSettings):
     @classmethod
     def _strip_trailing_slash(cls, value: str) -> str:
         return value.rstrip("/")
+
+    @field_validator("inline_rows_fallback")
+    @classmethod
+    def _no_inline_rows(cls, value: bool) -> bool:
+        # CLAUDE.md aturan 1 / KT-03: baris data tidak pernah masuk respons tool.
+        if value:
+            raise ValueError(
+                "MCP_INLINE_ROWS_FALLBACK=true tidak didukung di v0.1 (baris data tidak "
+                "pernah masuk respons tool, KT-03); biarkan false"
+            )
+        return value
 
     @field_validator("db_path", "cache_dir", "overrides_dir", "metric_cards_dir")
     @classmethod

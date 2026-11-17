@@ -1,6 +1,6 @@
 # CLAUDE.md — MCP Kota Bogor (satu-data-bogor)
 
-Server MCP yang membaca portal **opendata.kotabogor.go.id** (757 dataset, 39 OPD) dan melayani **X-Assistant Citya AI Bogor**. Pengguna akhir jawaban: Wali Kota dan pimpinan Pemkot Bogor. Pemilik: Akhdan Ravi Andaman (SCCIC ITB).
+Server MCP yang membaca portal **opendata.kotabogor.go.id** (±777 dataset per 17 Nov 2026; jumlah berubah seiring waktu; 39 OPD) dan melayani **X-Assistant Citya AI Bogor**. Pengguna akhir jawaban: Wali Kota dan pimpinan Pemkot Bogor. Pemilik: Akhdan Ravi Andaman (SCCIC ITB).
 
 Jawab dan tulis komentar/commit dalam **bahasa Indonesia yang lugas**; istilah teknis boleh bahasa Inggris. Identifier kode dalam bahasa Inggris, kecuali nama field kontrak yang sudah ditetapkan (mis. `tahun`, `opd`, `topik`).
 

@@ -103,6 +103,17 @@ def test_dataref_secret_accepted_and_hidden(
     assert secret not in repr(s)
 
 
+def test_inline_rows_fallback_true_rejected(
+    settings_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """KT-03: tidak ada jalur baris data di respons tool; true ditolak, bukan diabaikan."""
+    monkeypatch.setenv("MCP_INLINE_ROWS_FALLBACK", "true")
+    with pytest.raises(ValidationError, match=r"tidak didukung di v0.1"):
+        Settings()
+    monkeypatch.setenv("MCP_INLINE_ROWS_FALLBACK", "false")
+    assert Settings().inline_rows_fallback is False
+
+
 def test_qc_ratio(settings_env: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """MCP_QC_RATIO (KB-18): bawaan 50, bisa diubah lewat env, harus > 1."""
     assert _settings().qc_ratio == 50

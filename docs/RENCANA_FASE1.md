@@ -15,30 +15,30 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 | 8 | Tiga tool | `tools/search.py`, `tools/info.py`, `tools/data.py`; awalan `MCP_TOOL_PREFIX`; batas token dan `truncated`; galat portal mati / stale | KT-01 (snapshot JSON Schema), KT-03, KT-05, UT-13, UT-14 |
 | 9 | Server | `server.py` + `__main__.py`: stdio dan streamable-http :8800, file server :8799 | Uji manual dengan MCP Inspector (dicatat di README) |
 | 10 | Kartu metrik | 12 berkas YAML di `metric_cards/` (field Dok 4 bagian 8); slug dan kolom diisi dari katalog asli, lalu **diperiksa Akhdan** | Validasi skema kartu |
-| 11 | Smoke test | `tests/smoke/` ST-01..05, maks 60 permintaan, jeda 0,3 dtk | **Dijalankan Akhdan di laptop, atas izin** |
+| 11 | Smoke test | `tests/smoke/` ST-01..05, maks 60 permintaan, jeda 0,3 dtk | **Selesai 17 Nov 2026: LULUS** (`docs/SMOKE_REPORT_2026-11-17.md`) |
 | 12 | Dokumentasi | `README.md` (instal, jalan, konfigurasi), `docs/RUNBOOK.md` (sinkron, rotasi secret, portal mati, rekam ulang fixture) | — |
 
 ## TODO dari review Langkah 1 (10 Nov 2026)
 
 - [x] **Langkah 2 (UT-01):** offset `+07:07` dari portal dinormalkan dengan `replace(tzinfo=WIB)`, sehingga jam dinding tidak bergeser (bukan `astimezone`). Setelah itu, perbarui tes `test_plus_0707_not_normalized_here` di `tests/unit/test_models.py`, yang saat ini sengaja mengunci pergeseran 7 menit di model.
 - [x] **Langkah 6:** peran kolom ditentukan setelah urai NB-07. Kolom string yang nilainya hampir semua angka (selain `kode_*` dan `tahun`) diberi peran `measure`. Ini menutup kebocoran KT-03 lewat `preview`/`top_values` (contoh KM-08 "9.160.885"). Pengaman model KB-15 tetap ada sebagai lapis kedua. Penentuan peran memakai `ParseIssue` dari `services/normalize.normalize_rows`.
-- [ ] **Langkah 8:** bila `missing_periods` tidak kosong (dan ada periode yang ditemukan), status = `partial`. Dijaga di tool, bukan di amplop.
+- [x] **Langkah 8:** bila `missing_periods` tidak kosong (dan ada periode yang ditemukan), status = `partial`. Dijaga di tool, bukan di amplop. **Diterapkan di 8c (golden F-07/F-08, smoke ST-02).**
 
 ## TODO dari Langkah 2 (10 Nov 2026)
 
 - [x] **Langkah 3:** dari fixture asli, verifikasi (a) nama kolom id internal `/bigdata` untuk `INTERNAL_ID_COLUMNS` (KB-17); (b) bentuk `metadata_filter` dan `metadata[]` (KB-20); (c) nilai `type` di `history_draft`; (d) apakah ada angka desimal bertitik bertipe teks (risiko KB-16).
 - [x] **Langkah 4:** adaptor meratakan `metadata_filter` → `{kolom: nilai_unik}` dan `metadata[]` → `{nama: nilai}` sebelum memanggil `services/periods` (KB-20).
-- [ ] **Langkah 8:** tool membaca `MCP_QC_RATIO` dari settings dan meneruskannya ke `services/quality` (KB-18); `PeriodCoverage.note` disampaikan ke model untuk CP-03 (KK-F).
+- [x] **Langkah 8:** tool membaca `MCP_QC_RATIO` dari settings dan meneruskannya ke `services/quality` (KB-18); `PeriodCoverage.note` disampaikan ke model untuk CP-03 (KK-F). **Diterapkan di 8c (`qc_ratio` diteruskan di `tools/data.py`; CP-03 lewat notice `NO_TIME_DIMENSION`).**
 - [ ] **Dok 2:** usulkan revisi QC-02 sesuai KB-18, AK-01 menjadi enam endpoint sesuai KK-H, KK-04 sesuai KK-I, dan jumlah dataset 757 → 751 (rekaman 10 Nov 2026) (di Google Docs, lalu ekspor ulang).
 
 ## TODO dari Langkah 3 (10 Nov 2026)
 
-- [ ] **Akhdan, sebelum perekaman:** ~~konfirmasi KK-H~~ (disetujui); isi `MCP_USER_AGENT` di `.env` dengan kontak tim (bukan placeholder); jalankan `uv run python scripts/record_fixtures.py` (dry-run), lalu `--execute`.
+- [x] **Akhdan, sebelum perekaman:** ~~konfirmasi KK-H~~ (disetujui); isi `MCP_USER_AGENT` di `.env` dengan kontak tim (bukan placeholder); jalankan `uv run python scripts/record_fixtures.py` (dry-run), lalu `--execute`. **Selesai: rekaman 10 Nov 2026 (`tests/fixtures/recorded/2026-11-10`, Langkah 3).**
 - [x] **Setelah perekaman:** baca `docs/FIXTURE_REPORT.md`, putuskan KB-17 dan KB-20, pilih slug KM-07/KM-12 bila kandidatnya lebih dari satu, dan tinjau temuan email/telepon sebelum commit `tests/fixtures/recorded/`.
 
 ## TODO dari review fixture (10 Nov 2026)
 
-- [ ] **Akhdan:** jalankan `uv run python scripts/record_fixtures.py --only persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor --execute` (KM-12; 2 permintaan, berkas 034 dan 035).
+- [x] **Akhdan:** jalankan `uv run python scripts/record_fixtures.py --only persentase-penanganan-pengaduan-masyarakat-ke-inspektorat-daerah-kota-bogor --execute` (KM-12; 2 permintaan, berkas 034 dan 035). **Selesai: berkas 034 dan 035 ada di rekaman 10 Nov.**
 - [x] **Akhdan:** putuskan redaksi `organisasi_alamat`/`alamat` di fixture (KK-J: diredaksi).
 - [x] **Langkah 6 (KK-I):** `services/dictionary.column_role` dan perluasan `is_numeric_label_column`; cabut penanda xfail di `tests/unit/test_column_roles.py`.
 - [x] **Langkah 5:** sinkron katalog memakai field `catalog_slim` (KK-J: tanpa kontak); uji dengan `catalog_slim.json`.
@@ -51,43 +51,43 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [x] **Langkah 5:** peta `opd`/`topik` di katalog memakai `list_organisasi()`/`list_topik()` (KK-H).
 - [x] **Langkah 5 (KB-26):** `sync_worker` membuat **satu** instans `OpenDataJabarAdapter` untuk seluruh proses, dengan env baru `MCP_SYNC_REQUEST_DELAY_S` (bawaan 0,5, minimal 0,2) sebagai jeda antarpermintaan; tambahkan ke `config.py`, `.env.example`, dan tes config.
 - [x] **Langkah 5 (KK-K f):** laporan sinkron memuat `pages_read`, `total_data`, jumlah record, `duplicates`, `skipped`, `complete`, `error`, dan jumlah record yang dihapus.
-- [ ] **Langkah 8:** petakan galat adaptor ke `ErrorCode`: `SourceNotFound` → `DATASET_NOT_FOUND`; `SourceUnavailable` → `SOURCE_UNAVAILABLE` (atau `STALE_DATA` bila cache ada); `SourceRateLimited` → `RATE_LIMITED`; `InvalidSourceRequest` → `INVALID_PARAM`; `SourceProtocolError` → `INTERNAL`. Pakai `FakeSourceAdapter.fail_with` untuk UT-14.
+- [x] **Langkah 8:** petakan galat adaptor ke `ErrorCode`: `SourceNotFound` → `DATASET_NOT_FOUND`; `SourceUnavailable` → `SOURCE_UNAVAILABLE` (atau `STALE_DATA` bila cache ada); `SourceRateLimited` → `RATE_LIMITED`; `InvalidSourceRequest` → `INVALID_PARAM`; `SourceProtocolError` → `INTERNAL`. Pakai `FakeSourceAdapter.fail_with` untuk UT-14. **Diterapkan di 8b/8c (`SourceProtocolError` → `INTERNAL` lewat penangan galat tak terduga `run_tool`).**
 - [x] **Langkah 9:** konfigurasi handler log JSON (`mcp_bogor.logging`) untuk server; tutup adaptor (`aclose`) saat server berhenti (KB-48, KB-47).
 - [x] **Langkah 9 (KB-26):** server membuat **satu** instans `OpenDataJabarAdapter` saat start (lifespan FastMCP) dan memakainya bersama untuk semua tool call; jangan membuat adaptor per permintaan, karena pembatas laju dan jeda global 429 (KB-25) hanya berlaku per instans.
 - [x] **Akhdan:** putuskan KK-L (kolom `alamat`/`email` di baris data publik): disetujui.
 
 ## TODO dari Langkah 5 (10 Nov 2026)
 
-- [ ] **Akhdan:** jalankan `uv run python -m mcp_bogor.sync_worker --once` (±10 permintaan, jeda 0,5 dtk). Kode keluar 0 = complete/incomplete/skipped, 1 = failed, 2 = galat konfigurasi.
+- [x] **Akhdan:** jalankan `uv run python -m mcp_bogor.sync_worker --once` (±10 permintaan, jeda 0,5 dtk). Kode keluar 0 = complete/incomplete/skipped, 1 = failed, 2 = galat konfigurasi. **Selesai: sinkron terakhir 17 Nov 2026, `complete`, 777 dataset (Langkah 11).**
 - [x] **Akhdan:** putuskan KB-28 (ulang sinkron lebih cepat setelah gagal) dan KB-29 (perbaikan relevansi; dua kasus golden set xfail).
 - [x] **Akhdan:** setujui atau tolak dependensi PySastrawi (KB-29.2): disetujui; `pysastrawi==1.2.1` ditambahkan, stem hanya di nama, skema v3.
 - [ ] **Akhdan:** tinjau aturan indeks stem KB-29 (a) tanpa hitung ganda dan (b) awalan pe-/per- tidak di-stem.
 - [x] **Langkah 10 (KB-29.4):** sinonim kartu metrik (mis. "miskin" → KM-06, "PAD" → KM-01) dicek sebelum FTS.
 - [x] **Langkah 10 (KB-29):** sinonim KM-01 untuk "pendapatan asli daerah" (kasus relevansi N-03 yang masih xfail); setelah lulus, cabut xfail di `tests/unit/test_catalog_search.py`.
-- [ ] **Catatan migrasi:** katalog lokal skema v1 (bila sinkron sudah dijalankan) otomatis dimigrasikan ke v2 dan FTS-nya dibangun ulang saat `sync_worker` berikutnya membuka DB.
-- [ ] **Langkah 8:** `search_datasets` memakai `storage.db.connect_read` + `services.catalog.search`; catat `match_mode` di log tool; `CatalogNotReady` → galat INTERNAL dengan pesan templat (katalog belum disinkron).
-- [ ] **Langkah 8:** peringatan katalog usang bila `catalog_synced_at` lebih tua dari `MCP_CATALOG_SYNC_MIN_INTERVAL_H` × 2.
-- [ ] **Langkah 9:** mode terjadwal `sync_worker` (loop/cron) memakai `sync_once` yang sama; satu adaptor per proses (KB-26).
+- [x] **Catatan migrasi:** katalog lokal skema v1 (bila sinkron sudah dijalankan) otomatis dimigrasikan ke v2 dan FTS-nya dibangun ulang saat `sync_worker` berikutnya membuka DB. **Terjadi: katalog laptop kini skema v3.**
+- [x] **Langkah 8:** `search_datasets` memakai `storage.db.connect_read` + `services.catalog.search`; ~~catat `match_mode` di log tool~~; `CatalogNotReady` → galat INTERNAL dengan pesan templat (katalog belum disinkron). **Diterapkan di 8a, kecuali `match_mode`: log `tool_call` tidak memuatnya (tidak diperlukan untuk kriteria Fase 1).**
+- [x] **Langkah 8:** peringatan katalog usang bila `catalog_synced_at` lebih tua dari `MCP_CATALOG_SYNC_MIN_INTERVAL_H` × 2. **Diterapkan di 8a (notice `CATALOG_STALE`, faktor 2).**
+- [ ] **Langkah 9:** mode terjadwal `sync_worker` (loop/cron) memakai `sync_once` yang sama; satu adaptor per proses (KB-26). **Saat ini dipenuhi penjadwal OS (`docs/RUNBOOK.md` bagian 2); mode loop di dalam worker belum dibuat.**
 ## TODO dari Langkah 6 (11 Nov 2026)
 
 - [x] **Akhdan:** setujui atau ubah KB-30 dan KK-M (disetujui 11 Nov 2026; override memvalidasi measure hanya bila memuat meaning, unit, reviewed_by, reviewed_at).
 - [x] **Akhdan:** kolom `bulan` di aturan (b): diputuskan `bulan`, `triwulan`, `semester` → dimension (11 Nov 2026).
 - [ ] **Akhdan:** override `total_pendapatan` untuk `realisasi-pendapatan-asli-daerah-pad-kota-bogor` (meaning, unit, reviewed_by, reviewed_at), **setelah** artinya diverifikasi di portal atau ke Bapenda. Belum dibuat; sampai itu kamus dataset ini `dictionary_validated=false`. Lihat `docs/TEMUAN_MUTU_DATA.md` TM-01.
 - [ ] **Akhdan:** tentukan saluran pelaporan `docs/TEMUAN_MUTU_DATA.md` ke Diskominfo/OPD (QC-04, [Belum ditentukan] di Dok 2).
-- [ ] **Langkah 7–8 (KK-08):** jalankan `build_dictionary` saat dataset pertama kali diminta (probe + halaman pertama /bigdata), simpan hasil di cache; baca override lewat `storage.overrides.read_override` + `services.dictionary.parse_override`.
-- [ ] **Langkah 8 (KK-05):** `dictionary_validated=false` → peringatan di `get_dataset_info` dengan alasan (`reasons`), dan larangan visual tanpa konfirmasi; `OverrideError`/`OverrideFileError` → galat INTERNAL (berkas kurasi rusak), dicatat di log.
-- [ ] **Langkah 8:** `preview` dan `filters_applied` memakai peran dari kamus; `top_values` dari `ColumnInfo` hasil kamus (sudah ≤ 10 dan tanpa angka berformat).
+- [x] **Langkah 7–8 (KK-08):** jalankan `build_dictionary` saat dataset pertama kali diminta (probe + halaman pertama /bigdata), simpan hasil di cache; baca override lewat `storage.overrides.read_override` + `services.dictionary.parse_override`. **Diterapkan di 8b (`tools/info.py`: probe + cache kamus + override).**
+- [x] **Langkah 8 (KK-05):** `dictionary_validated=false` → peringatan di `get_dataset_info` dengan alasan (`reasons`), dan larangan visual tanpa konfirmasi; `OverrideError`/`OverrideFileError` → galat INTERNAL (berkas kurasi rusak), dicatat di log. **Diterapkan di 8b (notice `DICTIONARY_NOT_VALIDATED` dari `reasons`; override rusak → `INTERNAL`).**
+- [x] **Langkah 8:** `preview` dan `filters_applied` memakai peran dari kamus; `top_values` dari `ColumnInfo` hasil kamus (sudah ≤ 10 dan tanpa angka berformat). **Diterapkan di 8c (validator `DataResult`, KB-46).**
 - [ ] **Dok 2/Dok 4:** usulkan revisi KK-04 (aturan a–f, termasuk bulan/triwulan/semester), statistik template (751 dataset, 5.811 baris), dan `meaning_source` (KK-M).
 ## TODO dari Langkah 7 (11 Nov 2026)
 
 - [x] **Akhdan:** setujui atau ubah KB-32, KB-33, dan KK-N (disetujui 11 Nov 2026; `served_from` dihapus dari berkas data_ref, KB-34).
 - [x] **Akhdan:** peringatan TestClient/httpx2: tidak menambah dependensi; diredam persis di `pyproject.toml` (KB-35).
 - [ ] **Saat Starlette diperbarui:** cabut `filterwarnings` KB-35 di `pyproject.toml` dan cek ulang peringatan TestClient.
-- [ ] **Langkah 8 (data):** `get_dataset_data` memakai `DataCache.get_or_fetch(QueryKey.build(...), fetch, force_refresh=..., fallback_errors=(SourceUnavailable, SourceRateLimited))`; `served_from=stale_cache` → status partial + `STALE_DATA`; `CacheTooLarge` → `RESPONSE_TOO_LARGE`; `refresh_throttled` disebut di respons. data_ref dari `DataRefSigner.make_data_ref`. Isi berkas mengikuti Dok 4 bagian 6 (KK-N).
-- [ ] **Langkah 8 (info):** kamus lewat `DictionaryCache.get/put` dengan `data_updated_at` dari katalog dan `DictionaryOverride.digest()`; `DictionaryResult.from_dict` gagal → buat ulang.
+- [x] **Langkah 8 (data):** `get_dataset_data` memakai `DataCache.get_or_fetch(QueryKey.build(...), fetch, force_refresh=..., fallback_errors=(SourceUnavailable, SourceRateLimited))`; `served_from=stale_cache` → status partial + `STALE_DATA`; `CacheTooLarge` → `RESPONSE_TOO_LARGE`; `refresh_throttled` disebut di respons. data_ref dari `DataRefSigner.make_data_ref`. Isi berkas mengikuti Dok 4 bagian 6 (KK-N). **Diterapkan di 8c.**
+- [x] **Langkah 8 (info):** kamus lewat `DictionaryCache.get/put` dengan `data_updated_at` dari katalog dan `DictionaryOverride.digest()`; `DictionaryResult.from_dict` gagal → buat ulang. **Diterapkan di 8b.**
 - [ ] **Langkah 8:** pertimbangkan *negative cache* singkat setelah portal gagal agar permintaan beruntun dengan cache usang tidak terus memanggil portal (saat ini dibatasi oleh backoff dan jeda global adaptor saja).
 - [x] **Langkah 9:** file server = proses terpisah `python -m mcp_bogor.fileserver`; satu `DataCache` per proses (KB-47).
-- [ ] **Langkah 12 (RUNBOOK):** prosedur rotasi `MCP_DATAREF_SECRET` dengan `MCP_DATAREF_SECRET_PREVIOUS` (KB-33 (5)).
+- [x] **Langkah 12 (RUNBOOK):** prosedur rotasi `MCP_DATAREF_SECRET` dengan `MCP_DATAREF_SECRET_PREVIOUS` (KB-33 (5)). **Selesai di Langkah 12 (`docs/RUNBOOK.md` bagian 5).**
 ## TODO dari Langkah 8a (11 Nov 2026)
 
 - [x] **8a:** search_datasets, kerangka tool (`tools/common.py`), amplop + `notices` (KK-R), anggaran token (KB-38), deskripsi tool final, `server.build_server`, KT-01 dan KT-05.
@@ -103,9 +103,9 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 
 - [x] **Langkah 9:** stdio + streamable-http :8800 (stateless, JSON), file server :8799 terpisah, /healthz, DNS rebinding, token bearer opsional, log JSON ke stderr; tes HTTP sungguhan, stdio subprocess, token, /healthz.
 - [x] **Akhdan:** uji manual dengan MCP Inspector. **Bukti (11 Nov 2026, Akhdan): lulus 5 panggilan** — (1) `search_datasets` "kemiskinan"; (2) `get_dataset_info` kemiskinan; (3) `get_dataset_data` kemiskinan `periods=[2025, 2026]` → `partial` (2026 di `missing_periods`); (4) `get_dataset_data` kemiskinan dengan filter kecamatan → galat `LEVEL_NOT_AVAILABLE`; (5) `get_dataset_data` realisasi PAD → notice `DICTIONARY_NOT_VALIDATED`. Tindak lanjut: `meaning_source="omitted"` untuk kolom dimension di respons data (KK-S, masuk commit Langkah 10).
-- [ ] **Langkah 12 (README):** salin ringkasan uji manual Inspector di atas ke README, termasuk transport yang dipakai.
-- [ ] **Langkah 9 lanjutan (bila perlu):** mode terjadwal `sync_worker` (loop/cron, KB-28); saat ini `--once` dijalankan manual atau oleh penjadwal OS.
-- [ ] **Langkah 12 (RUNBOOK):** cara menjalankan dua proses (server + file server) sebagai layanan, rotasi `MCP_HTTP_AUTH_TOKEN`, dan pemantauan `/healthz`.
+- [x] **Langkah 12 (README):** salin ringkasan uji manual Inspector di atas ke README, termasuk transport yang dipakai. **Selesai di Langkah 12 (transport stdio, file server terpisah di localhost:8799).**
+- [ ] **Langkah 9 lanjutan (bila perlu):** mode terjadwal `sync_worker` (loop/cron, KB-28); saat ini `--once` dijalankan manual atau oleh penjadwal OS. **Saat ini dipenuhi penjadwal OS (`docs/RUNBOOK.md` bagian 2); mode loop di dalam worker belum dibuat.**
+- [x] **Langkah 12 (RUNBOOK):** cara menjalankan dua proses (server + file server) sebagai layanan, rotasi `MCP_HTTP_AUTH_TOKEN`, dan pemantauan `/healthz`. **Selesai di Langkah 12 (`docs/RUNBOOK.md` bagian 1 dan 5).**
 
 ## TODO dari Langkah 10a (15 Nov 2026)
 
@@ -122,15 +122,15 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [x] **10b:** pemasangan sinonim kartu di `search_datasets` (KB-50), `metric_card` di item search dan notice `DIFFERENT_DEFINITION` (KK-T), xfail N-03 dicabut (18/18 top-3), tes non-regresi urutan, fixture autouse pemulih root logger untuk semua tes CLI (`sync_worker`, `metric_cards`, `runtime`, file server).
 - [ ] **Akhdan:** review snapshot `tool_schemas.json` (field `metric_card`, notice `datasets`, kode `DIFFERENT_DEFINITION`).
 - [x] **Deskripsi `search_datasets`:** kalimat tentang `metric_card` dan notice `DIFFERENT_DEFINITION` ditambahkan (disetujui Akhdan 15 Nov 2026; masuk commit 10b).
-- [ ] **Langkah 11 (smoke):** smoke test akan mengisi cache kamus 10 kartu yang belum ada di laptop (KM-02..05, KM-07..12); setelah itu jalankan ulang `uv run python -m mcp_bogor.metric_cards --check` dan pastikan kode keluar 0 (hanya peringatan "belum diperiksa" sampai `reviewed_by` diisi).
+- [x] **Langkah 11 (smoke):** selesai 17 Nov 2026; `--check` atas cache smoke keluar 0 (12 OK, hanya NOT_REVIEWED). Semula: smoke test akan mengisi cache kamus 10 kartu yang belum ada di laptop (KM-02..05, KM-07..12); setelah itu jalankan ulang `uv run python -m mcp_bogor.metric_cards --check` dan pastikan kode keluar 0 (hanya peringatan "belum diperiksa" sampai `reviewed_by` diisi).
 - [ ] **Dok 4 bagian 3 dan bagian 2 (revisi di Google Docs):** `metric_card` di item search; notice `DIFFERENT_DEFINITION` + field `datasets` (KK-T), bersama revisi `notices` KK-R.
 
 ## TODO dari Langkah 11 (17 Nov 2026)
 - [x] **11a (harness, tanpa portal):** `tests/smoke/harness.py` (rencana, `GuardedTransport`, ST-01..05, laporan + pelindung isi), dry-run `uv run python -m tests.smoke`, `tests/smoke/test_smoke.py`, tes offline `tests/unit/test_smoke_harness.py` (ujung ke ujung atas portal tiruan respx: 25 permintaan = rencana), `OpenDataJabarAdapter.catalog_total()` + tes respx. Keputusan Akhdan 17 Nov 2026 dicatat di `RENCANA_LANGKAH11.md` bagian 8.
 - [x] **Temuan harness (diperbaiki):** `retrieved_at` di berkas data_ref ditulis dengan mikrodetik, sedangkan respons tool dibulatkan ke detik → KT-06 gagal dengan jam asli (tes kontrak lolos hanya karena jam palsu tanpa mikrodetik). `storage/cache.py` kini menulis bentuk yang sama dengan `WibDatetime`; tes regresi `test_kt06_clock_with_microseconds`.
-- [ ] **Akhdan (atas izin, ke portal):** `uv run pytest tests/smoke -m smoke`, lalu `--check` dengan `MCP_CACHE_DIR` cache smoke (perintah persis tercetak di dry-run dan laporan); salin hasil `--check` ke laporan.
-- [ ] **Catatan ST-01:** katalog laptop berisi 745 dataset (sinkron 15 Nov 2026 23:03 WIB); bila `total_data` portal berbeda, ST-01 gagal dengan "katalog lokal tertinggal" dan sinkron ulang dilakukan manual (smoke tidak menyinkron).
-- [ ] **Risiko pelindung laporan:** angka buatan harness (jumlah dataset, durasi ms) bisa kebetulan sama dengan nilai measure ≥ 3 digit; laporan lalu ditolak (positif palsu) dan drafnya disimpan di folder run dengan nomor baris pelanggaran, tanpa nilai. Akhdan menilai dan memutuskan.
+- [x] **Smoke 17 Nov 2026 LULUS** (dijalankan Akhdan, commit kode `a13c10f`; laporan `docs/SMOKE_REPORT_2026-11-17.md`, commit `000639b`): ST-01..05 lulus, 25 permintaan = rencana, nol 429, jeda terkecil 453 ms, KT-03 nol temuan, p95 search 129 ms dan data cache 185 ms. `metric_cards --check` atas cache smoke bersih: 12 OK, hanya peringatan NOT_REVIEWED (hasil disalin ke laporan).
+- [x] **Temuan katalog (ST-01):** katalog laptop 745 dataset (sinkron 15 Nov 2026 23:03 WIB) tertinggal dari portal; setelah sinkron manual 17 Nov 2026 14:15 WIB (`complete`) menjadi **777**, sama dengan `total_data` portal saat smoke. Portal bertambah 32 dataset dalam dua hari; angka "757 dataset" di CLAUDE.md dan Dok 1 sudah usang (dicatat untuk Langkah 12).
+- [x] **Risiko pelindung laporan** (tidak terjadi pada smoke 17 Nov): angka buatan harness (jumlah dataset, durasi ms) bisa kebetulan sama dengan nilai measure ≥ 3 digit; laporan lalu ditolak (positif palsu) dan drafnya disimpan di folder run dengan nomor baris pelanggaran, tanpa nilai. Akhdan menilai dan memutuskan.
 
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
 
