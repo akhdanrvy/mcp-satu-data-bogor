@@ -121,9 +121,16 @@ Turunan dari Handoff Fase 1 (6 Nov 2026) dan Dok 3–5. Kerjakan berurutan; tiap
 - [x] **Akhdan (review 10a):** sinonim "capaian pad" (KM-02) dan "retribusi" (KM-03) dipertahankan; periode KM-01 dan KM-11 mengikuti portal; catatan 2024 = 0 untuk volume KM-11 terkonfirmasi oleh QC Langkah 6 (N-08).
 - [x] **10b:** pemasangan sinonim kartu di `search_datasets` (KB-50), `metric_card` di item search dan notice `DIFFERENT_DEFINITION` (KK-T), xfail N-03 dicabut (18/18 top-3), tes non-regresi urutan, fixture autouse pemulih root logger untuk semua tes CLI (`sync_worker`, `metric_cards`, `runtime`, file server).
 - [ ] **Akhdan:** review snapshot `tool_schemas.json` (field `metric_card`, notice `datasets`, kode `DIFFERENT_DEFINITION`).
-- [ ] **Usulan (perlu persetujuan):** satu kalimat di deskripsi `search_datasets` tentang `metric_card` dan notice `DIFFERENT_DEFINITION`; deskripsi belum diubah di 10b.
+- [x] **Deskripsi `search_datasets`:** kalimat tentang `metric_card` dan notice `DIFFERENT_DEFINITION` ditambahkan (disetujui Akhdan 15 Nov 2026; masuk commit 10b).
 - [ ] **Langkah 11 (smoke):** smoke test akan mengisi cache kamus 10 kartu yang belum ada di laptop (KM-02..05, KM-07..12); setelah itu jalankan ulang `uv run python -m mcp_bogor.metric_cards --check` dan pastikan kode keluar 0 (hanya peringatan "belum diperiksa" sampai `reviewed_by` diisi).
 - [ ] **Dok 4 bagian 3 dan bagian 2 (revisi di Google Docs):** `metric_card` di item search; notice `DIFFERENT_DEFINITION` + field `datasets` (KK-T), bersama revisi `notices` KK-R.
+
+## TODO dari Langkah 11 (17 Nov 2026)
+- [x] **11a (harness, tanpa portal):** `tests/smoke/harness.py` (rencana, `GuardedTransport`, ST-01..05, laporan + pelindung isi), dry-run `uv run python -m tests.smoke`, `tests/smoke/test_smoke.py`, tes offline `tests/unit/test_smoke_harness.py` (ujung ke ujung atas portal tiruan respx: 25 permintaan = rencana), `OpenDataJabarAdapter.catalog_total()` + tes respx. Keputusan Akhdan 17 Nov 2026 dicatat di `RENCANA_LANGKAH11.md` bagian 8.
+- [x] **Temuan harness (diperbaiki):** `retrieved_at` di berkas data_ref ditulis dengan mikrodetik, sedangkan respons tool dibulatkan ke detik → KT-06 gagal dengan jam asli (tes kontrak lolos hanya karena jam palsu tanpa mikrodetik). `storage/cache.py` kini menulis bentuk yang sama dengan `WibDatetime`; tes regresi `test_kt06_clock_with_microseconds`.
+- [ ] **Akhdan (atas izin, ke portal):** `uv run pytest tests/smoke -m smoke`, lalu `--check` dengan `MCP_CACHE_DIR` cache smoke (perintah persis tercetak di dry-run dan laporan); salin hasil `--check` ke laporan.
+- [ ] **Catatan ST-01:** katalog laptop berisi 745 dataset (sinkron 15 Nov 2026 23:03 WIB); bila `total_data` portal berbeda, ST-01 gagal dengan "katalog lokal tertinggal" dan sinkron ulang dilakukan manual (smoke tidak menyinkron).
+- [ ] **Risiko pelindung laporan:** angka buatan harness (jumlah dataset, durasi ms) bisa kebetulan sama dengan nilai measure ≥ 3 digit; laporan lalu ditolak (positif palsu) dan drafnya disimpan di folder run dengan nomor baris pelanggaran, tanpa nilai. Akhdan menilai dan memutuskan.
 
 Kriteria lulus Fase 1 (Dok 5 bagian 5): unit + kontrak 100%; cakupan ≥ 80% di `services/` dan `tools/`; smoke 12 kartu 100%; KT-03 nol toleransi; nol respons 429.
 

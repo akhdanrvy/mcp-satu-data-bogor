@@ -101,6 +101,17 @@ def test_kt06_file_matches_tool_response(
     assert body["slug"] == args["slug"] and body["contract_version"] == "0.1"
 
 
+def test_kt06_clock_with_microseconds(catalog_db: Path, tmp_path: Path) -> None:
+    """Jam asli punya mikrodetik; retrieved_at berkas harus berbentuk sama dengan respons
+    (detik, +07:00). Temuan harness smoke Langkah 11."""
+    env = ToolEnv(catalog_db, tmp_path)
+    env.clock.now = env.clock.now.replace(microsecond=298299)
+    out = env.data(slug=KEMISKINAN)
+    body = download(env, out["result"]["data_ref"]["url"])
+    assert_matches_tool(out, body)
+    assert body["provenance"]["retrieved_at"].endswith(":00+07:00")
+
+
 def test_rows_are_normalized_and_typed(catalog_db: Path, tmp_path: Path) -> None:
     env = ToolEnv(catalog_db, tmp_path)
     body = download(env, env.data(slug=KUNJUNGAN, periods=[2024])["result"]["data_ref"]["url"])

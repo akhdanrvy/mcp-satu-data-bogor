@@ -563,6 +563,20 @@ class OpenDataJabarAdapter:
         self._health_cache = (self._monotonic(), result)
         return result
 
+    async def catalog_total(self) -> int:
+        """Jumlah dataset di portal menurut `pagination.total_data` (smoke ST-01).
+
+        Satu GET `/datasets?page=1&per_page=1` dengan retry biasa, tanpa cache. Bukan bagian
+        Protocol SourceAdapter: hanya dipakai harness smoke, tidak oleh tool.
+        """
+        body = await self._get("/datasets", {"page": 1, "per_page": 1})
+        total = parse_pagination(body.get("pagination")).total_data
+        if total is None:
+            raise SourceProtocolError(
+                "/datasets: pagination.total_data tidak ada", path="/datasets"
+            )
+        return total
+
     def last_health(self) -> tuple[SourceHealth, float] | None:
         """Baca-saja: hasil health() terakhir + umurnya (detik); tidak pernah mengirim GET."""
         if self._health_cache is None:

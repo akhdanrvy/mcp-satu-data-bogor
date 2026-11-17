@@ -478,7 +478,10 @@ class DataCache:
         if dropped:
             log_event(LOGGER, "cache_account_keys_dropped", slug=key.slug, count=dropped)
         # KB-34: retrieved_at di berkas = retrieved_at versi cache (satu sumber kebenaran).
-        clean["provenance"] = {**clean["provenance"], "retrieved_at": retrieved_at.isoformat()}
+        # Bentuk sama dengan respons tool (WibDatetime: detik, +07:00), agar KT-06 tetap cocok
+        # bila jam punya mikrodetik (temuan harness smoke Langkah 11).
+        file_retrieved_at = retrieved_at.astimezone(WIB).isoformat(timespec="seconds")
+        clean["provenance"] = {**clean["provenance"], "retrieved_at": file_retrieved_at}
         content = _dumps(clean)
 
         previous = self.latest(key)

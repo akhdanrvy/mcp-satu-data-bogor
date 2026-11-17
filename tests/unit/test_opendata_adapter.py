@@ -503,6 +503,33 @@ async def test_catalog_skips_records_without_slug_and_bad_data(
     assert snapshot.error and "SourceProtocolError" in snapshot.error
 
 
+# ---------------------------------------------------------------- catalog_total (ST-01)
+
+
+async def test_catalog_total_one_cheap_get(tmp_path: Path) -> None:
+    clock = FakeClock()
+    with respx.mock as router:
+        install_portal_routes(router)
+        async with _adapter(tmp_path, clock) as adapter:
+            total = await adapter.catalog_total()
+            assert adapter.requests_sent == 1
+        (call,) = router.calls
+        assert call.request.url.path.endswith("/datasets")
+        assert dict(call.request.url.params) == {"page": "1", "per_page": "1"}
+    assert total == recorded_portal().total_data
+
+
+async def test_catalog_total_without_total_data_is_protocol_error(tmp_path: Path) -> None:
+    clock = FakeClock()
+    with respx.mock as router:
+        router.get(f"{BASE_URL}/datasets").mock(
+            return_value=httpx.Response(200, json={"code": 200, "data": [], "pagination": {}})
+        )
+        async with _adapter(tmp_path, clock) as adapter:
+            with pytest.raises(SourceProtocolError, match="total_data"):
+                await adapter.catalog_total()
+
+
 # ---------------------------------------------------------------- health
 
 
