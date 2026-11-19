@@ -5,6 +5,10 @@ harus disetujui Akhdan dan diuji ulang dengan golden set (Dok 4 bagian 9).
 
 Rujukan antar-tool memakai nama berawalan MCP_TOOL_PREFIX; placeholder {search}, {info},
 {data} diisi saat build_server.
+
+MCP_CLIENT_PROFILE (KB-51) hanya mengganti paragraf pembuka get_dataset_data: `backend`
+(bawaan, snapshot tool_descriptions.json) atau `sandbox` (tool_descriptions_sandbox.json).
+Isi respons tool tidak berubah di profil mana pun (KT-03).
 """
 
 from __future__ import annotations
@@ -56,13 +60,37 @@ kecamatan atau kelurahan.
 Status `partial` dengan galat STALE_DATA berarti portal sedang tidak bisa dihubungi dan \
 penjelasan berasal dari simpanan lama; sebutkan tanggal `retrieved_at`."""
 
-_DATA = """\
+# Paragraf pembuka get_dataset_data per profil klien (KB-51). Sisanya sama untuk semua profil.
+_DATA_INTRO_BACKEND = """\
 Siapkan data satu dataset untuk dihitung dan digambar oleh sistem. Respons tool ini TIDAK \
 berisi angka: backend mengambil baris lengkap lewat `data_ref` lalu menghitung dan menggambar \
 sendiri. Jangan menulis, memperkirakan, atau mengarang angka apa pun dari respons ini. \
 `preview` hanya berisi kolom dimensi untuk memastikan filter benar. Arti kolom dimensi tidak \
 diulang di sini (meaning_source=omitted); lihat {info}.
 
+"""
+
+# Profil sandbox (Citya RAG Chat): model mengambil berkas data_ref sendiri lewat execute_code.
+# Kunci `rows` (daftar objek per baris) dan `columns` (name, role, unit, meaning) mengikuti
+# services.data.data_ref_payload. {ttl} diisi dari MCP_DATAREF_TTL_SECONDS.
+_DATA_INTRO_SANDBOX = """\
+Siapkan data satu dataset. Respons tool ini TIDAK berisi angka. Untuk mendapatkan angka, \
+ambil berkas `data_ref.url` lewat tool `execute_code`, mis.:
+    import httpx, pandas as pd
+    r = httpx.get("<isi data_ref.url>", timeout=60).json()
+    df = pd.DataFrame(r["rows"])
+Ganti "<isi data_ref.url>" dengan nilai `data_ref.url` dari respons ini. `r["columns"]` \
+memuat `name`, `role`, `unit`, dan `meaning` tiap kolom. Hitung di execute_code; cetak \
+hanya hasil hitungan atau baris yang diperlukan, bukan seluruh tabel, karena keluaran \
+execute_code dipotong bila panjang. Sebut angka HANYA dari hasil execute_code, apa adanya, \
+dengan satuan dari kamus kolom; jangan mengarang, memperkirakan, atau membulatkan sendiri. \
+`data_ref` berlaku {ttl}; bila URL menjawab 410 atau 403, panggil {data} lagi. \
+`preview` hanya berisi kolom dimensi untuk memastikan filter benar; arti kolom dimensi \
+ada di {info}.
+
+"""
+
+_DATA_BODY = """\
 Isi `periods` dengan tahun yang ditanyakan pengguna; kosongkan untuk semua tahun. `filters` \
 hanya untuk kolom dengan `role=dimension` dari {info} (mis. \
 {{"hari_operasional": ["HARI KERJA"]}}). Jangan menulis kolom nilai sebagai filter.
@@ -88,20 +116,44 @@ tren dari dataset berbeda walau namanya mirip (mis. "Tingkat Kemiskinan" dan "Pe
 Kepala Keluarga Miskin" adalah indikator berbeda), dan jangan membandingkan nilainya \
 seolah-olah satu seri."""
 
-_TEMPLATES = MappingProxyType(
-    {"search_datasets": _SEARCH, "get_dataset_info": _INFO, "get_dataset_data": _DATA}
-)
+CLIENT_PROFILES = ("backend", "sandbox")
+
+_DATA_INTROS = MappingProxyType({"backend": _DATA_INTRO_BACKEND, "sandbox": _DATA_INTRO_SANDBOX})
 
 
 def tool_name(prefix: str, base: str) -> str:
     return f"{prefix}{base}"
 
 
-def descriptions(prefix: str) -> dict[str, str]:
-    """{nama dasar: deskripsi} dengan rujukan antar-tool berawalan `prefix`."""
+def ttl_text(seconds: int) -> str:
+    """TTL data_ref untuk teks deskripsi: menit bila bulat, selain itu detik."""
+    if seconds % 60 == 0:
+        return f"{seconds // 60} menit"
+    return f"{seconds} detik"
+
+
+def _templates(profile: str) -> dict[str, str]:
+    if profile not in _DATA_INTROS:
+        raise ValueError(f"profil klien tidak dikenal: {profile!r}")
+    return {
+        "search_datasets": _SEARCH,
+        "get_dataset_info": _INFO,
+        "get_dataset_data": _DATA_INTROS[profile] + _DATA_BODY,
+    }
+
+
+def descriptions(
+    prefix: str, profile: str = "backend", *, dataref_ttl_seconds: int = 900
+) -> dict[str, str]:
+    """{nama dasar: deskripsi} dengan rujukan antar-tool berawalan `prefix`.
+
+    `profile` = MCP_CLIENT_PROFILE (KB-51). Profil backend tidak memakai TTL; teksnya
+    identik dengan sebelum profil diperkenalkan (snapshot tool_descriptions.json).
+    """
     names = {
         "search": tool_name(prefix, "search_datasets"),
         "info": tool_name(prefix, "get_dataset_info"),
         "data": tool_name(prefix, "get_dataset_data"),
+        "ttl": ttl_text(dataref_ttl_seconds),
     }
-    return {base: text.format(**names) for base, text in _TEMPLATES.items()}
+    return {base: text.format(**names) for base, text in _templates(profile).items()}

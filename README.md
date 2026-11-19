@@ -102,6 +102,7 @@ Semua nilai dibaca dari env berawalan `MCP_` atau dari berkas `.env` (`src/mcp_b
 | Variabel | Bawaan | Arti | Wajib? |
 |---|---|---|---|
 | `MCP_TOOL_PREFIX` | `satudata_` | Awalan nama tool (KT-05) | Opsional |
+| `MCP_CLIENT_PROFILE` | `backend` | Siapa yang mengambil berkas data_ref: `backend` (backend klien) atau `sandbox` (model lewat `execute_code`, uji Citya RAG Chat). Hanya mengubah teks deskripsi tool; isi respons sama (KT-03). Nilai lain ditolak saat start (KB-51) | Opsional |
 | `MCP_EXPOSE_OUTPUT_SCHEMA` | `true` | Iklankan `outputSchema` amplop di `list_tools`; `false` bila klien meneruskannya ke model dan memboroskan token | Opsional |
 | `MCP_MAX_RESPONSE_TOKENS` | `2000` | Anggaran token per respons; lewat batas → dipangkas (`truncated`) atau `RESPONSE_TOO_LARGE` | Opsional |
 | `MCP_SEARCH_MAX_PAGE_SIZE` | `20` | Batas `page_size` search | Opsional |

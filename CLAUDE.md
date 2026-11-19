@@ -22,6 +22,7 @@ Konflik yang sudah diketahui (ikuti Dok 4):
 
 ## Aturan yang tidak boleh dilanggar
 1. **Angka tidak pernah berasal dari LLM, dan baris data tidak pernah masuk respons tool.** `get_dataset_data` hanya mengembalikan `data_ref` + struktur + `preview` (≤5 baris, **kolom dimensi saja**). Tidak ada nilai kolom measure di respons tool mana pun (KT-03, nol toleransi). `MCP_INLINE_ROWS_FALLBACK` bawaan mati.
+   Pengecualian profil sandbox (KB-51, `MCP_CLIENT_PROFILE=sandbox`): angka dihitung di sandbox klien (`execute_code`) lalu disebut LLM. Respons tool tetap tanpa nilai measure (KT-03). Jangan "memperbaiki" profil ini menjadi seperti profil backend.
 2. **Galat tampil sebagai galat, bukan angka.** Respons `status=error` punya `result=null` dan tanpa angka.
 3. **Tandai, jangan perbaiki (ADR-007).** Data janggal diserahkan apa adanya + `quality_flags`. Jangan mengoreksi nilai.
 4. **Privasi:** field akun petugas (`username`, `history_draft[].username`, `username` di `/history_datasets`) tidak pernah disimpan ke SQLite maupun muncul di respons/log. Log tidak berisi isi baris data.

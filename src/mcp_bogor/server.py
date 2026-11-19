@@ -84,7 +84,9 @@ def output_schema(result_type: type[BaseModel]) -> dict[str, Any]:
 
 def tool_definitions(settings: Settings) -> list[types.Tool]:
     prefix = settings.tool_prefix
-    texts = descriptions(prefix)
+    texts = descriptions(
+        prefix, settings.client_profile, dataref_ttl_seconds=settings.dataref_ttl_seconds
+    )
     return [
         types.Tool(
             name=tool_name(prefix, spec.base),

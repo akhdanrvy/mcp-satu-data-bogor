@@ -174,6 +174,37 @@ Isi berkas (Dok 4 bagian 6):
 
 Berkas berisi data publik portal, tetapi tetap jangan disimpan permanen atau diteruskan apa adanya ke model. Hitung yang diperlukan, lalu kirim hasil hitungan ke `render_chart` atau narasi.
 
+### Profil sandbox (Citya RAG Chat)
+
+Di Citya RAG Chat (backend FastAPI), berkas data_ref **tidak** diambil backend. Model sendiri mengambilnya lewat tool `execute_code` (sandbox pandas per sesi, ada `httpx`) lalu menyebut angka dari stdout sandbox. Untuk uji coba ini alur "angka lewat LLM" diterima (KB-51). Respons tool tetap sama, tanpa nilai kolom measure (KT-03); yang berubah hanya deskripsi `get_dataset_data`, yang mengarahkan model ke `execute_code`.
+
+Env MCP (di `.env` mesin MCP):
+
+```
+MCP_CLIENT_PROFILE=sandbox
+MCP_TRANSPORT=streamable-http
+MCP_FILESERVER_PUBLIC_URL=http://host.docker.internal:8799
+```
+
+- `MCP_FILESERVER_PUBLIC_URL` memakai `host.docker.internal` karena URL data_ref dibuka dari **container sandbox**, bukan dari mesin host. `localhost` di dalam container menunjuk ke container itu sendiri.
+- Bila container tidak bisa menjangkau file server yang bind ke `127.0.0.1`, set `MCP_FILESERVER_HOST=0.0.0.0` dan batasi port 8799 dengan firewall agar hanya bisa dijangkau dari mesin itu (port ini tidak boleh terbuka ke publik).
+- File server tetap dijalankan terpisah (`uv run python -m mcp_bogor.fileserver`) dan `MCP_DATAREF_SECRET` wajib terisi.
+- Pada Docker Desktop (Windows), cek dari dalam container sandbox: `httpx.get("http://host.docker.internal:8799/healthz")` harus menjawab 200.
+
+Mendaftarkan server di `/admin` Citya:
+
+| Isian | Nilai |
+|---|---|
+| Nama | `satudata-bogor` |
+| URL | `http://localhost:8800/mcp` |
+| Auth | none |
+| Status | aktifkan |
+| Akses | berikan ke grup pengguna yang ikut uji |
+
+URL `localhost:8800` hanya benar bila backend Citya berjalan langsung di mesin yang sama (bukan di container). Bila backend Citya di container, pakai `http://host.docker.internal:8800/mcp`, jalankan server dengan `MCP_HTTP_HOST=0.0.0.0`, dan tambahkan `MCP_HTTP_ALLOWED_HOSTS=host.docker.internal:8800`; tanpa itu proteksi DNS rebinding menolak permintaan (KB-47). Auth `none` hanya untuk uji lokal; bila server bisa dijangkau dari mesin lain, isi `MCP_HTTP_AUTH_TOKEN`.
+
+Di profil ini aturan 1 bagian 5 berlaku dengan penyesuaian: angka hanya dari hasil `execute_code` atas berkas data_ref, disebut apa adanya dengan satuan dari `columns[].unit`. Aturan 2 s.d. 8 tetap berlaku.
+
 ## 5. Aturan memakai data untuk jawaban dan grafik
 
 1. **Angka hanya dari berkas data_ref**, dihitung backend. Model tidak boleh menyebut angka yang tidak berasal dari hasil hitung backend.

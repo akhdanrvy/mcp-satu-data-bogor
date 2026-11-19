@@ -33,7 +33,7 @@ from starlette.types import Receive, Scope, Send
 
 from mcp_bogor.adapters.base import SourceAdapter
 from mcp_bogor.adapters.opendata_jabar import OpenDataJabarAdapter
-from mcp_bogor.config import ConfigError, Settings
+from mcp_bogor.config import ConfigError, Settings, describe_validation_error
 from mcp_bogor.fileserver.signing import DataRefSigner
 from mcp_bogor.health import catalog_status, server_health, server_version
 from mcp_bogor.logging import configure_logging, get_logger, log_event, log_warning
@@ -222,7 +222,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         settings = Settings()
     except ValidationError as exc:
-        print(f"Konfigurasi tidak sah: {exc.error_count()} galat", file=sys.stderr)
+        print(describe_validation_error(exc), file=sys.stderr)
         return 2
     configure_logging(settings.log_level)
     http = settings.transport == "streamable-http"

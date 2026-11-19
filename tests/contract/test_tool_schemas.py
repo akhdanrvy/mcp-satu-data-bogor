@@ -81,6 +81,66 @@ def test_kt01_all_descriptions_snapshot(request: pytest.FixtureRequest) -> None:
     check_snapshot(request, "tool_descriptions.json", descriptions("satudata_"))
 
 
+def test_kt01_sandbox_descriptions_snapshot(request: pytest.FixtureRequest) -> None:
+    """KB-51: profil sandbox dikunci snapshot terpisah (TTL bawaan 900 detik)."""
+    check_snapshot(request, "tool_descriptions_sandbox.json", descriptions("satudata_", "sandbox"))
+
+
+def test_backend_profile_is_default_and_unchanged(tmp_path: Path) -> None:
+    """Profil backend (bawaan) = teks sebelum KB-51, tidak bergantung pada TTL."""
+    assert descriptions("satudata_") == descriptions("satudata_", "backend")
+    assert descriptions("satudata_", "backend", dataref_ttl_seconds=60) == descriptions("satudata_")
+    tools = _list_tools(make_settings(tmp_path))
+    assert {t.name: t.description for t in tools} == {
+        f"satudata_{base}": text for base, text in descriptions("satudata_").items()
+    }
+
+
+def test_sandbox_profile_changes_only_data_intro(tmp_path: Path) -> None:
+    backend = descriptions("satudata_")
+    sandbox = descriptions("satudata_", "sandbox")
+    assert sandbox["search_datasets"] == backend["search_datasets"]
+    assert sandbox["get_dataset_info"] == backend["get_dataset_info"]
+    data = sandbox["get_dataset_data"]
+    # bagian setelah paragraf pembuka sama persis dengan profil backend
+    tail = backend["get_dataset_data"].split("\n\n", 1)[1]
+    assert data.endswith(tail)
+    assert "backend" not in data and "oleh sistem" not in data
+    assert "TIDAK berisi angka" in data and "`execute_code`" in data
+    assert 'pd.DataFrame(r["rows"])' in data and 'r["columns"]' in data
+    assert "HANYA dari hasil execute_code" in data
+    assert 'httpx.get("<isi data_ref.url>", timeout=60)' in data
+    assert "dengan nilai `data_ref.url` dari respons ini" in data
+    assert "bukan seluruh tabel" in data and "DATA_REF_URL" not in data
+    assert "berlaku 15 menit" in data and "410 atau 403" in data
+    assert "satudata_get_dataset_data lagi" in data
+    # ukuran: pembuka sandbox tidak jauh lebih panjang dari versi backend
+    assert len(data) <= len(backend["get_dataset_data"]) * 1.3
+    # satu-satunya angka: TTL dan timeout contoh kode
+    digits = re.sub(r"R-10|berlaku 15 menit|timeout=60|410 atau 403", "", data)
+    assert not re.search(r"\d", digits)
+    tools = _list_tools(make_settings(tmp_path, client_profile="sandbox"))
+    assert tools[2].description == data
+
+
+def test_sandbox_ttl_follows_settings(tmp_path: Path) -> None:
+    assert (
+        "berlaku 30 menit"
+        in descriptions("x_", "sandbox", dataref_ttl_seconds=1800)["get_dataset_data"]
+    )
+    assert (
+        "berlaku 90 detik"
+        in descriptions("x_", "sandbox", dataref_ttl_seconds=90)["get_dataset_data"]
+    )
+    tools = _list_tools(make_settings(tmp_path, client_profile="sandbox", dataref_ttl_seconds=600))
+    assert "berlaku 10 menit" in (tools[2].description or "")
+
+
+def test_unknown_profile_rejected_by_descriptions() -> None:
+    with pytest.raises(ValueError, match="profil klien"):
+        descriptions("satudata_", "frontend")
+
+
 def test_input_schema_follows_settings(tmp_path: Path) -> None:
     tool = _list_tools(make_settings(tmp_path, search_max_page_size=5))[0]
     page_size = tool.inputSchema["properties"]["page_size"]
@@ -93,9 +153,10 @@ def test_input_schema_follows_settings(tmp_path: Path) -> None:
     assert tool.annotations.readOnlyHint is True and tool.annotations.openWorldHint is False
 
 
-def test_descriptions_reference_prefixed_names_only() -> None:
+@pytest.mark.parametrize("profile", ["backend", "sandbox"])
+def test_descriptions_reference_prefixed_names_only(profile: str) -> None:
     for prefix in ("satudata_", "uji_"):
-        texts = descriptions(prefix)
+        texts = descriptions(prefix, profile)
         assert set(texts) == set(BASE_NAMES)
         joined = "\n".join(texts.values())
         bare = re.findall(

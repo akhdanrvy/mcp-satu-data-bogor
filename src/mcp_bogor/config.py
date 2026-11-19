@@ -11,7 +11,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, SecretStr, field_validator, model_validator
+from pydantic import Field, SecretStr, ValidationError, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 CONTRACT_VERSION = "0.1"
@@ -104,6 +104,10 @@ class Settings(BaseSettings):
 
     # --- Kontrak dan batas (Dok 4 bagian 9) ---
     tool_prefix: str = "satudata_"
+    # KB-51: siapa yang mengambil berkas data_ref. "backend" = backend klien (bawaan);
+    # "sandbox" = model sendiri lewat execute_code (uji Citya RAG Chat). Hanya mengubah teks
+    # deskripsi tool, bukan isi respons (KT-03 tetap).
+    client_profile: Literal["backend", "sandbox"] = "backend"
     # KB-42 (revisi): iklankan outputSchema (JSON Schema amplop) di list_tools.
     expose_output_schema: bool = True
     max_response_tokens: int = Field(default=2000, gt=0)
@@ -125,6 +129,17 @@ class Settings(BaseSettings):
     @classmethod
     def _strip_trailing_slash(cls, value: str) -> str:
         return value.rstrip("/")
+
+    @field_validator("client_profile", mode="before")
+    @classmethod
+    def _known_profile(cls, value: object) -> object:
+        normalized = value.strip().lower() if isinstance(value, str) else value
+        if normalized not in ("backend", "sandbox"):
+            raise ValueError(
+                f"MCP_CLIENT_PROFILE={value!r} tidak dikenal; pakai 'backend' (bawaan) "
+                "atau 'sandbox'"
+            )
+        return normalized
 
     @field_validator("inline_rows_fallback")
     @classmethod
@@ -195,6 +210,19 @@ def _check_secret(raw: str, name: str) -> bytes:
     if len(key) < _SECRET_MIN_BYTES:
         raise ConfigError(f"{name} minimal {_SECRET_MIN_BYTES} byte.")
     return key
+
+
+def describe_validation_error(exc: ValidationError) -> str:
+    """Pesan start-up: satu baris per field (`MCP_<NAMA>: pesan`), tanpa nilai input.
+
+    Hanya `msg` pydantic yang dicetak (bukan `input`), agar nilai rahasia tidak ikut keluar.
+    """
+    lines = [f"Konfigurasi tidak sah: {exc.error_count()} galat"]
+    for err in exc.errors(include_input=False, include_url=False):
+        field = "_".join(str(part) for part in err["loc"]).upper()
+        name = f"MCP_{field}" if field else "MCP"
+        lines.append(f"- {name}: {err['msg']}")
+    return "\n".join(lines)
 
 
 @lru_cache(maxsize=1)

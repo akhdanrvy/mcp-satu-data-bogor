@@ -196,3 +196,62 @@ def test_kt03_get_dataset_data(catalog_db: Path, tmp_path: Path, slug: str, vari
     # (b) nilai khas measure, juga di respons galat
     values = [row[measure] for row in _recorded_rows()[slug]]
     assert find_leaks(_search_text(out), values) == []
+
+
+# ---------------------------------------------------------------- profil klien (KB-51)
+
+
+def _via_server(env: Any, slug: str) -> tuple[list[str], dict[str, Any]]:
+    """list_tools + get_dataset_data lewat server MCP (klien in-memory), sesuai profil env."""
+    from mcp.shared.memory import create_connected_server_and_client_session
+
+    from mcp_bogor.server import build_server
+
+    async def run() -> tuple[list[str], dict[str, Any]]:
+        async with create_connected_server_and_client_session(build_server(env.deps)) as client:
+            tools = (await client.list_tools()).tools
+            call = await client.call_tool(
+                f"{env.settings.tool_prefix}get_dataset_data", {"slug": slug}
+            )
+            return [t.description or "" for t in tools], call.structuredContent
+
+    return asyncio.run(run())
+
+
+@pytest.mark.parametrize("profile", ["backend", "sandbox"])
+@pytest.mark.parametrize("slug", sorted(MEASURES))
+def test_kt03_both_client_profiles(
+    catalog_db: Path, tmp_path: Path, slug: str, profile: str
+) -> None:
+    """MCP_CLIENT_PROFILE hanya mengubah deskripsi: respons dan deskripsi tetap tanpa measure."""
+    from tests.tool_support import ToolEnv
+
+    env = ToolEnv(catalog_db, tmp_path, overrides_dir=ROOT / "overrides", client_profile=profile)
+    texts, out = _via_server(env, slug)
+    values = [row[MEASURES[slug]] for row in _recorded_rows()[slug]]
+    assert find_leaks(_search_text(out), values) == []
+    assert find_leaks({"descriptions": texts}, values) == []
+    if out["result"] is not None:
+        dims = {c["name"] for c in out["result"]["columns"] if c["role"] == "dimension"}
+        assert all(set(row) <= dims for row in out["result"]["preview"])
+
+
+def test_client_profile_does_not_change_response(catalog_db: Path, tmp_path: Path) -> None:
+    """Respons get_dataset_data identik di kedua profil (selain URL bertanda tangan)."""
+    from tests.tool_support import ToolEnv
+
+    slug = "tingkat-kemiskinan-di-kota-bogor-2"
+    outs = []
+    for profile in ("backend", "sandbox"):
+        env = ToolEnv(
+            catalog_db,
+            tmp_path / profile,
+            overrides_dir=ROOT / "overrides",
+            client_profile=profile,
+        )
+        _texts, out = _via_server(env, slug)
+        outs.append(_search_text(out))
+    assert outs[0]["status"] == "ok"
+    for out in outs:
+        out.pop("request_id", None)
+    assert outs[0] == outs[1]
